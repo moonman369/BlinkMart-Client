@@ -2,27 +2,45 @@ import React, { useEffect, useState } from "react";
 import { IoSearch } from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
 import { TypeAnimation } from "react-type-animation";
+import { useMobile } from "../hooks/useMobile";
+import { FaArrowLeft } from "react-icons/fa6";
 
 const Search = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isSearchPage, setIsSearchPage] = useState(false);
+  const [isMobile] = useMobile();
+  const [isSearchPage, setIsSearchPage] = useState(
+    location.pathname === "/search"
+  );
 
   useEffect(() => {
     setIsSearchPage(location.pathname === "/search");
   }, [location]);
 
-  console.log(isSearchPage);
-
   const redirectToSearchPage = () => {
     navigate("/search");
   };
 
+  const redirectToHomePage = () => {
+    navigate("/");
+  };
+
   return (
     <div className="w-full min-w-[300px] lg:min-w-[420px] lg:h-12 h-11 rounded-lg border overflow-hidden flex items-center text-neutral-400 bg-gray-800 group focus-within:border-highlight-100">
-      <button className="flex justify-center items-center h-full p-3 text-neutral-400 group-focus-within:text-highlight-100">
-        <IoSearch size={20} />
-      </button>
+      <div>
+        {isMobile && isSearchPage ? (
+          <button
+            className="flex justify-center items-center h-full p-3 text-neutral-400 group-focus-within:text-highlight-100"
+            onClick={redirectToHomePage}
+          >
+            <FaArrowLeft size={20} />
+          </button>
+        ) : (
+          <button className="flex justify-center items-center h-full p-3 text-neutral-400 group-focus-within:text-highlight-100">
+            <IoSearch size={20} />
+          </button>
+        )}
+      </div>
       <div className="w-full h-full flex items-center">
         {!isSearchPage ? (
           <div onClick={redirectToSearchPage}>
