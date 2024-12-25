@@ -6,6 +6,7 @@ import { RouterProvider } from "react-router-dom";
 import router from "./routes/index.jsx";
 
 createRoot(document.getElementById("root")).render(
+  // `StrictMode` Loads components twice for dev purpose
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>

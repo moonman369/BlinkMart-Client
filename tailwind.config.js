@@ -6,6 +6,7 @@ export default {
       colors: {
         "primary-200": "#ffbf00",
         "primary-100": "#ffc929",
+        "highlight-100": "#5bc249",
         "secondary-200": "#00b050",
         "secondry-100": "#0b1a78",
       },
