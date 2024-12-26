@@ -26,24 +26,24 @@ const Search = () => {
   };
 
   return (
-    <div className="w-full min-w-[300px] lg:min-w-[420px] lg:h-12 h-11 rounded-lg border overflow-hidden flex items-center text-neutral-400 bg-gray-800 group focus-within:border-highlight-100">
+    <div className="w-full min-w-[300px] lg:min-w-[420px] lg:h-12 h-11 rounded-lg border overflow-hidden flex items-center text-neutral-400 bg-gray-700 group focus-within:border-primary-200">
       <div>
         {isMobile && isSearchPage ? (
           <button
-            className="flex justify-center items-center h-full p-3 text-neutral-400 group-focus-within:text-highlight-100"
+            className="flex justify-center items-center h-full p-3 text-neutral-400 group-focus-within:text-primary-200"
             onClick={redirectToHomePage}
           >
             <FaArrowLeft size={20} />
           </button>
         ) : (
-          <button className="flex justify-center items-center h-full p-3 text-neutral-400 group-focus-within:text-highlight-100">
+          <button className="flex justify-center items-center h-full p-3 text-neutral-400 group-focus-within:text-primary-200">
             <IoSearch size={20} />
           </button>
         )}
       </div>
       <div className="w-full h-full flex items-center">
         {!isSearchPage ? (
-          <div onClick={redirectToSearchPage}>
+          <div onClick={redirectToSearchPage} className="w-full">
             <TypeAnimation
               sequence={[
                 // Same substring at the start will only be typed once, initially

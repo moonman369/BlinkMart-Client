@@ -1,24 +1,31 @@
 import React, { useEffect, useState } from "react";
-import logo from "../assets/blinkmart-logo-3.png";
+import logo from "../assets/blinkmart-logo.png";
 import Search from "./Search";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { useMobile } from "../hooks/useMobile";
+import { TiShoppingCart } from "react-icons/ti";
 
 const Header = () => {
   const [isMobile] = useMobile();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [isSearchPage, setIsSearchPage] = useState(
     location?.pathname === "/search"
   );
+
   useEffect(() => {
     setIsSearchPage(location?.pathname === "/search");
   }, [location]);
 
+  const redirectToLoginPage = () => {
+    navigate("/login");
+  };
+
   console.log(isMobile);
   return (
-    <header className="h-28 lg:h-21 shadow-md sticky top-0 bg-black text-gray-200 flex flex-col gap-2 items-center justify-center p-2">
+    <header className="h-28 lg:h-21 shadow-sm shadow-secondary-200 sticky top-0 bg-black text-gray-200 flex flex-col gap-2 items-center justify-center p-2">
       {!(isSearchPage && isMobile) && (
         <div className="container mx-auto flex items-center h-full pr-2 justify-between">
           {/* logo */}
@@ -48,10 +55,25 @@ const Header = () => {
 
           {/* login and cart */}
           <div>
+            {/* mobile */}
             <button className="text-neutral-400 lg:hidden">
               <FaRegCircleUser size={26} />
             </button>
-            <div className="hidden lg:block">Login and Cart</div>
+
+            {/* desktop */}
+            <div className="hidden lg:flex items-center gap-10">
+              <button onClick={redirectToLoginPage} className="text-lg px-2">
+                Login
+              </button>
+              <button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-3 py-3 rounded text-white">
+                <div className="animate-bounce">
+                  <TiShoppingCart size={30} />
+                </div>
+                <div className="font-semibold">
+                  <p>My Cart</p>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       )}
