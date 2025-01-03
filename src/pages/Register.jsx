@@ -3,6 +3,8 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import toast from "react-hot-toast";
 import { customAxios } from "../util/customAxios";
 import { apiSummary } from "../config/api/apiSummary";
+import { axiosToastError } from "../util/axiosToastError";
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [userData, setUserData] = useState({
@@ -19,6 +21,7 @@ const Register = () => {
   const [passwordsMatch, setPasswordsMatch] = useState(
     userData?.password === userData?.confirmPassword
   );
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -67,8 +70,13 @@ const Register = () => {
       });
 
       console.log(`Register Response: `, response);
+      if (response?.status === apiSummary.endpoints.register.successStatus) {
+        toast.success("User has been created successfully!🎉");
+      }
+      navigate("/login");
     } catch (error) {
       console.error(error);
+      axiosToastError(error);
     }
   };
 
@@ -165,6 +173,15 @@ const Register = () => {
             Register
           </button>
         </form>
+        <p className="flex justify-center text-[12px]">
+          Already have an account?&nbsp;
+          <Link
+            className="font-semibold text-primary-200 hover:text-secondary-200 hover:underline"
+            to={"/login"}
+          >
+            Login
+          </Link>
+        </p>
       </div>
     </section>
   );

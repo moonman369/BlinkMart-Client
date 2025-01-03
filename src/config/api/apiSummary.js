@@ -4,6 +4,12 @@ export const apiSummary = {
     register: {
       path: "api/v1/user/register",
       method: "post",
+      successStatus: 201,
+    },
+    login: {
+      path: "api/v1/user/login",
+      method: "post",
+      successStatus: 200,
     },
   },
 };
