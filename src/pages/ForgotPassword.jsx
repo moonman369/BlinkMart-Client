@@ -6,12 +6,10 @@ import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import { Link, useNavigate } from "react-router-dom";
 
-const Login = () => {
+const ForgotPassword = () => {
   const [userData, setUserData] = useState({
     email: "",
-    password: "",
   });
-  const [showPassword, setShowPassword] = useState(false);
   const [isUserDataPopulated, setIsUserDataPopulated] = useState(
     Object.values(userData).every((x) => x)
   );
@@ -20,13 +18,6 @@ const Login = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUserData((prevUserData) => ({ ...prevUserData, [name]: value }));
-  };
-
-  const toggleShowPassword = () => {
-    if (!userData.password || userData.password === "") {
-      return;
-    }
-    setShowPassword((currentValue) => !currentValue);
   };
 
   useEffect(() => {
@@ -42,19 +33,24 @@ const Login = () => {
       }
 
       const response = await customAxios({
-        url: apiSummary.endpoints.login.path,
-        method: apiSummary.endpoints.login.method,
+        url: apiSummary.endpoints.forgotPassword.path,
+        method: apiSummary.endpoints.forgotPassword.method,
         data: {
           email: userData.email,
-          password: userData.password,
         },
       });
 
-      console.log(`Login Response: `, response);
-      if (response?.status === apiSummary.endpoints.login.successStatus) {
-        toast.success("Login Successful!🎉");
+      console.log(`Forgot Password Response: `, response);
+      if (
+        response?.status === apiSummary.endpoints.forgotPassword.successStatus
+      ) {
+        toast.success(response.data["message"]);
+        navigate("/verify-otp", {
+          state: {
+            email: userData.email,
+          },
+        });
       }
-      navigate("/");
     } catch (error) {
       console.error(error);
       axiosToastError(error);
@@ -66,11 +62,12 @@ const Login = () => {
     <section className="w-full container mx-auto px-2">
       <div className="bg-gray-900 my-4 w-full max-w-lg mx-auto rounded p-6">
         <div className="flex text-2xl justify-center">
-          <h1>LOGIN TO &nbsp;</h1>
+          <h1>FORGOT &nbsp;</h1>
           <h1 className="tracking-wider">
             <b className="text-secondary-200">BLINK</b>
             <b className="text-primary-200">MART</b>
           </h1>
+          <h1>&nbsp; PASSWORD</h1>
         </div>
         <form className="grid gap-2 mt-6" onSubmit={handleSubmit}>
           {/* Email */}
@@ -88,30 +85,6 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Password */}
-          <div className="grid gap-1 mt-3">
-            <label htmlFor="password">Password* </label>
-            <div className="p-2 border rounded bg-gray-700 flex items-center focus-within:border-primary-200">
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                name="password"
-                className="w-full bg-transparent outline-none"
-                value={userData.password}
-                onChange={handleInputChange}
-              />
-              <div onClick={toggleShowPassword} className="cursor-pointer">
-                {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
-              </div>
-            </div>
-            <Link
-              to={"/forgot-password"}
-              className="block ml-auto text-[12px] text-primary-200 hover:text-secondary-200 hover:underline font-semibold"
-            >
-              Forgot password?
-            </Link>
-          </div>
-
           <button
             disabled={!isUserDataPopulated}
             className={`${
@@ -120,17 +93,17 @@ const Login = () => {
                 : "bg-gray-500"
             } text-white py-3 rounded font-semibold my-8 tracking-wider w-full`}
           >
-            Login
+            Send OTP
           </button>
         </form>
         <div className="flex justify-center text-[12px]">
           <p className="">
-            Don't have an account?&nbsp;
+            Already have an account?&nbsp;
             <Link
               className="font-semibold text-primary-200 hover:text-secondary-200 hover:underline"
-              to={"/register"}
+              to={"/login"}
             >
-              Register
+              Login
             </Link>
           </p>
         </div>
@@ -139,4 +112,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ForgotPassword;

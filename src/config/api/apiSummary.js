@@ -11,5 +11,20 @@ export const apiSummary = {
       method: "post",
       successStatus: 200,
     },
+    forgotPassword: {
+      path: "api/v1/user/forgot-password",
+      method: "post",
+      successStatus: 200,
+    },
+    forgotPassword: {
+      path: "api/v1/user/forgot-password",
+      method: "post",
+      successStatus: 200,
+    },
+    verifyOtp: {
+      path: "api/v1/user/verify-forgot-password-otp",
+      method: "post",
+      successStatus: 200,
+    },
   },
 };
