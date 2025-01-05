@@ -26,5 +26,10 @@ export const apiSummary = {
       method: "post",
       successStatus: 200,
     },
+    resetPassword: {
+      path: "api/v1/user/reset-password",
+      method: "put",
+      successStatus: 200,
+    },
   },
 };

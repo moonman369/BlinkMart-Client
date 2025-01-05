@@ -46,8 +46,13 @@ const VerifyOTP = () => {
       console.log(`Verify OTP Response: `, response);
       if (response?.status === apiSummary.endpoints.verifyOtp.successStatus) {
         toast.success(response.data["message"]);
+        navigate("/reset-password", {
+          state: {
+            verifyOtpResponse: response.data,
+            email: location?.state?.email,
+          },
+        });
       }
-      navigate("/login");
     } catch (error) {
       console.error(error);
       axiosToastError(error);
