@@ -21,7 +21,10 @@ const ResetPassword = () => {
   console.log(location);
 
   useEffect(() => {
-    if (!location?.state?.email) {
+    if (
+      !location?.state?.email ||
+      !location?.state?.verifyOtpResponse?.success
+    ) {
       navigate("/forgot-password");
     }
   }, []);
