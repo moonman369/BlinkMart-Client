@@ -31,5 +31,10 @@ export const apiSummary = {
       method: "put",
       successStatus: 200,
     },
+    refreshToken: {
+      path: "api/v1/user/refresh-token",
+      method: "post",
+      successStatus: 200,
+    },
   },
 };

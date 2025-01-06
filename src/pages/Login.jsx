@@ -53,8 +53,14 @@ const Login = () => {
       console.log(`Login Response: `, response);
       if (response?.status === apiSummary.endpoints.login.successStatus) {
         toast.success("Login Successful!🎉");
+        localStorage.setItem("accessToken", response.data.tokens.access);
+        localStorage.setItem("refreshToken", response.data.tokens.refresh);
+        setUserData({
+          email: "",
+          password: "",
+        });
+        navigate("/");
       }
-      navigate("/");
     } catch (error) {
       console.error(error);
       axiosToastError(error);
