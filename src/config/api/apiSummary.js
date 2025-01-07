@@ -11,6 +11,11 @@ export const apiSummary = {
       method: "post",
       successStatus: 200,
     },
+    getUserDetails: {
+      path: "api/v1/user/get-details",
+      method: "get",
+      successStatus: 200,
+    },
     forgotPassword: {
       path: "api/v1/user/forgot-password",
       method: "post",

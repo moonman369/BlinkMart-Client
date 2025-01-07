@@ -60,6 +60,4 @@ const refreshAccessToken = async (refreshToken) => {
   } catch (error) {}
 };
 
-export default {
-  customAxios,
-};
+export default customAxios;

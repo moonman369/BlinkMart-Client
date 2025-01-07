@@ -5,15 +5,19 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { useMobile } from "../hooks/useMobile";
 import { TiShoppingCart } from "react-icons/ti";
+import { useSelector } from "react-redux";
+import { use } from "react";
 
 const Header = () => {
   const [isMobile] = useMobile();
   const location = useLocation();
   const navigate = useNavigate();
-
   const [isSearchPage, setIsSearchPage] = useState(
     location?.pathname === "/search"
   );
+  const user = useSelector((state) => state?.user);
+
+  console.log(`User From store: `, user);
 
   useEffect(() => {
     setIsSearchPage(location?.pathname === "/search");
