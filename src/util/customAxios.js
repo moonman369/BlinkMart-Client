@@ -20,7 +20,7 @@ customAxios.interceptors.request.use(
   }
 );
 
-//Generate ne accessToken using refreshToken
+//Generate new accessToken using refreshToken
 customAxios.interceptors.request.use(
   (response) => response,
   async (error) => {
@@ -49,6 +49,9 @@ const refreshAccessToken = async (refreshToken) => {
       withCredentials: true,
       url: apiSummary.endpoints.refreshToken.path,
       method: apiSummary.endpoints.refreshToken.method,
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
+      },
     });
 
     const { accessToken } = response.data.tokens;
@@ -57,4 +60,6 @@ const refreshAccessToken = async (refreshToken) => {
   } catch (error) {}
 };
 
-export default customAxios;
+export default {
+  customAxios,
+};
