@@ -7,6 +7,7 @@ import { useMobile } from "../hooks/useMobile";
 import { TiShoppingCart } from "react-icons/ti";
 import { useSelector } from "react-redux";
 import { use } from "react";
+import { GoTriangleDown, GoTriangleUp } from "react-icons/go";
 
 const Header = () => {
   const [isMobile] = useMobile();
@@ -66,9 +67,19 @@ const Header = () => {
 
             {/* desktop */}
             <div className="hidden lg:flex items-center gap-10">
-              <button onClick={redirectToLoginPage} className="text-lg px-2">
-                Login
-              </button>
+              {user._id ? (
+                <div className="f">
+                  <div className="flex items-center gap-2">
+                    <p>Account</p>
+                    <GoTriangleDown />
+                    {/* <GoTriangleUp /> */}
+                  </div>
+                </div>
+              ) : (
+                <button onClick={redirectToLoginPage} className="text-lg px-2">
+                  Login
+                </button>
+              )}
               <button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-3 py-3 rounded text-white">
                 <div className="animate-bounce">
                   <TiShoppingCart size={30} />
