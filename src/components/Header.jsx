@@ -8,6 +8,7 @@ import { TiShoppingCart } from "react-icons/ti";
 import { useSelector } from "react-redux";
 import { use } from "react";
 import { GoTriangleDown, GoTriangleUp } from "react-icons/go";
+import UserMenu from "./UserMenu";
 
 const Header = () => {
   const [isMobile] = useMobile();
@@ -17,6 +18,7 @@ const Header = () => {
     location?.pathname === "/search"
   );
   const user = useSelector((state) => state?.user);
+  const [openUserMenu, setOpenUserMenu] = useState(false);
 
   console.log(`User From store: `, user);
 
@@ -68,11 +70,16 @@ const Header = () => {
             {/* desktop */}
             <div className="hidden lg:flex items-center gap-10">
               {user._id ? (
-                <div className="f">
+                <div className="relative">
                   <div className="flex items-center gap-2">
                     <p>Account</p>
                     <GoTriangleDown />
                     {/* <GoTriangleUp /> */}
+                  </div>
+                  <div className="absolute right-0 top-16">
+                    <div className="bg-black rounded p-4 min-w-52 lg:shadow-secondary-lg ">
+                      <UserMenu />
+                    </div>
                   </div>
                 </div>
               ) : (
