@@ -5,6 +5,9 @@ import customAxios from "../util/customAxios";
 import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import { Link, useNavigate } from "react-router-dom";
+import { fetchUserDetails } from "../util/fetchUserDetails";
+import { useDispatch } from "react-redux";
+import { setUserDetails } from "../store/userSlice";
 
 const Login = () => {
   const [userData, setUserData] = useState({
@@ -28,6 +31,7 @@ const Login = () => {
     }
     setShowPassword((currentValue) => !currentValue);
   };
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setIsUserDataPopulated(Object.values(userData).every((x) => x));
@@ -52,6 +56,9 @@ const Login = () => {
 
       console.log(`Login Response: `, response);
       if (response?.status === apiSummary.endpoints.login.successStatus) {
+        const userData = await fetchUserDetails();
+        console.log(userData);
+        dispatch(setUserDetails(userData?.data?.data));
         toast.success("Login Successful!🎉");
         localStorage.setItem("accessToken", response.data.tokens.access);
         localStorage.setItem("refreshToken", response.data.tokens.refresh);

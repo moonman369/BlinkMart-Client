@@ -71,16 +71,28 @@ const Header = () => {
             <div className="hidden lg:flex items-center gap-10">
               {user._id ? (
                 <div className="relative">
-                  <div className="flex items-center gap-2">
+                  <div
+                    className="flex items-center gap-2 cursor-pointer select-none"
+                    onClick={() => {
+                      setOpenUserMenu((initValue) => !initValue);
+                    }}
+                  >
                     <p>Account</p>
-                    <GoTriangleDown />
-                    {/* <GoTriangleUp /> */}
+                    {openUserMenu ? (
+                      <GoTriangleUp size={20} />
+                    ) : (
+                      <GoTriangleDown size={20} />
+                    )}
                   </div>
-                  <div className="absolute right-0 top-16">
-                    <div className="bg-black rounded p-4 min-w-52 lg:shadow-secondary-lg ">
-                      <UserMenu />
+                  {openUserMenu ? (
+                    <div className="absolute right-0 top-16">
+                      <div className="bg-black rounded p-4 min-w-52 shadow-sm shadow-secondary-200 ">
+                        <UserMenu />
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <></>
+                  )}
                 </div>
               ) : (
                 <button onClick={redirectToLoginPage} className="text-lg px-2">
