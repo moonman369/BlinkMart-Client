@@ -41,5 +41,10 @@ export const apiSummary = {
       method: "post",
       successStatus: 200,
     },
+    logout: {
+      path: "api/v1/user/logout",
+      method: "get",
+      successStatus: 200,
+    },
   },
 };

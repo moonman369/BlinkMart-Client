@@ -26,6 +26,10 @@ const Header = () => {
     setIsSearchPage(location?.pathname === "/search");
   }, [location]);
 
+  useEffect(() => {
+    setOpenUserMenu(false);
+  }, [user]);
+
   const redirectToLoginPage = () => {
     navigate("/login");
   };
