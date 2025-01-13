@@ -34,6 +34,15 @@ const Header = () => {
     navigate("/login");
   };
 
+  const handleMobileUserMenu = () => {
+    if (!user?._id) {
+      navigate("/login");
+      return;
+    } else {
+      navigate("/user");
+    }
+  };
+
   console.log(isMobile);
   return (
     <header className="h-28 lg:h-21 shadow-sm shadow-secondary-200 sticky top-0 bg-black text-gray-200 flex flex-col gap-2 items-center justify-center p-2">
@@ -67,7 +76,12 @@ const Header = () => {
           {/* login and cart */}
           <div>
             {/* mobile */}
-            <button className="text-neutral-400 lg:hidden">
+            <button
+              className={`${
+                user?._id ? "text-secondary-200" : "text-primary-200"
+              } lg:hidden`}
+              onClick={handleMobileUserMenu}
+            >
               <FaRegCircleUser size={26} />
             </button>
 

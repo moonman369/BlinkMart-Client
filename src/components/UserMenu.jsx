@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Divider from "./Divider";
 import customAxios from "../util/customAxios.js";
 import { apiSummary } from "../config/api/apiSummary";
@@ -8,9 +8,10 @@ import { resetUserDetails } from "../store/userSlice.js";
 import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError.js";
 
-const UserMenu = () => {
+const UserMenu = ({ isMobile }) => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -24,6 +25,9 @@ const UserMenu = () => {
         localStorage.clear();
         toast.success(response?.data?.message);
       }
+      if (isMobile) {
+        navigate(-1);
+      }
     } catch (error) {
       axiosToastError(error);
     }
@@ -31,8 +35,8 @@ const UserMenu = () => {
 
   return (
     <div>
-      <div className="font-semibold mb-5">My Account</div>
-      <div className="text-sm">{user.username || user.mobile}</div>
+      <div className="font-semibold mb-1">My Account</div>
+      <div className="text-sm mb-1">{user.username || user.mobile}</div>
       <Divider />
       <div className="text-sm grid gap-2 mt-3">
         <Link to={""} className="px-2 hover:text-primary-200">
