@@ -7,6 +7,7 @@ import { apiSummary } from "../config/api/apiSummary";
 import { resetUserDetails } from "../store/userSlice.js";
 import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError.js";
+import { HiOutlineExternalLink } from "react-icons/hi";
 
 const UserMenu = ({ isMobile }) => {
   const user = useSelector((state) => state.user);
@@ -34,11 +35,21 @@ const UserMenu = ({ isMobile }) => {
   };
 
   return (
-    <div>
+    <div className="p-2">
       <div className="font-semibold mb-1">My Account</div>
-      <div className="text-sm mb-1">{user.username || user.mobile}</div>
+      <div className="text-sm mb-1">
+        <Link
+          to={"/dashboard/profile"}
+          className="flex gap-2 hover:text-secondary-200"
+        >
+          <span className="max-w-52 text-ellipsis line-clamp-1">
+            {user.username || user.mobile}
+          </span>
+          <HiOutlineExternalLink size={20} />
+        </Link>
+      </div>
       <Divider />
-      <div className="text-sm grid gap-2 mt-3">
+      <div className="text-sm grid gap-4 mt-4">
         <Link to={""} className="px-2 hover:text-primary-200">
           My Orders
         </Link>
