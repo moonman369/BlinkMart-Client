@@ -50,10 +50,16 @@ const UserMenu = ({ isMobile }) => {
       </div>
       <Divider />
       <div className="text-sm grid gap-4 mt-4">
-        <Link to={""} className="px-2 hover:text-primary-200">
+        <Link
+          to={"/dashboard/my-orders"}
+          className="px-2 hover:text-primary-200"
+        >
           My Orders
         </Link>
-        <Link to={""} className="px-2 hover:text-primary-200">
+        <Link
+          to={"/dashboard/addresses"}
+          className="px-2 hover:text-primary-200"
+        >
           Saved Addresses
         </Link>
         <button

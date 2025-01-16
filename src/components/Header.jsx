@@ -20,7 +20,7 @@ const Header = () => {
   const user = useSelector((state) => state?.user);
   const [openUserMenu, setOpenUserMenu] = useState(false);
 
-  console.log(`User From store: `, user);
+  // console.log(`User From store: `, user);
 
   useEffect(() => {
     setIsSearchPage(location?.pathname === "/search");
@@ -43,7 +43,7 @@ const Header = () => {
     }
   };
 
-  console.log(isMobile);
+  // console.log(isMobile);
   return (
     <header className="h-28 lg:h-21 shadow-sm shadow-secondary-200 sticky top-0 bg-black text-gray-200 flex flex-col gap-2 items-center justify-center p-2">
       {!(isSearchPage && isMobile) && (
