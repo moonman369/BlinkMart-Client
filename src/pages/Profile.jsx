@@ -40,6 +40,18 @@ const Profile = () => {
           }}
         />
       )}
+
+      {/* name, mob, email, change pwd */}
+      <form className="my-4">
+        <div className="grid gap-2">
+          <label>Name</label>
+          <input
+            type="text"
+            placeholder={user.username}
+            className="p-2 border rounded bg-gray-700 flex items-center outline-none focus-within:border-primary-200"
+          />
+        </div>
+      </form>
     </div>
   );
 };

@@ -9,6 +9,7 @@ export default {
         "highlight-100": "#5bc249",
         "secondary-200": "#00b050",
         "secondry-100": "#0b1a78",
+        "bg-primary-100": "#1f2937",
       },
     },
   },

@@ -6,14 +6,14 @@ const Dashboard = () => {
   return (
     <div>
       <section>
-        <div className="container mx-auto p-3 grid lg:grid-cols-[250px,1fr] bg-gray-900">
+        <div className="container mx-auto grid lg:grid-cols-[250px,1fr] bg-black bg-opacity-90">
           {/* Left: Menu */}
-          <div className="py-4 sticky top-24 overflow-y-auto hidden lg:block">
+          <div className="py-4 sticky top-24 h-[100vh] overflow-y-hidden hidden lg:block">
             <UserMenu />
           </div>
 
           {/* Right: Content */}
-          <div className="pl-6">
+          <div className="pl-6 bg-gray-800 p-5">
             <Outlet />
           </div>
         </div>
