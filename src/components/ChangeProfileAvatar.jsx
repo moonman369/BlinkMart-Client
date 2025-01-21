@@ -4,16 +4,16 @@ import { MdOutlineClose } from "react-icons/md";
 import customAxios from "../util/customAxios";
 import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError";
-import { data } from "react-router-dom";
 import { apiSummary } from "../config/api/apiSummary";
 import { fetchUserDetails } from "../util/fetchUserDetails";
-import { setUserDetails } from "../store/userSlice";
+import { setUserDetails, updateAvatar } from "../store/userSlice";
 import { useDispatch } from "react-redux";
 
 const ChangeProfileAvatar = ({ user, closeModal }) => {
   const [file, setFile] = useState(null);
   const inputRef = useRef(null);
   const dispatch = useDispatch();
+  const [uploadingInProgress, setUploadingInProgress] = useState(false);
 
   const handleFileSelect = (e) => {
     setFile(e.target.files[0]);
@@ -27,6 +27,7 @@ const ChangeProfileAvatar = ({ user, closeModal }) => {
   const handleUploadAvatar = async (e) => {
     e.preventDefault();
     try {
+      setUploadingInProgress(true);
       const formData = new FormData();
       formData.append("avatar", file);
 
@@ -41,16 +42,17 @@ const ChangeProfileAvatar = ({ user, closeModal }) => {
       ) {
         console.log("upload avatar response: ", response);
         toast.success("Avatar uploaded successfully!");
-        const userData = await fetchUserDetails();
-        console.log(userData);
-        dispatch(setUserDetails(userData?.data?.data));
+        dispatch(updateAvatar({ avatar: response?.data?.avatarUrl }));
         closeModal();
       } else {
         toast.error(`Failed to upload avatar! ${response?.data?.errorMessage}`);
       }
     } catch (error) {
+      setUploadingInProgress(false);
       console.error(error);
       axiosToastError(error);
+    } finally {
+      setUploadingInProgress(false);
     }
   };
 
@@ -60,12 +62,15 @@ const ChangeProfileAvatar = ({ user, closeModal }) => {
     <section className="fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-60 flex items-center justify-center">
       <div className="bg-[#1f2937] max-w-sm w-full rounded p-6 flex flex-col items-center justify-center">
         <div
-          className="ml-auto cursor-pointer hover:text-red-600"
-          onClick={closeModal}
+          className="ml-auto cursor-pointer hover:text-red-600 w-fit block"
+          onClick={() => {
+            handleDeselectFile();
+            closeModal();
+          }}
         >
           <MdOutlineClose size={16} />
         </div>
-        <div className="w-20 h-20 flex items-center justify-center rounded-full overflow-hidden drop-shadow-lg">
+        <div className="w-[180px] h-[180px] flex items-center justify-center rounded-full overflow-hidden drop-shadow-lg">
           {user?.avatar ? (
             <img
               src={user?.avatar}
@@ -101,7 +106,7 @@ const ChangeProfileAvatar = ({ user, closeModal }) => {
           disabled={!file}
           onClick={handleUploadAvatar}
         >
-          Upload
+          {uploadingInProgress ? "Uploading..." : "Upload"}
         </button>
       </div>
     </section>
