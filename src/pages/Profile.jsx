@@ -10,12 +10,12 @@ const Profile = () => {
   console.log("profile", user);
   return (
     <div>
-      <div className="w-20 h-20 flex items-center justify-center rounded-full overflow-hidden drop-shadow-lg">
+      <div className="w-[100px] h-[100px] flex items-center justify-center rounded-full overflow-hidden drop-shadow-lg">
         {user?.avatar ? (
           <img
             src={user?.avatar}
             alt={user.username}
-            className="w-full h-full"
+            className="w-full h-full border-secondary-200 border-[3px] rounded-full"
           />
         ) : (
           <FaRegUserCircle size={65} />
@@ -25,12 +25,19 @@ const Profile = () => {
         onClick={() => {
           setOpenChangeAvatar(true);
         }}
-        className="text-xs min-w-20 border-[2px] px-3 py-1 rounded-full mt-2 hover:border-primary-200 hover:text-primary-200"
+        className="text-xs min-w-20 border-[2px] px-3 py-1 rounded-full mt-2 mx-auto hover:border-primary-200 hover:text-primary-200"
       >
         Change
       </button>
 
-      {openChangeAvatar && <ChangeProfileAvatar user={user} />}
+      {openChangeAvatar && (
+        <ChangeProfileAvatar
+          user={user}
+          closeModal={() => {
+            setOpenChangeAvatar(false);
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -46,5 +46,10 @@ export const apiSummary = {
       method: "get",
       successStatus: 200,
     },
+    setProfileAvatar: {
+      path: "api/v1/user/set-avatar",
+      method: "put",
+      successStatus: 200,
+    },
   },
 };
