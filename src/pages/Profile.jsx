@@ -49,21 +49,23 @@ const Profile = () => {
   const handleSaveUserData = async (e) => {
     e.preventDefault();
     try {
-      setSavingInProgress(true);
-      const response = await customAxios({
-        url: apiSummary.endpoints.updateUserDetails.path,
-        method: apiSummary.endpoints.updateUserDetails.method,
-        data: userData,
-      });
+      if (userDataUpdated) {
+        setSavingInProgress(true);
+        const response = await customAxios({
+          url: apiSummary.endpoints.updateUserDetails.path,
+          method: apiSummary.endpoints.updateUserDetails.method,
+          data: userData,
+        });
 
-      if (
-        response?.status ===
-        apiSummary.endpoints.updateUserDetails.successStatus
-      ) {
-        setUserDataUpdated(false);
-        const userData = fetchUserDetails();
-        dispatch(setUserDetails(userData?.data?.data));
-        toast.success(response?.data?.message);
+        if (
+          response?.status ===
+          apiSummary.endpoints.updateUserDetails.successStatus
+        ) {
+          setUserDataUpdated(false);
+          const freshUserData = await fetchUserDetails();
+          dispatch(setUserDetails(freshUserData?.data?.data));
+          toast.success(response?.data?.message);
+        }
       }
     } catch (error) {
       axiosToastError(error);
@@ -151,6 +153,7 @@ const Profile = () => {
           className={`${
             userDataUpdated ? "bg-green-700 hover:bg-green-800" : "bg-gray-500"
           } text-white py-3 rounded font-semibold my-8 tracking-wider w-full`}
+          disabled={!userDataUpdated}
         >
           {savingInProgress ? "Saving..." : "Save"}
         </button>
