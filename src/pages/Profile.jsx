@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ChangeProfileAvatar from "../components/ChangeProfileAvatar";
+import customAxios from "../util/customAxios";
+import { apiSummary } from "../config/api/apiSummary";
+import toast from "react-hot-toast";
+import { axiosToastError } from "../util/axiosToastError";
+import { fetchUserDetails } from "../util/fetchUserDetails";
+import { setUserDetails } from "../store/userSlice";
 
 const Profile = () => {
   const user = useSelector((state) => state.user);
@@ -11,6 +17,9 @@ const Profile = () => {
     email: user?.email ?? "",
     mobile: user?.mobile ?? "",
   });
+  const [userDataUpdated, setUserDataUpdated] = useState(false);
+  const [savingInProgress, setSavingInProgress] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setUserData({
@@ -20,14 +29,48 @@ const Profile = () => {
     });
   }, [user]);
 
+  useEffect(() => {
+    // console.log(userData?.username !== user?.username);
+    // console.log(userData?.email !== user?.email);
+    // console.log(userData?.mobile !== (user?.mobile ?? ""));
+    // setUserDataUpdated(JSON.stringify(userData) !== JSON.stringify(user));
+    setUserDataUpdated(
+      userData?.username !== (user?.username ?? "") ||
+        userData?.email !== (user?.email ?? "") ||
+        userData?.mobile !== (user?.mobile ?? "")
+    );
+  }, [user, userData]);
+
   const handleOnUserDataChange = (e) => {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSaveUserData = (e) => {
+  const handleSaveUserData = async (e) => {
     e.preventDefault();
-    console.log("Save User Data", userData);
+    try {
+      setSavingInProgress(true);
+      const response = await customAxios({
+        url: apiSummary.endpoints.updateUserDetails.path,
+        method: apiSummary.endpoints.updateUserDetails.method,
+        data: userData,
+      });
+
+      if (
+        response?.status ===
+        apiSummary.endpoints.updateUserDetails.successStatus
+      ) {
+        setUserDataUpdated(false);
+        const userData = fetchUserDetails();
+        dispatch(setUserDetails(userData?.data?.data));
+        toast.success(response?.data?.message);
+      }
+    } catch (error) {
+      axiosToastError(error);
+      setSavingInProgress(false);
+    } finally {
+      setSavingInProgress(false);
+    }
   };
 
   console.log("profile", user);
@@ -76,6 +119,7 @@ const Profile = () => {
             name="username"
             value={userData?.username}
             onChange={handleOnUserDataChange}
+            required
           />
         </div>
         <div className="grid gap-2">
@@ -87,6 +131,7 @@ const Profile = () => {
             name="email"
             value={userData?.email}
             onChange={handleOnUserDataChange}
+            required
           />
         </div>
         <div className="grid gap-2">
@@ -98,11 +143,16 @@ const Profile = () => {
             name="mobile"
             value={userData?.mobile}
             onChange={handleOnUserDataChange}
+            // required
           />
         </div>
 
-        <button className="text-white py-3 px-5 rounded font-semibold my-8 bg-green-700 hover:bg-green-800">
-          Save
+        <button
+          className={`${
+            userDataUpdated ? "bg-green-700 hover:bg-green-800" : "bg-gray-500"
+          } text-white py-3 rounded font-semibold my-8 tracking-wider w-full`}
+        >
+          {savingInProgress ? "Saving..." : "Save"}
         </button>
       </form>
     </div>

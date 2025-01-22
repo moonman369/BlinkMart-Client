@@ -51,5 +51,10 @@ export const apiSummary = {
       method: "put",
       successStatus: 200,
     },
+    updateUserDetails: {
+      path: "api/v1/user/update-details",
+      method: "put",
+      successStatus: 200,
+    },
   },
 };

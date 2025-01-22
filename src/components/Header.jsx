@@ -51,7 +51,7 @@ const Header = () => {
 
   // console.log(isMobile);
   return (
-    <header className="h-28 lg:h-21 shadow-sm shadow-secondary-200 sticky top-0 bg-black text-gray-200 flex flex-col gap-2 items-center justify-center p-2">
+    <header className="h-28 lg:h-21 shadow-sm shadow-secondary-200 sticky top-0 bg-black text-gray-200 flex flex-col gap-2 items-center justify-center p-2 z-50">
       {!(isSearchPage && isMobile) && (
         <div className="container mx-auto flex items-center h-full pr-2 justify-between">
           {/* logo */}
