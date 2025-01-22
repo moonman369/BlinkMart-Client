@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import logo from "../assets/blinkmart-logo.png";
 import Search from "./Search";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { use } from "react";
 import { GoTriangleDown, GoTriangleUp } from "react-icons/go";
 import UserMenu from "./UserMenu";
+import useCloseOnOutsideClick from "../hooks/useCloseOnOutsideClick";
 
 const Header = () => {
   const [isMobile] = useMobile();
@@ -19,6 +20,11 @@ const Header = () => {
   );
   const user = useSelector((state) => state?.user);
   const [openUserMenu, setOpenUserMenu] = useState(false);
+  const userMenuRef = useRef(null);
+  const accountRef = useRef(null);
+  // useCloseOnOutsideClick([userMenuRef, accountRef], () => {
+  //   setOpenUserMenu(false);
+  // });
 
   // console.log(`User From store: `, user);
 
@@ -90,21 +96,30 @@ const Header = () => {
               {user._id ? (
                 <div className="relative">
                   <div
+                    ref={accountRef}
                     className="flex items-center gap-2 cursor-pointer select-none"
                     onClick={() => {
                       setOpenUserMenu((initValue) => !initValue);
                     }}
                   >
-                    <p>Account</p>
                     {openUserMenu ? (
-                      <GoTriangleUp size={20} />
+                      <>
+                        <p>Account</p>
+                        <GoTriangleUp size={20} />
+                      </>
                     ) : (
-                      <GoTriangleDown size={20} />
+                      <>
+                        <p>Account</p>
+                        <GoTriangleDown size={20} />
+                      </>
                     )}
                   </div>
                   {openUserMenu ? (
                     <div className="absolute right-0 top-16">
-                      <div className="bg-black rounded p-4 min-w-52 shadow-sm shadow-secondary-200 ">
+                      <div
+                        className="bg-black rounded p-4 min-w-52 shadow-sm shadow-secondary-200 "
+                        ref={userMenuRef}
+                      >
                         <UserMenu />
                       </div>
                     </div>
