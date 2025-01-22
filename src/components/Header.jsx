@@ -120,7 +120,11 @@ const Header = () => {
                         className="bg-black rounded p-4 min-w-52 shadow-sm shadow-secondary-200 "
                         ref={userMenuRef}
                       >
-                        <UserMenu />
+                        <UserMenu
+                          close={() => {
+                            setOpenUserMenu(false);
+                          }}
+                        />
                       </div>
                     </div>
                   ) : (

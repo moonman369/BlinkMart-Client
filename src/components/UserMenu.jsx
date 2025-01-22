@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError.js";
 import { HiOutlineExternalLink } from "react-icons/hi";
 
-const UserMenu = ({ isMobile }) => {
+const UserMenu = ({ isMobile, close }) => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -34,11 +34,18 @@ const UserMenu = ({ isMobile }) => {
     }
   };
 
+  const handleClose = () => {
+    if (close) {
+      close();
+    }
+  };
+
   return (
     <div className="p-2">
       <div className="font-semibold mb-1">My Account</div>
       <div className="text-sm mb-1">
         <Link
+          onClick={handleClose}
           to={"/dashboard/profile"}
           className="flex gap-2 hover:text-secondary-200"
         >
@@ -51,12 +58,14 @@ const UserMenu = ({ isMobile }) => {
       <Divider />
       <div className="text-sm grid gap-4 mt-4">
         <Link
+          onClick={handleClose}
           to={"/dashboard/my-orders"}
           className="px-2 hover:text-primary-200"
         >
           My Orders
         </Link>
         <Link
+          onClick={handleClose}
           to={"/dashboard/addresses"}
           className="px-2 hover:text-primary-200"
         >
