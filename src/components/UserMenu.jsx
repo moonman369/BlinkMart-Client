@@ -29,6 +29,7 @@ const UserMenu = ({ isMobile, close }) => {
       if (isMobile) {
         navigate(-1);
       }
+      navigate("/");
     } catch (error) {
       axiosToastError(error);
     }
@@ -56,23 +57,51 @@ const UserMenu = ({ isMobile, close }) => {
         </Link>
       </div>
       <Divider />
-      <div className="text-sm grid gap-4 mt-4">
+      <div className="text-sm grid gap-2 mt-4">
+        <Link
+          onClick={handleClose}
+          to={"/dashboard/products"}
+          className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
+        >
+          Products
+        </Link>
+        <Link
+          onClick={handleClose}
+          to={"/dashboard/categories"}
+          className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
+        >
+          Categories
+        </Link>
+        <Link
+          onClick={handleClose}
+          to={"/dashboard/sub-categories"}
+          className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
+        >
+          Sub-Categories
+        </Link>
+        <Link
+          onClick={handleClose}
+          to={"/dashboard/products"}
+          className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
+        >
+          Upload Product
+        </Link>
         <Link
           onClick={handleClose}
           to={"/dashboard/my-orders"}
-          className="px-2 hover:text-primary-200"
+          className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
         >
           My Orders
         </Link>
         <Link
           onClick={handleClose}
           to={"/dashboard/addresses"}
-          className="px-2 hover:text-primary-200"
+          className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
         >
           Saved Addresses
         </Link>
         <button
-          className="text-left text-red-400 font-semibold hover:text-red-600 rounded px-2"
+          className="text-left text-red-400 font-semibold hover:text-red-600 hover:bg-gray-800 rounded p-2"
           onClick={handleLogout}
         >
           Logout
