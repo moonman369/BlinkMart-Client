@@ -58,34 +58,38 @@ const UserMenu = ({ isMobile, close }) => {
       </div>
       <Divider />
       <div className="text-sm grid gap-2 mt-4">
-        <Link
-          onClick={handleClose}
-          to={"/dashboard/products"}
-          className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
-        >
-          Products
-        </Link>
-        <Link
-          onClick={handleClose}
-          to={"/dashboard/categories"}
-          className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
-        >
-          Categories
-        </Link>
-        <Link
-          onClick={handleClose}
-          to={"/dashboard/sub-categories"}
-          className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
-        >
-          Sub-Categories
-        </Link>
-        <Link
-          onClick={handleClose}
-          to={"/dashboard/products"}
-          className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
-        >
-          Upload Product
-        </Link>
+        {user.role === "ADMIN" && (
+          <>
+            <Link
+              onClick={handleClose}
+              to={"/dashboard/products"}
+              className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
+            >
+              Products
+            </Link>
+            <Link
+              onClick={handleClose}
+              to={"/dashboard/categories"}
+              className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
+            >
+              Categories
+            </Link>
+            <Link
+              onClick={handleClose}
+              to={"/dashboard/sub-categories"}
+              className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
+            >
+              Sub-Categories
+            </Link>
+            <Link
+              onClick={handleClose}
+              to={"/dashboard/upload-product"}
+              className="p-2 hover:text-primary-200 hover:bg-gray-800 rounded-md"
+            >
+              Upload Product
+            </Link>
+          </>
+        )}
         <Link
           onClick={handleClose}
           to={"/dashboard/my-orders"}
