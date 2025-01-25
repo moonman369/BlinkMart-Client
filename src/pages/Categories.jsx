@@ -1,7 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
+import AddCategoryModal from "../components/AddCategoryModal";
 
 const Categories = () => {
-  return <div>Categories</div>;
+  const [openAddCategoryModal, setOpenAddCategoryModal] = useState(false);
+
+  return (
+    <section>
+      <div className="p-3 font-semibold bg-gray-900 shadow-secondary-200 shadow-md rounded-md flex items-center justify-between">
+        <h2 className="text-[20px]">Categories</h2>
+        <button
+          className={`text-white p-3 rounded font-semibold tracking-wider bg-green-700 hover:bg-green-800`}
+          onClick={() => setOpenAddCategoryModal(true)}
+        >
+          Add Category
+        </button>
+      </div>
+
+      {openAddCategoryModal && (
+        <AddCategoryModal
+          closeModal={() => {
+            setOpenAddCategoryModal(false);
+          }}
+        />
+      )}
+    </section>
+  );
 };
 
 export default Categories;
