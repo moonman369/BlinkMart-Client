@@ -2,22 +2,50 @@ import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { getFileAsBase64 } from "../util/fileToBase64";
 import { IMAGE_MIMETYPE_LIST } from "../util/constants";
+import customAxios from "../util/customAxios";
 import toast from "react-hot-toast";
+import { apiSummary } from "../config/api/apiSummary";
+import { axiosToastError } from "../util/axiosToastError";
 
 const AddCategoryModal = ({ closeModal }) => {
-  const [imageFile, setImageFile] = useState(null);
   const [newCategoryData, setNewCategoryData] = useState({
     name: "",
-    image: "",
+    image: null,
   });
 
   const handleOnChange = (e) => {
+    e.preventDefault();
     const { name, value } = e.target;
     setNewCategoryData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      if (!newCategoryData.name) {
+        toast.error("Category Name is required!");
+        return;
+      }
+      const formData = new FormData();
+      formData.append("name", newCategoryData?.name);
+      formData.append("image", newCategoryData?.image);
+      const response = await customAxios({
+        url: apiSummary.endpoints.category.addCategory.path,
+        method: apiSummary.endpoints.category.addCategory.method,
+        data: formData,
+      });
+      console.log("response", response);
+      if (
+        response.status ===
+        apiSummary.endpoints.category.addCategory.successStatus
+      ) {
+        toast.success(response.data.message);
+      }
+    } catch (error) {
+      axiosToastError(error);
+    } finally {
+      closeModal();
+    }
   };
 
   const handleUploadCategoryImage = async (e) => {
@@ -25,11 +53,10 @@ const AddCategoryModal = ({ closeModal }) => {
     if (file) {
       console.log(file?.type);
       if (IMAGE_MIMETYPE_LIST.includes(file.type)) {
-        setImageFile(file);
-        const fileBase64String = await getFileAsBase64(file);
+        // const fileBase64String = await getFileAsBase64(file);
         setNewCategoryData((prevData) => ({
           ...prevData,
-          image: fileBase64String,
+          image: file,
         }));
       } else {
         toast.error(
@@ -38,6 +65,8 @@ const AddCategoryModal = ({ closeModal }) => {
       }
     }
   };
+
+  console.log(newCategoryData);
 
   return (
     <section className="fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
@@ -69,7 +98,7 @@ const AddCategoryModal = ({ closeModal }) => {
               <div className="border bg-gray-800 h-36 w-full lg:w-50 rounded focus-within:border-primary-200 outline-none flex items-center justify-center text-neutral-500">
                 {newCategoryData?.image ? (
                   <img
-                    src={URL.createObjectURL(imageFile)}
+                    src={URL.createObjectURL(newCategoryData?.image)}
                     className="overflow-hidden h-32"
                   />
                 ) : (

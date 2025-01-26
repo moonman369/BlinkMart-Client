@@ -58,5 +58,12 @@ export const apiSummary = {
         successStatus: 200,
       },
     },
+    category: {
+      addCategory: {
+        path: "api/v1/category/add-category",
+        method: "post",
+        successStatus: 201,
+      },
+    },
   },
 };
