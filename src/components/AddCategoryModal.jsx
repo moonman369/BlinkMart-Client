@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
+import { getFileAsBase64 } from "../util/fileToBase64";
+import { IMAGE_MIMETYPE_LIST } from "../util/constants";
+import toast from "react-hot-toast";
 
 const AddCategoryModal = ({ closeModal }) => {
+  const [imageFile, setImageFile] = useState(null);
   const [newCategoryData, setNewCategoryData] = useState({
     name: "",
-    image: null,
+    image: "",
   });
 
   const handleOnChange = (e) => {
@@ -16,13 +20,23 @@ const AddCategoryModal = ({ closeModal }) => {
     e.preventDefault();
   };
 
-  const handleUploadCategoryImage = (e) => {
+  const handleUploadCategoryImage = async (e) => {
     const file = e.target.files[0];
-    console.log("file", file);
     if (file) {
-      setNewCategoryData((prevData) => ({ ...prevData, image: file }));
+      console.log(file?.type);
+      if (IMAGE_MIMETYPE_LIST.includes(file.type)) {
+        setImageFile(file);
+        const fileBase64String = await getFileAsBase64(file);
+        setNewCategoryData((prevData) => ({
+          ...prevData,
+          image: fileBase64String,
+        }));
+      } else {
+        toast.error(
+          `Invalid file format! Choose a format from this list: ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/heif', 'image/heic']`
+        );
+      }
     }
-    console.log(newCategoryData);
   };
 
   return (
@@ -55,7 +69,7 @@ const AddCategoryModal = ({ closeModal }) => {
               <div className="border bg-gray-800 h-36 w-full lg:w-50 rounded focus-within:border-primary-200 outline-none flex items-center justify-center text-neutral-500">
                 {newCategoryData?.image ? (
                   <img
-                    src={URL.createObjectURL(newCategoryData?.image)}
+                    src={URL.createObjectURL(imageFile)}
                     className="overflow-hidden h-32"
                   />
                 ) : (

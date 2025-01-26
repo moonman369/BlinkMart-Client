@@ -46,8 +46,8 @@ const Login = () => {
       }
 
       const response = await customAxios({
-        url: apiSummary.endpoints.login.path,
-        method: apiSummary.endpoints.login.method,
+        url: apiSummary.endpoints.user.login.path,
+        method: apiSummary.endpoints.user.login.method,
         data: {
           email: userData.email,
           password: userData.password,
@@ -55,7 +55,7 @@ const Login = () => {
       });
 
       console.log(`Login Response: `, response);
-      if (response?.status === apiSummary.endpoints.login.successStatus) {
+      if (response?.status === apiSummary.endpoints.user.login.successStatus) {
         const userData = await fetchUserDetails();
         console.log(userData);
         dispatch(setUserDetails(userData?.data?.data));

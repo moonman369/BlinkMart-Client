@@ -35,8 +35,8 @@ const VerifyOTP = () => {
       }
 
       const response = await customAxios({
-        url: apiSummary.endpoints.verifyOtp.path,
-        method: apiSummary.endpoints.verifyOtp.method,
+        url: apiSummary.endpoints.user.verifyOtp.path,
+        method: apiSummary.endpoints.user.verifyOtp.method,
         data: {
           email: location?.state?.email,
           otp: userData.join(""),
@@ -44,7 +44,9 @@ const VerifyOTP = () => {
       });
 
       console.log(`Verify OTP Response: `, response);
-      if (response?.status === apiSummary.endpoints.verifyOtp.successStatus) {
+      if (
+        response?.status === apiSummary.endpoints.user.verifyOtp.successStatus
+      ) {
         toast.success(response.data["message"]);
         navigate("/reset-password", {
           state: {

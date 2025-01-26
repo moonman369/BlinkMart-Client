@@ -32,13 +32,14 @@ const ChangeProfileAvatar = ({ user, closeModal }) => {
       formData.append("avatar", file);
 
       const response = await customAxios({
-        url: apiSummary.endpoints.setProfileAvatar.path,
-        method: apiSummary.endpoints.setProfileAvatar.method,
+        url: apiSummary.endpoints.user.setProfileAvatar.path,
+        method: apiSummary.endpoints.user.setProfileAvatar.method,
         data: formData,
       });
 
       if (
-        response.status === apiSummary.endpoints.setProfileAvatar.successStatus
+        response.status ===
+        apiSummary.endpoints.user.setProfileAvatar.successStatus
       ) {
         console.log("upload avatar response: ", response);
         toast.success("Avatar uploaded successfully!");

@@ -61,8 +61,8 @@ const ResetPassword = () => {
       }
 
       const response = await customAxios({
-        url: apiSummary.endpoints.resetPassword.path,
-        method: apiSummary.endpoints.resetPassword.method,
+        url: apiSummary.endpoints.user.resetPassword.path,
+        method: apiSummary.endpoints.user.resetPassword.method,
         data: {
           email: location?.state?.email,
           newPassword: userData.newPassword,
@@ -72,7 +72,8 @@ const ResetPassword = () => {
 
       console.log(`Login Response: `, response);
       if (
-        response?.status === apiSummary.endpoints.resetPassword.successStatus
+        response?.status ===
+        apiSummary.endpoints.user.resetPassword.successStatus
       ) {
         toast.success("Your Password has been successfully reset!🎉");
       }

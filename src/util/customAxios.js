@@ -47,8 +47,8 @@ const refreshAccessToken = async (refreshToken) => {
     const response = await axios({
       baseURL: apiSummary.baseUrl,
       withCredentials: true,
-      url: apiSummary.endpoints.refreshToken.path,
-      method: apiSummary.endpoints.refreshToken.method,
+      url: apiSummary.endpoints.user.user.refreshToken.path,
+      method: apiSummary.endpoints.user.refreshToken.method,
       headers: {
         Authorization: `Bearer ${refreshToken}`,
       },

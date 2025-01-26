@@ -52,14 +52,14 @@ const Profile = () => {
       if (userDataUpdated) {
         setSavingInProgress(true);
         const response = await customAxios({
-          url: apiSummary.endpoints.updateUserDetails.path,
-          method: apiSummary.endpoints.updateUserDetails.method,
+          url: apiSummary.endpoints.user.updateUserDetails.path,
+          method: apiSummary.endpoints.user.updateUserDetails.method,
           data: userData,
         });
 
         if (
           response?.status ===
-          apiSummary.endpoints.updateUserDetails.successStatus
+          apiSummary.endpoints.user.updateUserDetails.successStatus
         ) {
           setUserDataUpdated(false);
           const freshUserData = await fetchUserDetails();

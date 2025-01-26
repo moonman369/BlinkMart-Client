@@ -17,11 +17,11 @@ const UserMenu = ({ isMobile, close }) => {
   const handleLogout = async () => {
     try {
       const response = await customAxios({
-        url: apiSummary.endpoints.logout.path,
-        method: apiSummary.endpoints.logout.method,
+        url: apiSummary.endpoints.user.logout.path,
+        method: apiSummary.endpoints.user.logout.method,
       });
 
-      if (response.status === apiSummary.endpoints.logout.successStatus) {
+      if (response.status === apiSummary.endpoints.user.logout.successStatus) {
         dispatch(resetUserDetails());
         localStorage.clear();
         toast.success(response?.data?.message);

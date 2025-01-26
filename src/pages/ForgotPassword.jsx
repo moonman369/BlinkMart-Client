@@ -33,8 +33,8 @@ const ForgotPassword = () => {
       }
 
       const response = await customAxios({
-        url: apiSummary.endpoints.forgotPassword.path,
-        method: apiSummary.endpoints.forgotPassword.method,
+        url: apiSummary.endpoints.user.forgotPassword.path,
+        method: apiSummary.endpoints.user.forgotPassword.method,
         data: {
           email: userData.email,
         },
@@ -42,7 +42,8 @@ const ForgotPassword = () => {
 
       console.log(`Forgot Password Response: `, response);
       if (
-        response?.status === apiSummary.endpoints.forgotPassword.successStatus
+        response?.status ===
+        apiSummary.endpoints.user.forgotPassword.successStatus
       ) {
         toast.success(response.data["message"]);
         navigate("/verify-otp", {

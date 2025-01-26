@@ -60,8 +60,8 @@ const Register = () => {
       }
 
       const response = await customAxios({
-        url: apiSummary.endpoints.register.path,
-        method: apiSummary.endpoints.register.method,
+        url: apiSummary.endpoints.user.register.path,
+        method: apiSummary.endpoints.user.register.method,
         data: {
           username: userData.name,
           email: userData.email,
@@ -70,7 +70,9 @@ const Register = () => {
       });
 
       console.log(`Register Response: `, response);
-      if (response?.status === apiSummary.endpoints.register.successStatus) {
+      if (
+        response?.status === apiSummary.endpoints.user.register.successStatus
+      ) {
         toast.success("User has been created successfully!🎉");
       }
       navigate("/login");
