@@ -64,6 +64,11 @@ export const apiSummary = {
         method: "post",
         successStatus: 201,
       },
+      getAllCategories: {
+        path: "api/v1/category/get-all-categories",
+        method: "get",
+        successStatus: 200,
+      },
     },
   },
 };

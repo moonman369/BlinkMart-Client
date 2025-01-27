@@ -1,8 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddCategoryModal from "../components/AddCategoryModal";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Categories = () => {
   const [openAddCategoryModal, setOpenAddCategoryModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  const fetchAllCategories = async () => {
+    try {
+      setLoading(true);
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllCategories();
+  }, []);
 
   return (
     <section>
@@ -15,6 +31,10 @@ const Categories = () => {
           Add Category
         </button>
       </div>
+
+      {categories.length <= 0 && !loading && <p>No Categories Found</p>}
+
+      {loading && <LoadingSpinner />}
 
       {openAddCategoryModal && (
         <AddCategoryModal
