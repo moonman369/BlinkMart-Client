@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 
-const AddCategoryModal = ({ closeModal }) => {
+const AddCategoryModal = ({ fetchCategories, closeModal }) => {
   const [newCategoryData, setNewCategoryData] = useState({
     name: "",
     image: null,
@@ -39,6 +39,7 @@ const AddCategoryModal = ({ closeModal }) => {
         response.status ===
         apiSummary.endpoints.category.addCategory.successStatus
       ) {
+        fetchCategories();
         toast.success(response.data.message);
       }
     } catch (error) {
