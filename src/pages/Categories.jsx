@@ -51,14 +51,15 @@ const Categories = () => {
 
       {categories.length <= 0 && !loading && <NoData />}
 
-      <div className="grid grid-cols-4 gap-4 p-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 p-6 mt-4">
         {categories.map((category, index) => {
           return (
-            <div className="w-32 overflow-hidden rounded shadow-md">
+            <div className="w-32 overflow-hidden rounded shadow-md ">
               <img
                 src={category?.image === "" ? noImage : category?.image}
                 alt={category?.name}
                 className=""
+                key={index}
               />
             </div>
           );
