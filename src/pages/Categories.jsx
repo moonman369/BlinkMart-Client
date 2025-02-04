@@ -6,11 +6,14 @@ import customAxios from "../util/customAxios";
 import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import noImage from "../assets/no_image.png";
+import EditCategoryModal from "../components/EditCategoryModal";
 
 const Categories = () => {
   const [openAddCategoryModal, setOpenAddCategoryModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [openEditCategoryModal, setOpenEditCategoryModal] = useState(false);
+  const [editCategoryContext, setEditCategoryContext] = useState({});
 
   const fetchAllCategories = async () => {
     try {
@@ -33,6 +36,11 @@ const Categories = () => {
     }
   };
 
+  const handleEditClick = (category) => {
+    setOpenEditCategoryModal(true);
+    setEditCategoryContext(category);
+  };
+
   useEffect(() => {
     fetchAllCategories();
   }, []);
@@ -51,16 +59,27 @@ const Categories = () => {
 
       {categories.length <= 0 && !loading && <NoData />}
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 p-6 mt-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-12 p-6 mt-4">
         {categories.map((category, index) => {
           return (
-            <div className="w-32 overflow-hidden rounded shadow-md ">
+            <div className="w-32 overflow-hidden rounded shadow-md group">
               <img
                 src={category?.image === "" ? noImage : category?.image}
                 alt={category?.name}
-                className=""
+                className="rounded"
                 key={index}
               />
+              <div className="items-center h-9 flex gap-2">
+                <button
+                  onClick={() => handleEditClick(category)}
+                  className="flex-1 bg-primary-100 hover:bg-yellow-500 text-bg-primary-100 rounded"
+                >
+                  Edit
+                </button>
+                <button className="flex-1 bg-red-400 hover:bg-red-500 text-bg-primary-100 rounded">
+                  Delete
+                </button>
+              </div>
             </div>
           );
         })}
@@ -74,6 +93,13 @@ const Categories = () => {
           closeModal={() => {
             setOpenAddCategoryModal(false);
           }}
+        />
+      )}
+
+      {openEditCategoryModal && (
+        <EditCategoryModal
+          closeModal={() => setOpenEditCategoryModal(false)}
+          category={editCategoryContext}
         />
       )}
     </section>
