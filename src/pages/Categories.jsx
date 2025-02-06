@@ -8,13 +8,15 @@ import { axiosToastError } from "../util/axiosToastError";
 import noImage from "../assets/no_image.png";
 import EditCategoryModal from "../components/EditCategoryModal";
 import { current } from "@reduxjs/toolkit";
+import DeleteCategoryModal from "../components/DeleteCategoryModal";
 
 const Categories = () => {
   const [openAddCategoryModal, setOpenAddCategoryModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [openEditCategoryModal, setOpenEditCategoryModal] = useState(false);
-  const [editCategoryContext, setEditCategoryContext] = useState({});
+  const [categoryProp, setCategoryProp] = useState({});
+  const [openDeleteCategoryModal, setOpenDeleteCategoryModal] = useState(false);
 
   const fetchAllCategories = async () => {
     try {
@@ -43,7 +45,11 @@ const Categories = () => {
 
   const handleEditClick = (category) => {
     setOpenEditCategoryModal(true);
-    setEditCategoryContext(category);
+    setCategoryProp(category);
+  };
+  const handleDeleteClick = (category) => {
+    setOpenDeleteCategoryModal(true);
+    setCategoryProp(category);
   };
 
   useEffect(() => {
@@ -81,7 +87,10 @@ const Categories = () => {
                 >
                   Edit
                 </button>
-                <button className="flex-1 bg-red-400 hover:bg-red-500 text-bg-primary-100 rounded">
+                <button
+                  onClick={() => handleDeleteClick(category)}
+                  className="flex-1 bg-red-400 hover:bg-red-500 text-bg-primary-100 rounded"
+                >
                   Delete
                 </button>
               </div>
@@ -104,7 +113,15 @@ const Categories = () => {
       {openEditCategoryModal && (
         <EditCategoryModal
           closeModal={() => setOpenEditCategoryModal(false)}
-          category={editCategoryContext}
+          category={categoryProp}
+          fetchCategories={fetchAllCategories}
+        />
+      )}
+
+      {openDeleteCategoryModal && (
+        <DeleteCategoryModal
+          closeModal={() => setOpenDeleteCategoryModal(false)}
+          category={categoryProp}
           fetchCategories={fetchAllCategories}
         />
       )}

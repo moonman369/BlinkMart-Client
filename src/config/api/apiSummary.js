@@ -74,6 +74,11 @@ export const apiSummary = {
         method: "put",
         successStatus: 200,
       },
+      deleteCategory: {
+        path: "api/v1/category/delete-category",
+        method: "delete",
+        successStatus: 204,
+      },
     },
   },
 };
