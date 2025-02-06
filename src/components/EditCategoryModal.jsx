@@ -11,6 +11,7 @@ const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
     name: "",
     image: null,
   });
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     setNewCategoryData((prevData) => ({
@@ -28,6 +29,7 @@ const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setProcessing(true);
       if (!newCategoryData.name) {
         toast.error("Category Name is required!");
         return;
@@ -54,6 +56,7 @@ const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
       console.error(error);
       axiosToastError(error);
     } finally {
+      setProcessing(false);
     }
   };
 
@@ -141,11 +144,12 @@ const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
                   : "bg-gray-900"
               }`}
               disabled={
-                !newCategoryData?.image &&
-                newCategoryData?.name === category?.name
+                (!newCategoryData?.image &&
+                  newCategoryData?.name === category?.name) ||
+                processing
               }
             >
-              Update
+              {processing ? "Updating..." : "Update"}
             </button>
           </div>
         </form>

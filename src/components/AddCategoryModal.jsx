@@ -12,6 +12,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
     name: "",
     image: null,
   });
+  const [processing, setProcessing] = useState(false);
 
   const handleOnChange = (e) => {
     e.preventDefault();
@@ -22,6 +23,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setProcessing(true);
       if (!newCategoryData.name) {
         toast.error("Category Name is required!");
         return;
@@ -41,11 +43,12 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
       ) {
         fetchCategories();
         toast.success(response.data.message);
+        closeModal();
       }
     } catch (error) {
       axiosToastError(error);
     } finally {
-      closeModal();
+      setProcessing(false);
     }
   };
 
@@ -131,8 +134,9 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
                   ? "bg-green-700 hover:bg-green-800"
                   : "bg-gray-900"
               }`}
+              disabled={!newCategoryData.name || processing}
             >
-              Submit
+              {processing ? "Submitting..." : "Submit"}
             </button>
           </div>
         </form>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import customAxios from "../util/customAxios";
 import { apiSummary } from "../config/api/apiSummary";
@@ -6,8 +6,11 @@ import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError";
 
 const DeleteCategoryModal = ({ closeModal, category, fetchCategories }) => {
+  const [processing, setProcessing] = useState(false);
+
   const handleDelete = async () => {
     try {
+      setProcessing(true);
       const deleteResponse = await customAxios({
         url: `${apiSummary.endpoints.category.deleteCategory.path}/${category?._id}`,
         method: apiSummary.endpoints.category.deleteCategory.method,
@@ -24,6 +27,8 @@ const DeleteCategoryModal = ({ closeModal, category, fetchCategories }) => {
     } catch (error) {
       console.error(error);
       axiosToastError(error);
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -40,20 +45,22 @@ const DeleteCategoryModal = ({ closeModal, category, fetchCategories }) => {
           </button>
         </div>
         <div className="flex-col items-center justify-center">
-          <p className="my-4 text-[16px]">
+          <p className="my-4 text-[16px] ml-3">
             Are you sure you want to{" "}
-            <b className="text-red-400">permanently delete</b> this category?
+            <b className="text-red-400">&nbsp;permanently delete&nbsp;</b> this
+            category?
           </p>
           <div className="w-fit ml-auto flex items-center gap-6">
             <button
               onClick={handleDelete}
-              className="px-4 py-1 rounded bg-red-400 hover:bg-red-500 text-bg-primary-100"
+              className="px-4 py-1 rounded bg-red-400 hover:bg-red-500 text-bg-primary-100 font-semibold"
+              disabled={processing}
             >
-              Delete
+              {processing ? "Deleting..." : "Delete"}
             </button>
             <button
               onClick={closeModal}
-              className="px-4 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-bg-primary-100"
+              className="px-4 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-bg-primary-100 font-semibold"
             >
               Cancel
             </button>
