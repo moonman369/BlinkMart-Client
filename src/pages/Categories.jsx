@@ -7,6 +7,7 @@ import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import noImage from "../assets/no_image.png";
 import EditCategoryModal from "../components/EditCategoryModal";
+import { current } from "@reduxjs/toolkit";
 
 const Categories = () => {
   const [openAddCategoryModal, setOpenAddCategoryModal] = useState(false);
@@ -21,6 +22,10 @@ const Categories = () => {
       const fetchCategoriesResponse = await customAxios({
         url: apiSummary.endpoints.category.getAllCategories.path,
         method: apiSummary.endpoints.category.getAllCategories.method,
+        params: {
+          currentPage: 1,
+          pageSize: 20,
+        },
       });
       console.log(fetchCategoriesResponse);
       if (
@@ -72,7 +77,7 @@ const Categories = () => {
               <div className="items-center h-9 flex gap-2">
                 <button
                   onClick={() => handleEditClick(category)}
-                  className="flex-1 bg-primary-100 hover:bg-yellow-500 text-bg-primary-100 rounded"
+                  className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-bg-primary-100 rounded"
                 >
                   Edit
                 </button>
@@ -100,6 +105,7 @@ const Categories = () => {
         <EditCategoryModal
           closeModal={() => setOpenEditCategoryModal(false)}
           category={editCategoryContext}
+          fetchCategories={fetchAllCategories}
         />
       )}
     </section>

@@ -1,11 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
+import { IMAGE_MIMETYPE_LIST } from "../util/constants";
+import customAxios from "../util/customAxios";
+import toast from "react-hot-toast";
+import { apiSummary } from "../config/api/apiSummary";
+import { axiosToastError } from "../util/axiosToastError";
 
-const EditCategoryModal = ({ closeModal, category }) => {
+const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
   const [newCategoryData, setNewCategoryData] = useState({
     name: "",
     image: null,
   });
+
+  useEffect(() => {
+    setNewCategoryData((prevData) => ({
+      ...prevData,
+      name: category?.name,
+    }));
+  }, []);
 
   const handleOnChange = (e) => {
     e.preventDefault();
@@ -21,25 +33,27 @@ const EditCategoryModal = ({ closeModal, category }) => {
         return;
       }
       const formData = new FormData();
-      formData.append("name", newCategoryData?.name);
-      formData.append("image", newCategoryData?.image);
+      newCategoryData?.name && formData.append("name", newCategoryData?.name);
+      newCategoryData?.image &&
+        formData.append("image", newCategoryData?.image);
       const response = await customAxios({
-        url: apiSummary.endpoints.category.addCategory.path,
-        method: apiSummary.endpoints.category.addCategory.method,
+        url: `${apiSummary.endpoints.category.updateCategory.path}/${category?._id}`,
+        method: apiSummary.endpoints.category.updateCategory.method,
         data: formData,
       });
       console.log("response", response);
       if (
         response.status ===
-        apiSummary.endpoints.category.addCategory.successStatus
+        apiSummary.endpoints.category.updateCategory.successStatus
       ) {
         fetchCategories();
         toast.success(response.data.message);
+        closeModal();
       }
     } catch (error) {
+      console.error(error);
       axiosToastError(error);
     } finally {
-      closeModal();
     }
   };
 
@@ -81,7 +95,7 @@ const EditCategoryModal = ({ closeModal, category }) => {
             <input
               type="text"
               name="name"
-              value={category?.name}
+              value={newCategoryData?.name}
               className="w-full p-2 border rounded bg-gray-800 mt- focus-within:border-primary-200 outline-none"
               onChange={handleOnChange}
               placeholder="Enter Category Name"
@@ -91,8 +105,11 @@ const EditCategoryModal = ({ closeModal, category }) => {
             <p>Image (Optional)</p>
             <div className="flex gap-4 flex-col items-center">
               <div className="border bg-gray-800 h-36 w-full lg:w-50 rounded focus-within:border-primary-200 outline-none flex items-center justify-center text-neutral-500">
-                {category?.image ? (
-                  <img src={category.image} className="overflow-hidden h-32" />
+                {newCategoryData?.image ? (
+                  <img
+                    src={URL.createObjectURL(newCategoryData?.image)}
+                    className="overflow-hidden h-32"
+                  />
                 ) : (
                   <p>No Image</p>
                 )}
@@ -104,7 +121,7 @@ const EditCategoryModal = ({ closeModal, category }) => {
                       ? "bg-primary-100 hover:bg-primary-200"
                       : "bg-gray-900"
                   } text-gray-800 p-2 text-[12px] rounded font-semibold tracking-wider cursor-pointer`}
-                  disabled={!newCategoryData.name}
+                  disabled={newCategoryData?.name != category?.name}
                 >
                   Upload Image
                 </div>
@@ -118,12 +135,17 @@ const EditCategoryModal = ({ closeModal, category }) => {
             </div>
             <button
               className={`text-white p-4 rounded font-semibold mt-8 tracking-wider text-[17px] ${
-                newCategoryData.name
+                newCategoryData?.name != category?.name ||
+                newCategoryData?.image
                   ? "bg-green-700 hover:bg-green-800"
                   : "bg-gray-900"
               }`}
+              disabled={
+                !newCategoryData?.image &&
+                newCategoryData?.name === category?.name
+              }
             >
-              Submit
+              Update
             </button>
           </div>
         </form>

@@ -70,7 +70,7 @@ export const apiSummary = {
         successStatus: 200,
       },
       updateCategory: {
-        path: "api/v1/category/update-category/",
+        path: "api/v1/category/update-category",
         method: "put",
         successStatus: 200,
       },
