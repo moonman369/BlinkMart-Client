@@ -10,3 +10,5 @@ export const IMAGE_MIMETYPE_LIST = [
   "image/heif", // HEIF
   "image/heic", // HEIC
 ];
+
+export const USER_ROLE_ADMIN = "ADMIN";
