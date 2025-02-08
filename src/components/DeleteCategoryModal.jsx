@@ -44,13 +44,13 @@ const DeleteCategoryModal = ({ closeModal, category, fetchCategories }) => {
             <IoClose size={25} />
           </button>
         </div>
-        <div className="flex-col items-center justify-center">
-          <p className="my-4 text-[16px] ml-3">
+        <div className="flex-col items-center justify-center pt-4">
+          <p className="my-4 flex items-center justify-center text-[16px] ml-3">
             Are you sure you want to{" "}
             <b className="text-red-400">&nbsp;permanently delete&nbsp;</b> this
             category?
           </p>
-          <div className="w-fit ml-auto flex items-center gap-6">
+          <div className="flex items-center justify-center gap-6">
             <button
               onClick={handleDelete}
               className="px-4 py-1 rounded bg-red-400 hover:bg-red-500 text-bg-primary-100 font-semibold"

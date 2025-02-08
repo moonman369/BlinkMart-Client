@@ -8,6 +8,7 @@ import { resetUserDetails } from "../store/userSlice.js";
 import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError.js";
 import { HiOutlineExternalLink } from "react-icons/hi";
+import { isAdmin } from "../util/isAdmin.js";
 
 const UserMenu = ({ isMobile, close }) => {
   const user = useSelector((state) => state.user);
@@ -48,17 +49,22 @@ const UserMenu = ({ isMobile, close }) => {
         <Link
           onClick={handleClose}
           to={"/dashboard/profile"}
-          className="flex gap-2 hover:text-secondary-200"
+          className={`flex gap-2 ${
+            isAdmin(user) ? "hover:text-red-400" : "hover:text-secondary-200"
+          }`}
         >
           <span className="max-w-52 text-ellipsis line-clamp-1">
-            {user.username || user.mobile}
+            {`${user?.username || user?.mobile}`}
+            {isAdmin(user) && (
+              <span className="text-red-400">&nbsp;(Admin)</span>
+            )}
           </span>
           <HiOutlineExternalLink size={20} />
         </Link>
       </div>
       <Divider />
       <div className="text-sm grid gap-2 mt-4">
-        {user.role === "ADMIN" && (
+        {isAdmin(user) && (
           <>
             <Link
               onClick={handleClose}
