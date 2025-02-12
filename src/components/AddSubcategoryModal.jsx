@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { IMAGE_MIMETYPE_LIST } from "../util/constants.js";
+import { useSelector } from "react-redux";
 
 const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
   const [newSubcategoryData, setNewSubcategoryData] = useState({
@@ -9,11 +10,18 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
     categories: [],
   });
   const [processing, setProcessing] = useState(false);
+  const categories = useSelector((state) => state.product.allCategories);
 
   const handleOnChange = (e) => {
     e.preventDefault();
-    const { name, value } = e.target;
-    setNewSubcategoryData((prevData) => ({ ...prevData, [name]: value }));
+    const newCategoryId = e.target.value;
+    const newCategory = categories.find(
+      (category) => category?._id === newCategoryId
+    );
+    setNewSubcategoryData((prevData) => ({
+      ...prevData,
+      category: [...prevData.category, newCategory],
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -126,8 +134,23 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
             </div>
             <div className="grid gap-2 mt-4">
               <label>Select Category*</label>
-              <select className="bg-gray-800 border p-3 focus-within:border-primary-200 outline-none rounded w-full gap-1">
-                <option value={""}>Select Category</option>
+              <select
+                className="bg-gray-800 border p-3 focus-within:border-primary-200 outline-none rounded w-full gap-1"
+                onChange={handleOnChange}
+                name="category"
+              >
+                <option className="text-[14px]" value={""} disabled>
+                  Select category
+                </option>
+                {categories.map((category, index) => (
+                  <option
+                    className="text-[14px]"
+                    key={index}
+                    value={category?._id}
+                  >
+                    {category?.name}
+                  </option>
+                ))}
               </select>
             </div>
             <button
