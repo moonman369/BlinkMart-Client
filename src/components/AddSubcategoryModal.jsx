@@ -18,9 +18,20 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
     const newCategory = categories.find(
       (category) => category?._id === newCategoryId
     );
+    console.log(newCategory);
     setNewSubcategoryData((prevData) => ({
       ...prevData,
-      category: [...prevData.category, newCategory],
+      categories: [...prevData?.categories, newCategory],
+    }));
+  };
+
+  const removeCategory = (categoryId) => {
+    const newCategories = newSubcategoryData.categories.filter(
+      (category) => category?._id !== categoryId
+    );
+    setNewSubcategoryData((prevData) => ({
+      ...prevData,
+      categories: newCategories,
     }));
   };
 
@@ -74,7 +85,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
     }
   };
 
-  console.log(newSubcategoryData);
+  console.log("newSubcategoryData", newSubcategoryData);
 
   return (
     <section className="fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
@@ -134,24 +145,49 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
             </div>
             <div className="grid gap-2 mt-4">
               <label>Select Category*</label>
-              <select
-                className="bg-gray-800 border p-3 focus-within:border-primary-200 outline-none rounded w-full gap-1"
-                onChange={handleOnChange}
-                name="category"
-              >
-                <option className="text-[14px]" value={""} disabled>
-                  Select category
-                </option>
-                {categories.map((category, index) => (
-                  <option
-                    className="text-[14px]"
-                    key={index}
-                    value={category?._id}
-                  >
-                    {category?.name}
+              <div className="bg-gray-800 border p-3 focus-within:border-primary-200 outline-none rounded w-full gap-2">
+                <div
+                  className={`flex gap-2 flex-wrap ${
+                    newSubcategoryData?.categories?.length > 0
+                      ? "border-b border-gray-500 pb-2"
+                      : ""
+                  }`}
+                >
+                  {newSubcategoryData?.categories?.map((category, index) => (
+                    <span
+                      key={index}
+                      className="bg-gray-700 text-[14px] text-secondary-200 font-semibold p-1 rounded flex items-center justify-center gap-1"
+                    >
+                      <p>{category?.name}</p>
+                      <IoClose
+                        size={15}
+                        className="cursor-pointer flex items-center justify-center bg-yellow-900 text-primary-200 rounded-full"
+                        onClick={() => {
+                          removeCategory(category?._id);
+                        }}
+                      />
+                    </span>
+                  ))}
+                </div>
+                <select
+                  className="w-full outline-none bg-gray-800"
+                  onChange={handleOnChange}
+                  name="category"
+                >
+                  <option className="text-[14px]" value={""}>
+                    Select category
                   </option>
-                ))}
-              </select>
+                  {categories.map((category, index) => (
+                    <option
+                      className="text-[14px]"
+                      key={index}
+                      value={category?._id}
+                    >
+                      {category?.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <button
               className={`text-white p-4 rounded font-semibold mt-8 tracking-wider text-[17px] ${
