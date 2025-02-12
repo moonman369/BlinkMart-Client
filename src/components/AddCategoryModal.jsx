@@ -6,6 +6,7 @@ import customAxios from "../util/customAxios";
 import toast from "react-hot-toast";
 import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
+import { useDispatch } from "react-redux";
 
 const AddCategoryModal = ({ fetchCategories, closeModal }) => {
   const [newCategoryData, setNewCategoryData] = useState({
@@ -13,6 +14,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
     image: null,
   });
   const [processing, setProcessing] = useState(false);
+  const dispatch = useDispatch();
 
   const handleOnChange = (e) => {
     e.preventDefault();
@@ -42,6 +44,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
         apiSummary.endpoints.category.addCategory.successStatus
       ) {
         fetchCategories();
+        // dispatch(setAllCategories(response.data.data));
         toast.success(response.data.message);
         closeModal();
       }

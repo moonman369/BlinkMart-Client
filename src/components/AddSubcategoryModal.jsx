@@ -124,9 +124,9 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
                 />
               </label>
             </div>
-            <div>
-              <label>Select Categories</label>
-              <select>
+            <div className="grid gap-2 mt-4">
+              <label>Select Category*</label>
+              <select className="bg-gray-800 border p-3 focus-within:border-primary-200 outline-none rounded w-full gap-1">
                 <option value={""}>Select Category</option>
               </select>
             </div>

@@ -7,36 +7,35 @@ import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import noImage from "../assets/no_image.png";
 import EditCategoryModal from "../components/EditCategoryModal";
-import { current } from "@reduxjs/toolkit";
 import DeleteCategoryModal from "../components/DeleteCategoryModal";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllCategories } from "../util/fetchAllCategories";
+import { setAllCategories } from "../store/productSlice";
 
 const Categories = () => {
   const [openAddCategoryModal, setOpenAddCategoryModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([]);
+  // const [categories, setCategories] = useState([]);
+  const categories = useSelector((state) => state.product.allCategories);
   const [openEditCategoryModal, setOpenEditCategoryModal] = useState(false);
   const [categoryProp, setCategoryProp] = useState({});
   const [openDeleteCategoryModal, setOpenDeleteCategoryModal] = useState(false);
+  const dispatch = useDispatch();
 
-  const fetchAllCategories = async () => {
+  const refreshCategories = async () => {
     try {
       setLoading(true);
-      const fetchCategoriesResponse = await customAxios({
-        url: apiSummary.endpoints.category.getAllCategories.path,
-        method: apiSummary.endpoints.category.getAllCategories.method,
-        params: {
-          currentPage: 1,
-          pageSize: 20,
-        },
-      });
+      const fetchCategoriesResponse = await fetchAllCategories();
       console.log(fetchCategoriesResponse);
       if (
         fetchCategoriesResponse.status ===
         apiSummary.endpoints.category.getAllCategories.successStatus
       ) {
-        setCategories(fetchCategoriesResponse?.data?.data);
+        console.log("Refresh Categories", fetchCategoriesResponse);
+        dispatch(setAllCategories(fetchCategoriesResponse.data.data));
       }
     } catch (error) {
+      console.error("Fetch Categories Error: ", error);
       axiosToastError(error);
     } finally {
       setLoading(false);
@@ -53,7 +52,7 @@ const Categories = () => {
   };
 
   useEffect(() => {
-    fetchAllCategories();
+    // fetchAllCategories();
   }, []);
 
   return (
@@ -103,7 +102,7 @@ const Categories = () => {
 
       {openAddCategoryModal && (
         <AddCategoryModal
-          fetchCategories={fetchAllCategories}
+          fetchCategories={refreshCategories}
           closeModal={() => {
             setOpenAddCategoryModal(false);
           }}
@@ -114,7 +113,7 @@ const Categories = () => {
         <EditCategoryModal
           closeModal={() => setOpenEditCategoryModal(false)}
           category={categoryProp}
-          fetchCategories={fetchAllCategories}
+          fetchCategories={refreshCategories}
         />
       )}
 
@@ -122,7 +121,7 @@ const Categories = () => {
         <DeleteCategoryModal
           closeModal={() => setOpenDeleteCategoryModal(false)}
           category={categoryProp}
-          fetchCategories={fetchAllCategories}
+          fetchCategories={refreshCategories}
         />
       )}
     </section>

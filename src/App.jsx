@@ -8,20 +8,45 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { fetchUserDetails } from "./util/fetchUserDetails";
 import { setUserDetails } from "./store/userSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllCategories } from "./util/fetchAllCategories";
+import { setAllCategories } from "./store/productSlice";
 
 function App() {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const getUser = async () => {
-    const userData = await fetchUserDetails();
-    console.log(userData);
-    dispatch(setUserDetails(userData?.data?.data));
+    try {
+      const userData = await fetchUserDetails();
+      console.log("user", userData);
+      dispatch(setUserDetails(userData?.data?.data));
+    } catch (error) {
+      console.error("Fetch User Error: ", error);
+      toast.error("Error fetching user details!");
+    }
+  };
+
+  const getAllCategories = async () => {
+    try {
+      const allCategories = await fetchAllCategories();
+      console.log("allCategories", allCategories);
+      dispatch(setAllCategories(allCategories?.data?.data));
+    } catch (error) {
+      console.error("Fetch Categories Error: ", error);
+      toast.error("Error fetching categories!");
+    }
   };
 
   useEffect(() => {
     getUser();
   }, []);
+
+  useEffect(() => {
+    if (user && user?.role === "ADMIN") {
+      getAllCategories();
+    }
+  }, [user]);
 
   return (
     <>
