@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { IMAGE_MIMETYPE_LIST } from "../util/constants.js";
 import { useSelector } from "react-redux";
@@ -11,8 +11,22 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
   });
   const [processing, setProcessing] = useState(false);
   const categories = useSelector((state) => state.product.allCategories);
+  const [categoryBucket, setCategoryBucket] = useState([]);
 
-  const handleOnChange = (e) => {
+  useEffect(() => {
+    setCategoryBucket(categories);
+  }, [categories]);
+
+  const handleOnNameChange = (e) => {
+    e.preventDefault();
+    const newSubcategoryName = e?.target?.value;
+    setNewSubcategoryData((prevData) => ({
+      ...prevData,
+      name: newSubcategoryName,
+    }));
+  };
+
+  const handleOnCategorySelect = (e) => {
     e.preventDefault();
     const newCategoryId = e.target.value;
     const newCategory = categories.find(
@@ -23,6 +37,12 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
       ...prevData,
       categories: [...prevData?.categories, newCategory],
     }));
+
+    const newCategoryBucket = categoryBucket.filter(
+      (category) => category?._id !== newCategoryId
+    );
+    setCategoryBucket(newCategoryBucket);
+    e.target.value = "";
   };
 
   const removeCategory = (categoryId) => {
@@ -33,6 +53,11 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
       ...prevData,
       categories: newCategories,
     }));
+
+    setCategoryBucket((prevBucket) => [
+      ...prevBucket,
+      categories.find((category) => category?._id === categoryId),
+    ]);
   };
 
   const handleSubmit = async (e) => {
@@ -107,7 +132,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
               name="name"
               value={newSubcategoryData?.name}
               className="w-full p-2 border rounded bg-gray-800 mt- focus-within:border-primary-200 outline-none"
-              onChange={handleOnChange}
+              onChange={handleOnNameChange}
               placeholder="Enter Subcategory Name"
             />
           </div>
@@ -161,7 +186,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
                       <p>{category?.name}</p>
                       <IoClose
                         size={15}
-                        className="cursor-pointer flex items-center justify-center bg-yellow-900 text-primary-200 rounded-full"
+                        className="cursor-pointer flex items-center justify-center text-primary-200 font-extrabold rounded-full"
                         onClick={() => {
                           removeCategory(category?._id);
                         }}
@@ -171,13 +196,13 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
                 </div>
                 <select
                   className="w-full outline-none bg-gray-800"
-                  onChange={handleOnChange}
+                  onChange={handleOnCategorySelect}
                   name="category"
                 >
-                  <option className="text-[14px]" value={""}>
-                    Select category
+                  <option className="text-[14px]" value={""} disabled selected>
+                    Select atleast one or more categories
                   </option>
-                  {categories.map((category, index) => (
+                  {categoryBucket.map((category, index) => (
                     <option
                       className="text-[14px]"
                       key={index}
@@ -191,11 +216,16 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
             </div>
             <button
               className={`text-white p-4 rounded font-semibold mt-8 tracking-wider text-[17px] ${
-                newSubcategoryData.name
+                newSubcategoryData?.name &&
+                newSubcategoryData?.categories?.length > 0
                   ? "bg-green-700 hover:bg-green-800"
                   : "bg-gray-900"
               }`}
-              disabled={!newSubcategoryData.name || processing}
+              disabled={
+                !newSubcategoryData?.name ||
+                newSubcategoryData?.categories?.length <= 0 ||
+                processing
+              }
             >
               {processing ? "Submitting..." : "Submit"}
             </button>
