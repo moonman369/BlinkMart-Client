@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { IMAGE_MIMETYPE_LIST } from "../util/constants.js";
 import { useSelector } from "react-redux";
+import { apiSummary } from "../config/api/apiSummary.js";
+import { axiosToastError } from "../util/axiosToastError.js";
+import customAxios from "../util/customAxios.js";
+import toast from "react-hot-toast";
 
 const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
   const [newSubcategoryData, setNewSubcategoryData] = useState({
@@ -70,22 +74,29 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
       }
       const formData = new FormData();
       formData.append("name", newSubcategoryData?.name);
+      formData.append(
+        "categories",
+        JSON.stringify(
+          newSubcategoryData?.categories?.map((category) => category?._id)
+        )
+      );
       formData.append("image", newSubcategoryData?.image);
       const response = await customAxios({
-        url: apiSummary.endpoints.category.addCategory.path,
-        method: apiSummary.endpoints.category.addCategory.method,
+        url: apiSummary.endpoints.subcategory.addSubcategory.path,
+        method: apiSummary.endpoints.subcategory.addSubcategory.method,
         data: formData,
       });
       console.log("response", response);
       if (
         response.status ===
-        apiSummary.endpoints.category.addCategory.successStatus
+        apiSummary.endpoints.subcategory.addSubcategory.successStatus
       ) {
         fetchSubcategories();
         toast.success(response.data.message);
         closeModal();
       }
     } catch (error) {
+      console.error(error);
       axiosToastError(error);
     } finally {
       setProcessing(false);

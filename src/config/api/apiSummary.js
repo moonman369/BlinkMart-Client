@@ -80,5 +80,17 @@ export const apiSummary = {
         successStatus: 204,
       },
     },
+    subcategory: {
+      addSubcategory: {
+        path: "api/v1/subcategory/add-subcategory",
+        method: "post",
+        successStatus: 201,
+      },
+      getAllSubcategories: {
+        path: "api/v1/subcategory/get-all-subcategories",
+        method: "get",
+        successStatus: 200,
+      },
+    },
   },
 };

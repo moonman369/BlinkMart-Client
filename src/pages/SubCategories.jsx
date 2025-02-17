@@ -19,6 +19,7 @@ const SubCategories = () => {
       {openAddSubcategoryModal && (
         <AddSubcategoryModal
           closeModal={() => setOpenAddSubcategoryModal(false)}
+          fetchSubcategories={() => {}}
         />
       )}
     </section>
