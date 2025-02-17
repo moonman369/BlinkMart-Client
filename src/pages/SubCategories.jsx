@@ -1,8 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddSubcategoryModal from "../components/AddSubcategoryModal";
+import axios from "axios";
+import { axiosToastError } from "../util/axiosToastError";
+import customAxios from "../util/customAxios";
+import { apiSummary } from "../config/api/apiSummary";
 
 const SubCategories = () => {
   const [openAddSubcategoryModal, setOpenAddSubcategoryModal] = useState(false);
+  const [subcategories, setSubcategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchSubcategories = async () => {
+    try {
+      const subcategoryResponse = await customAxios({
+        url: apiSummary.endpoints.subcategory.getAllSubcategories.path,
+        method: apiSummary.endpoints.subcategory.getAllSubcategories.method,
+      });
+      if (
+        subcategoryResponse.status ===
+        apiSummary.endpoints.subcategory.getAllSubcategories.successStatus
+      ) {
+        setSubcategories(subcategoryResponse.data.data);
+      }
+    } catch (error) {
+      axiosToastError(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSubcategories();
+  }, []);
+
+  console.log("subcategories", subcategories);
 
   return (
     <section>
