@@ -4,11 +4,49 @@ import axios from "axios";
 import { axiosToastError } from "../util/axiosToastError";
 import customAxios from "../util/customAxios";
 import { apiSummary } from "../config/api/apiSummary";
+import DisplayTable from "../components/DisplayTable";
+import { createColumnHelper } from "@tanstack/react-table";
 
 const SubCategories = () => {
   const [openAddSubcategoryModal, setOpenAddSubcategoryModal] = useState(false);
   const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const columnHelper = createColumnHelper();
+  const columns = [
+    columnHelper.accessor("name", {
+      header: "Name",
+    }),
+    columnHelper.accessor("image", {
+      header: "Image",
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center justify-center">
+            <img
+              src={row?.original?.image}
+              alt={row?.original?.name}
+              className="w-14"
+            />
+          </div>
+        );
+      },
+    }),
+    columnHelper.accessor("category", {
+      header: "Category",
+      cell: ({ row }) => {
+        console.log("row", row?.original?.category);
+        const categoriesArray = row?.original?.category;
+        if (categoriesArray && categoriesArray.length > 0) {
+          return categoriesArray.map((category) => (
+            <div key={category.id} className="text-center">
+              {category.name}
+            </div>
+          ));
+        }
+        // return row?.original?.category?.name;
+      },
+    }),
+  ];
 
   const fetchSubcategories = async () => {
     try {
@@ -20,7 +58,7 @@ const SubCategories = () => {
         subcategoryResponse.status ===
         apiSummary.endpoints.subcategory.getAllSubcategories.successStatus
       ) {
-        setSubcategories(subcategoryResponse.data.data);
+        setSubcategories(subcategoryResponse?.data?.data);
       }
     } catch (error) {
       axiosToastError(error);
@@ -43,6 +81,10 @@ const SubCategories = () => {
         >
           Add Subcategory
         </button>
+      </div>
+
+      <div>
+        <DisplayTable data={subcategories} columns={columns} />
       </div>
 
       {openAddSubcategoryModal && (
