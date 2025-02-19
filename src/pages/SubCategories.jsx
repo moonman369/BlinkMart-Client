@@ -6,11 +6,13 @@ import customAxios from "../util/customAxios";
 import { apiSummary } from "../config/api/apiSummary";
 import DisplayTable from "../components/DisplayTable";
 import { createColumnHelper } from "@tanstack/react-table";
+import ViewImage from "../components/ViewImage";
 
 const SubCategories = () => {
   const [openAddSubcategoryModal, setOpenAddSubcategoryModal] = useState(false);
   const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
 
   const columnHelper = createColumnHelper();
   const columns = [
@@ -25,7 +27,10 @@ const SubCategories = () => {
             <img
               src={row?.original?.image}
               alt={row?.original?.name}
-              className="w-14"
+              className="w-8 cursor-pointer"
+              onClick={() => {
+                setSelectedSubcategory(row?.original);
+              }}
             />
           </div>
         );
@@ -38,7 +43,10 @@ const SubCategories = () => {
         const categoriesArray = row?.original?.category;
         if (categoriesArray && categoriesArray.length > 0) {
           return categoriesArray.map((category) => (
-            <div key={category.id} className="text-center">
+            <div
+              key={category._id}
+              className="text-center px-1 inline-block shadow-secondary-200 shadow-sm"
+            >
               {category.name}
             </div>
           ));
@@ -91,6 +99,14 @@ const SubCategories = () => {
         <AddSubcategoryModal
           closeModal={() => setOpenAddSubcategoryModal(false)}
           fetchSubcategories={() => {}}
+        />
+      )}
+
+      {selectedSubcategory && (
+        <ViewImage
+          url={selectedSubcategory?.image}
+          alt={selectedSubcategory?.name}
+          close={() => setSelectedSubcategory(null)}
         />
       )}
     </section>

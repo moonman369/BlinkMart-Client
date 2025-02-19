@@ -19,8 +19,10 @@ const DisplayTable = ({ data, columns }) => {
         <thead className="bg-black text-white">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
+              <th className="border border-gray-500 w-[60px]">SL No.</th>
+              {console.log(headerGroup.headers)}
               {headerGroup.headers.map((header) => (
-                <th key={header.id} className="border">
+                <th key={header.id} className="border border-gray-500">
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -33,10 +35,11 @@ const DisplayTable = ({ data, columns }) => {
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.map((row) => (
+          {table.getRowModel().rows.map((row, index) => (
             <tr key={row.id}>
+              <td className="border border-gray-500 px-2 py-2">{index + 1}</td>
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="border px-2 py-2">
+                <td key={cell.id} className="border border-gray-500 px-2 py-2">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
