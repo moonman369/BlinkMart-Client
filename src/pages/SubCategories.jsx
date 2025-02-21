@@ -9,12 +9,16 @@ import { createColumnHelper } from "@tanstack/react-table";
 import ViewImage from "../components/ViewImage";
 import { LuPencil } from "react-icons/lu";
 import { MdOutlineDelete } from "react-icons/md";
+import EditSubcategoryModal from "../components/EditSubcategoryModal";
 
 const SubCategories = () => {
   const [openAddSubcategoryModal, setOpenAddSubcategoryModal] = useState(false);
   const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [openEditSubcategoryModal, setOpenEditSubcategoryModal] =
+    useState(false);
+  const [openViewImageModal, setOpenViewImageModal] = useState(false);
 
   const columnHelper = createColumnHelper();
   const columns = [
@@ -31,7 +35,7 @@ const SubCategories = () => {
               alt={row?.original?.name}
               className="w-8 cursor-pointer"
               onClick={() => {
-                setSelectedSubcategory(row?.original);
+                handleImageClick(row?.original);
               }}
             />
           </div>
@@ -61,7 +65,10 @@ const SubCategories = () => {
       cell: ({ row }) => {
         return (
           <div className="flex items-center justify-center">
-            <button className="text-gray-800 p-1 bg-primary-200 rounded-md hover:bg-yellow-600">
+            <button
+              className="text-gray-800 p-1 bg-primary-200 rounded-md hover:bg-yellow-600"
+              onClick={() => handleEditClick(row?.original)}
+            >
               <LuPencil size={16} />
             </button>
             <button className="text-gray-800 p-1 bg-red-500 rounded-md hover:bg-red-700 ml-2">
@@ -89,10 +96,28 @@ const SubCategories = () => {
       axiosToastError(error);
     }
   };
-
   useEffect(() => {
     fetchSubcategories();
   }, []);
+
+  const handleEditClick = (subcategory) => {
+    setOpenEditSubcategoryModal(true);
+    setSelectedSubcategory(subcategory);
+    console.log("subcategory", subcategory);
+  };
+  const closeEditSubcategoryModal = () => {
+    setOpenEditSubcategoryModal(false);
+    setSelectedSubcategory(null);
+  };
+
+  const handleImageClick = (subcategory) => {
+    setOpenViewImageModal(true);
+    setSelectedSubcategory(subcategory);
+  };
+  const closeViewImageModal = () => {
+    setOpenViewImageModal(false);
+    setSelectedSubcategory(null);
+  };
 
   console.log("subcategories", subcategories);
 
@@ -119,12 +144,16 @@ const SubCategories = () => {
         />
       )}
 
-      {selectedSubcategory && (
+      {openViewImageModal && selectedSubcategory && (
         <ViewImage
           url={selectedSubcategory?.image}
           alt={selectedSubcategory?.name}
-          close={() => setSelectedSubcategory(null)}
+          close={closeViewImageModal}
         />
+      )}
+
+      {openEditSubcategoryModal && selectedSubcategory && (
+        <EditSubcategoryModal closeModal={closeEditSubcategoryModal} />
       )}
     </section>
   );
