@@ -7,6 +7,8 @@ import { apiSummary } from "../config/api/apiSummary";
 import DisplayTable from "../components/DisplayTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import ViewImage from "../components/ViewImage";
+import { LuPencil } from "react-icons/lu";
+import { MdOutlineDelete } from "react-icons/md";
 
 const SubCategories = () => {
   const [openAddSubcategoryModal, setOpenAddSubcategoryModal] = useState(false);
@@ -52,6 +54,21 @@ const SubCategories = () => {
           ));
         }
         // return row?.original?.category?.name;
+      },
+    }),
+    columnHelper.accessor("_id", {
+      header: "Actions",
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center justify-center">
+            <button className="text-gray-800 p-1 bg-primary-200 rounded-md hover:bg-yellow-600">
+              <LuPencil size={16} />
+            </button>
+            <button className="text-gray-800 p-1 bg-red-500 rounded-md hover:bg-red-700 ml-2">
+              <MdOutlineDelete size={16} />
+            </button>
+          </div>
+        );
       },
     }),
   ];
