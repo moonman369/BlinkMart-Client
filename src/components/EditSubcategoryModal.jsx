@@ -141,7 +141,7 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
             <input
               type="text"
               name="name"
-              value={newSubcategoryData?.name}
+              value={subcategory?.name}
               className="w-full p-2 border rounded bg-gray-800 mt- focus-within:border-primary-200 outline-none"
               onChange={handleOnNameChange}
               placeholder="Enter Subcategory Name"
