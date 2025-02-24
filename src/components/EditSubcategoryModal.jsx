@@ -18,7 +18,15 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
   const [categoryBucket, setCategoryBucket] = useState([]);
 
   useEffect(() => {
+    setNewSubcategoryData(subcategory);
+    for (let categoryCurrent of subcategory?.category) {
+      const newCategoryBucket = categoryBucket.filter(
+        (category) => category?._id !== categoryCurrent?._id
+      );
+      setCategoryBucket(newCategoryBucket);
+    }
     setCategoryBucket(categories);
+    console.log("subcategory from props", subcategory);
   }, [categories]);
 
   const handleOnNameChange = (e) => {
@@ -153,7 +161,11 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
               <div className="border bg-gray-800 h-36 w-full lg:w-50 rounded focus-within:border-primary-200 outline-none flex items-center justify-center text-neutral-500">
                 {newSubcategoryData?.image ? (
                   <img
-                    src={URL.createObjectURL(newSubcategoryData?.image)}
+                    src={
+                      typeof newSubcategoryData?.image != "string"
+                        ? URL.createObjectURL(newSubcategoryData?.image)
+                        : newSubcategoryData?.image
+                    }
                     className="overflow-hidden h-32"
                   />
                 ) : (

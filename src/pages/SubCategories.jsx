@@ -153,7 +153,10 @@ const SubCategories = () => {
       )}
 
       {openEditSubcategoryModal && selectedSubcategory && (
-        <EditSubcategoryModal closeModal={closeEditSubcategoryModal} />
+        <EditSubcategoryModal
+          closeModal={closeEditSubcategoryModal}
+          subcategory={selectedSubcategory}
+        />
       )}
     </section>
   );
