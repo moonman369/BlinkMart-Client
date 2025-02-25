@@ -8,31 +8,29 @@ import customAxios from "../util/customAxios.js";
 import toast from "react-hot-toast";
 
 const EditSubcategoryModal = ({ closeModal, subcategory }) => {
-  const [newSubcategoryData, setNewSubcategoryData] = useState({
-    name: "",
-    image: null,
-    categories: [],
-  });
+  const [editSubcategoryData, setEditSubcategoryData] = useState(subcategory);
   const [processing, setProcessing] = useState(false);
   const categories = useSelector((state) => state.product.allCategories);
   const [categoryBucket, setCategoryBucket] = useState([]);
 
   useEffect(() => {
-    setNewSubcategoryData(subcategory);
-    for (let categoryCurrent of subcategory?.category) {
-      const newCategoryBucket = categoryBucket.filter(
-        (category) => category?._id !== categoryCurrent?._id
-      );
-      setCategoryBucket(newCategoryBucket);
-    }
-    setCategoryBucket(categories);
-    console.log("subcategory from props", subcategory);
-  }, [categories]);
+    setEditSubcategoryData(subcategory);
+  }, [subcategory]);
+
+  useEffect(() => {
+    const newCategoryBucket = categories.filter(
+      (category) =>
+        !editSubcategoryData?.category.find(
+          (subCategory) => subCategory?._id === category?._id
+        )
+    );
+    setCategoryBucket(newCategoryBucket);
+  }, [editSubcategoryData, categories]);
 
   const handleOnNameChange = (e) => {
     e.preventDefault();
     const newSubcategoryName = e?.target?.value;
-    setNewSubcategoryData((prevData) => ({
+    setEditSubcategoryData((prevData) => ({
       ...prevData,
       name: newSubcategoryName,
     }));
@@ -45,9 +43,9 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
       (category) => category?._id === newCategoryId
     );
     console.log(newCategory);
-    setNewSubcategoryData((prevData) => ({
+    setEditSubcategoryData((prevData) => ({
       ...prevData,
-      categories: [...prevData?.categories, newCategory],
+      category: [...prevData?.category, newCategory],
     }));
 
     const newCategoryBucket = categoryBucket.filter(
@@ -58,12 +56,12 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
   };
 
   const removeCategory = (categoryId) => {
-    const newCategories = newSubcategoryData.categories.filter(
+    const newCategories = editSubcategoryData?.category.filter(
       (category) => category?._id !== categoryId
     );
-    setNewSubcategoryData((prevData) => ({
+    setEditSubcategoryData((prevData) => ({
       ...prevData,
-      categories: newCategories,
+      category: newCategories,
     }));
 
     setCategoryBucket((prevBucket) => [
@@ -129,13 +127,13 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
     }
   };
 
-  console.log("newSubcategoryData", newSubcategoryData);
+  console.log("editSubcategoryData", editSubcategoryData);
 
   return (
     <section className="fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
       <div className="bg-gray-700 max-w-4xl lg:max-w-[40%] w-full p-4 rounded-md">
         <div className="flex items-center justify-between">
-          <h1 className="font-semibold text-[18px]">New Subcategory</h1>
+          <h1 className="font-semibold text-[18px]">Edit Subcategory</h1>
           <button
             className="w-fit block ml-auto text-red-600"
             onClick={closeModal}
@@ -149,7 +147,7 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
             <input
               type="text"
               name="name"
-              value={subcategory?.name}
+              value={editSubcategoryData?.name}
               className="w-full p-2 border rounded bg-gray-800 mt- focus-within:border-primary-200 outline-none"
               onChange={handleOnNameChange}
               placeholder="Enter Subcategory Name"
@@ -159,12 +157,12 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
             <p>Image (Optional)</p>
             <div className="flex gap-4 flex-col items-center">
               <div className="border bg-gray-800 h-36 w-full lg:w-50 rounded focus-within:border-primary-200 outline-none flex items-center justify-center text-neutral-500">
-                {newSubcategoryData?.image ? (
+                {editSubcategoryData?.image ? (
                   <img
                     src={
-                      typeof newSubcategoryData?.image != "string"
-                        ? URL.createObjectURL(newSubcategoryData?.image)
-                        : newSubcategoryData?.image
+                      typeof editSubcategoryData?.image != "string"
+                        ? URL.createObjectURL(editSubcategoryData?.image)
+                        : editSubcategoryData?.image
                     }
                     className="overflow-hidden h-32"
                   />
@@ -175,11 +173,11 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
               <label htmlFor="newCategoryImage">
                 <div
                   className={`${
-                    newSubcategoryData.name
+                    editSubcategoryData.name
                       ? "bg-primary-100 hover:bg-primary-200"
                       : "bg-gray-900"
                   } text-gray-800 p-2 text-[12px] rounded font-semibold tracking-wider cursor-pointer`}
-                  disabled={!newSubcategoryData.name}
+                  disabled={!editSubcategoryData.name}
                 >
                   Upload Image
                 </div>
@@ -196,12 +194,12 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
               <div className="bg-gray-800 border p-3 focus-within:border-primary-200 outline-none rounded w-full gap-2">
                 <div
                   className={`flex gap-2 flex-wrap ${
-                    newSubcategoryData?.categories?.length > 0
+                    editSubcategoryData?.category?.length > 0
                       ? "border-b border-gray-500 pb-2"
                       : ""
                   }`}
                 >
-                  {newSubcategoryData?.categories?.map((category, index) => (
+                  {editSubcategoryData?.category?.map((category, index) => (
                     <span
                       key={index}
                       className="bg-gray-700 text-[14px] text-secondary-200 font-semibold p-1 rounded flex items-center justify-center gap-1"
@@ -239,15 +237,21 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
             </div>
             <button
               className={`text-white p-4 rounded font-semibold mt-8 tracking-wider text-[17px] ${
-                newSubcategoryData?.name &&
-                newSubcategoryData?.categories?.length > 0
+                editSubcategoryData?.name &&
+                editSubcategoryData?.categories?.length > 0 &&
+                (editSubcategoryData?.name !== subcategory?.name ||
+                  editSubcategoryData?.category?.length !==
+                    subcategory?.category?.length)
                   ? "bg-green-700 hover:bg-green-800"
                   : "bg-gray-900"
               }`}
               disabled={
-                !newSubcategoryData?.name ||
-                newSubcategoryData?.categories?.length <= 0 ||
-                processing
+                !editSubcategoryData?.name ||
+                editSubcategoryData?.categories?.length <= 0 ||
+                processing ||
+                (editSubcategoryData?.name === subcategory?.name &&
+                  editSubcategoryData?.categories?.length ===
+                    subcategory?.categories?.length)
               }
             >
               {processing ? "Submitting..." : "Submit"}
