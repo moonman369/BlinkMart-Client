@@ -56,19 +56,20 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
     e.target.value = "";
   };
 
-  useEffect(() => {
-    console.log(
-      "condition",
-      editSubcategoryData?.name != null,
-      editSubcategoryData?.category?.length > 0,
-      !processing,
-      editSubcategoryData?.name !== subcategory?.name,
-      !checkCategoriesArrayEquality(
-        editSubcategoryData?.category,
-        subcategory?.category
-      )
-    );
-  }, [editSubcategoryData, subcategory]);
+  // useEffect(() => {
+  //   console.log(
+  //     "condition",
+  //     editSubcategoryData?.name != null,
+  //     editSubcategoryData?.category?.length > 0,
+  //     !processing,
+  //     editSubcategoryData?.name !== subcategory?.name,
+  //     editSubcategoryData?.image !== subcategory?.image,
+  //     !checkCategoriesArrayEquality(
+  //       editSubcategoryData?.category,
+  //       subcategory?.category
+  //     )
+  //   );
+  // }, [editSubcategoryData, subcategory]);
 
   const removeCategory = (categoryId) => {
     const newCategories = editSubcategoryData?.category.filter(
@@ -130,7 +131,7 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
       console.log(file?.type);
       if (IMAGE_MIMETYPE_LIST.includes(file.type)) {
         // const fileBase64String = await getFileAsBase64(file);
-        setNewSubcategoryData((prevData) => ({
+        setEditSubcategoryData((prevData) => ({
           ...prevData,
           image: file,
         }));
