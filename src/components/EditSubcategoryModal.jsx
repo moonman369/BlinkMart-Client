@@ -6,6 +6,7 @@ import { apiSummary } from "../config/api/apiSummary.js";
 import { axiosToastError } from "../util/axiosToastError.js";
 import customAxios from "../util/customAxios.js";
 import toast from "react-hot-toast";
+import { checkCategoriesArrayEquality } from "../util/checkCategoriesArrayEquality.js";
 
 const EditSubcategoryModal = ({ closeModal, subcategory }) => {
   const [editSubcategoryData, setEditSubcategoryData] = useState(subcategory);
@@ -54,6 +55,20 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
     setCategoryBucket(newCategoryBucket);
     e.target.value = "";
   };
+
+  useEffect(() => {
+    console.log(
+      "condition",
+      editSubcategoryData?.name != null,
+      editSubcategoryData?.category?.length > 0,
+      !processing,
+      editSubcategoryData?.name !== subcategory?.name,
+      !checkCategoriesArrayEquality(
+        editSubcategoryData?.category,
+        subcategory?.category
+      )
+    );
+  }, [editSubcategoryData, subcategory]);
 
   const removeCategory = (categoryId) => {
     const newCategories = editSubcategoryData?.category.filter(
@@ -238,10 +253,14 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
             <button
               className={`text-white p-4 rounded font-semibold mt-8 tracking-wider text-[17px] ${
                 editSubcategoryData?.name &&
-                editSubcategoryData?.categories?.length > 0 &&
+                editSubcategoryData?.category?.length > 0 &&
+                !processing &&
                 (editSubcategoryData?.name !== subcategory?.name ||
-                  editSubcategoryData?.category?.length !==
-                    subcategory?.category?.length)
+                  editSubcategoryData?.image !== subcategory?.image ||
+                  !checkCategoriesArrayEquality(
+                    editSubcategoryData?.category,
+                    subcategory?.category
+                  ))
                   ? "bg-green-700 hover:bg-green-800"
                   : "bg-gray-900"
               }`}
@@ -250,8 +269,11 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
                 editSubcategoryData?.categories?.length <= 0 ||
                 processing ||
                 (editSubcategoryData?.name === subcategory?.name &&
-                  editSubcategoryData?.categories?.length ===
-                    subcategory?.categories?.length)
+                  editSubcategoryData?.image === subcategory?.image &&
+                  checkCategoriesArrayEquality(
+                    editSubcategoryData?.category,
+                    subcategory?.category
+                  ))
               }
             >
               {processing ? "Submitting..." : "Submit"}
