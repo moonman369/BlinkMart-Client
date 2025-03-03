@@ -140,7 +140,7 @@ const SubCategories = () => {
       {openAddSubcategoryModal && (
         <AddSubcategoryModal
           closeModal={() => setOpenAddSubcategoryModal(false)}
-          fetchSubcategories={() => {}}
+          fetchSubcategories={fetchSubcategories}
         />
       )}
 
@@ -156,6 +156,7 @@ const SubCategories = () => {
         <EditSubcategoryModal
           closeModal={closeEditSubcategoryModal}
           subcategory={selectedSubcategory}
+          fetchSubcategories={fetchSubcategories}
         />
       )}
     </section>

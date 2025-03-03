@@ -91,6 +91,11 @@ export const apiSummary = {
         method: "get",
         successStatus: 200,
       },
+      updateSubcategory: {
+        path: "api/v1/subcategory/update-subcategory",
+        method: "put",
+        successStatus: 200,
+      },
     },
   },
 };

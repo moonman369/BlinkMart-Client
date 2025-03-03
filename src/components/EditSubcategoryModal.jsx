@@ -8,7 +8,11 @@ import customAxios from "../util/customAxios.js";
 import toast from "react-hot-toast";
 import { checkCategoriesArrayEquality } from "../util/checkCategoriesArrayEquality.js";
 
-const EditSubcategoryModal = ({ closeModal, subcategory }) => {
+const EditSubcategoryModal = ({
+  fetchSubcategories,
+  closeModal,
+  subcategory,
+}) => {
   const [editSubcategoryData, setEditSubcategoryData] = useState(subcategory);
   const [processing, setProcessing] = useState(false);
   const categories = useSelector((state) => state.product.allCategories);
@@ -90,28 +94,26 @@ const EditSubcategoryModal = ({ closeModal, subcategory }) => {
     e.preventDefault();
     try {
       setProcessing(true);
-      if (!newSubcategoryData.name) {
+      if (!editSubcategoryData.name) {
         toast.error("Category Name is required!");
         return;
       }
       const formData = new FormData();
-      formData.append("name", newSubcategoryData?.name);
+      formData.append("name", editSubcategoryData?.name);
       formData.append(
         "categories",
-        JSON.stringify(
-          newSubcategoryData?.categories?.map((category) => category?._id)
-        )
+        JSON.stringify(editSubcategoryData?.category?.map((cat) => cat?._id))
       );
-      formData.append("image", newSubcategoryData?.image);
+      formData.append("image", editSubcategoryData?.image);
       const response = await customAxios({
-        url: apiSummary.endpoints.subcategory.addSubcategory.path,
-        method: apiSummary.endpoints.subcategory.addSubcategory.method,
+        url: `${apiSummary.endpoints.subcategory.updateSubcategory.path}/${editSubcategoryData?._id}`,
+        method: apiSummary.endpoints.subcategory.updateSubcategory.method,
         data: formData,
       });
       console.log("response", response);
       if (
         response.status ===
-        apiSummary.endpoints.subcategory.addSubcategory.successStatus
+        apiSummary.endpoints.subcategory.updateSubcategory.successStatus
       ) {
         fetchSubcategories();
         toast.success(response.data.message);
