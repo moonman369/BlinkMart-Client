@@ -20,6 +20,7 @@ const Categories = () => {
   const [openEditCategoryModal, setOpenEditCategoryModal] = useState(false);
   const [categoryProp, setCategoryProp] = useState({});
   const [openDeleteCategoryModal, setOpenDeleteCategoryModal] = useState(false);
+
   const dispatch = useDispatch();
 
   const refreshCategories = async () => {
