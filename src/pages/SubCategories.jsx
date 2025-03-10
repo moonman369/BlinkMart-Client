@@ -10,6 +10,8 @@ import ViewImage from "../components/ViewImage";
 import { LuPencil } from "react-icons/lu";
 import { MdOutlineDelete } from "react-icons/md";
 import EditSubcategoryModal from "../components/EditSubcategoryModal";
+import DeleteCategoryModal from "../components/DeleteCategoryModal";
+import DeleteSubcategoryModal from "../components/DeleteSubcategoryModal";
 
 const SubCategories = () => {
   const [openAddSubcategoryModal, setOpenAddSubcategoryModal] = useState(false);
@@ -19,6 +21,8 @@ const SubCategories = () => {
   const [openEditSubcategoryModal, setOpenEditSubcategoryModal] =
     useState(false);
   const [openViewImageModal, setOpenViewImageModal] = useState(false);
+  const [openDeleteSubcategoryModal, setOpenDeleteSubcategoryModal] =
+    useState(false);
 
   const columnHelper = createColumnHelper();
   const columns = [
@@ -51,7 +55,7 @@ const SubCategories = () => {
           return categoriesArray.map((category) => (
             <div
               key={category._id}
-              className="text-center px-1 inline-block shadow-secondary-200 shadow-sm"
+              className="text-center px-1 inline-block rounded m-2 p-[2px] shadow-secondary-200 shadow-md"
             >
               {category.name}
             </div>
@@ -71,7 +75,10 @@ const SubCategories = () => {
             >
               <LuPencil size={16} />
             </button>
-            <button className="text-gray-800 p-1 bg-red-500 rounded-md hover:bg-red-700 ml-2">
+            <button
+              className="text-gray-800 p-1 bg-red-500 rounded-md hover:bg-red-700 ml-2"
+              onClick={() => handleDeleteClick(row?.original)}
+            >
               <MdOutlineDelete size={16} />
             </button>
           </div>
@@ -107,6 +114,16 @@ const SubCategories = () => {
   };
   const closeEditSubcategoryModal = () => {
     setOpenEditSubcategoryModal(false);
+    setSelectedSubcategory(null);
+  };
+
+  const handleDeleteClick = (subcategory) => {
+    setOpenDeleteSubcategoryModal(true);
+    setSelectedSubcategory(subcategory);
+    console.log("subcategory", subcategory);
+  };
+  const closeDeleteSubcategoryModal = () => {
+    setOpenDeleteSubcategoryModal(false);
     setSelectedSubcategory(null);
   };
 
@@ -155,6 +172,14 @@ const SubCategories = () => {
       {openEditSubcategoryModal && selectedSubcategory && (
         <EditSubcategoryModal
           closeModal={closeEditSubcategoryModal}
+          subcategory={selectedSubcategory}
+          fetchSubcategories={fetchSubcategories}
+        />
+      )}
+
+      {openDeleteSubcategoryModal && selectedSubcategory && (
+        <DeleteSubcategoryModal
+          closeModal={closeDeleteSubcategoryModal}
           subcategory={selectedSubcategory}
           fetchSubcategories={fetchSubcategories}
         />

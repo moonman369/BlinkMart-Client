@@ -96,6 +96,11 @@ export const apiSummary = {
         method: "put",
         successStatus: 200,
       },
+      deleteSubcategory: {
+        path: "api/v1/subcategory/delete-subcategory",
+        method: "delete",
+        successStatus: 200,
+      },
     },
   },
 };
