@@ -22,7 +22,10 @@ const DisplayTable = ({ data, columns }) => {
               <th className="border border-gray-500 w-[60px]">SL No.</th>
               {console.log(headerGroup.headers)}
               {headerGroup.headers.map((header) => (
-                <th key={header.id} className="border border-gray-500">
+                <th
+                  key={header.id}
+                  className="border border-gray-500 whitespace-nowrap"
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -39,7 +42,10 @@ const DisplayTable = ({ data, columns }) => {
             <tr key={row.id}>
               <td className="border border-gray-500 px-2 py-2">{index + 1}</td>
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="border border-gray-500 px-2 py-2">
+                <td
+                  key={cell.id}
+                  className="border border-gray-500 px-2 py-2 whitespace-nowrap"
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}

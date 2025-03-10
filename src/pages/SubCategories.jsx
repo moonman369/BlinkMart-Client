@@ -150,7 +150,7 @@ const SubCategories = () => {
         </button>
       </div>
 
-      <div>
+      <div className="overflow-auto w-full max-w-[90vw]">
         <DisplayTable data={subcategories} columns={columns} />
       </div>
 
