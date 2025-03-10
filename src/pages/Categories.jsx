@@ -11,6 +11,7 @@ import DeleteCategoryModal from "../components/DeleteCategoryModal";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCategories } from "../util/fetchAllCategories";
 import { setAllCategories } from "../store/productSlice";
+import PaginationBar from "../components/PaginationBar";
 
 const Categories = () => {
   const [openAddCategoryModal, setOpenAddCategoryModal] = useState(false);
@@ -125,6 +126,8 @@ const Categories = () => {
           fetchCategories={refreshCategories}
         />
       )}
+
+      <PaginationBar pageSize={10} totalPages={10} />
     </section>
   );
 };
