@@ -10,7 +10,8 @@ import { fetchUserDetails } from "./util/fetchUserDetails";
 import { setUserDetails } from "./store/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCategories } from "./util/fetchAllCategories";
-import { setAllCategories } from "./store/productSlice";
+import { setAllCategories, setCategoryPageDetails } from "./store/productSlice";
+import { all } from "axios";
 
 function App() {
   const dispatch = useDispatch();
@@ -29,9 +30,17 @@ function App() {
 
   const getAllCategories = async () => {
     try {
-      const allCategories = await fetchAllCategories();
-      console.log("allCategories", allCategories);
+      const allCategories = await fetchAllCategories(1, 10);
+      // console.log("allCategories", allCategories);
       dispatch(setAllCategories(allCategories?.data?.data));
+      dispatch(
+        setCategoryPageDetails({
+          pageSize: allCategories?.data?.pageSize,
+          currentPage: allCategories?.data?.currentPage,
+          count: allCategories?.data?.count,
+          totalCount: allCategories?.data?.totalCount,
+        })
+      );
     } catch (error) {
       console.error("Fetch Categories Error: ", error);
       toast.error("Error fetching categories!");

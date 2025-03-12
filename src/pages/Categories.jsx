@@ -18,16 +18,22 @@ const Categories = () => {
   const [loading, setLoading] = useState(false);
   // const [categories, setCategories] = useState([]);
   const categories = useSelector((state) => state.product.allCategories);
+  const categoryPageDetails = useSelector(
+    (state) => state.product.pageDetails.categories
+  );
   const [openEditCategoryModal, setOpenEditCategoryModal] = useState(false);
   const [categoryProp, setCategoryProp] = useState({});
   const [openDeleteCategoryModal, setOpenDeleteCategoryModal] = useState(false);
 
   const dispatch = useDispatch();
 
-  const refreshCategories = async () => {
+  const refreshCategories = async (currentPage, pageSize) => {
     try {
       setLoading(true);
-      const fetchCategoriesResponse = await fetchAllCategories();
+      const fetchCategoriesResponse = await fetchAllCategories(
+        currentPage,
+        pageSize
+      );
       console.log(fetchCategoriesResponse);
       if (
         fetchCategoriesResponse.status ===
@@ -55,6 +61,7 @@ const Categories = () => {
 
   useEffect(() => {
     // fetchAllCategories();
+    console.log("categoriesPageDetails", categoryPageDetails);
   }, []);
 
   return (
@@ -104,7 +111,9 @@ const Categories = () => {
 
       {openAddCategoryModal && (
         <AddCategoryModal
-          fetchCategories={refreshCategories}
+          fetchCategories={() => {
+            refreshCategories(1, 10);
+          }}
           closeModal={() => {
             setOpenAddCategoryModal(false);
           }}
@@ -115,7 +124,9 @@ const Categories = () => {
         <EditCategoryModal
           closeModal={() => setOpenEditCategoryModal(false)}
           category={categoryProp}
-          fetchCategories={refreshCategories}
+          fetchCategories={() => {
+            refreshCategories(1, 10);
+          }}
         />
       )}
 
@@ -123,11 +134,20 @@ const Categories = () => {
         <DeleteCategoryModal
           closeModal={() => setOpenDeleteCategoryModal(false)}
           category={categoryProp}
-          fetchCategories={refreshCategories}
+          fetchCategories={() => {
+            refreshCategories(1, 10);
+          }}
         />
       )}
 
-      <PaginationBar pageSize={10} totalPages={10} />
+      <PaginationBar
+        pageSize={10}
+        totalPages={
+          categoryPageDetails?.totalCount / 10 +
+          (categoryPageDetails?.totalCount % 10 > 0 ? 1 : 0)
+        }
+        reloadPage={refreshCategories}
+      />
     </section>
   );
 };

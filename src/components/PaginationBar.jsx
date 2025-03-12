@@ -6,38 +6,36 @@ import {
   MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
 
-const PaginationBar = ({
-  pageSize,
-  totalPages,
-  nextPage,
-  previousPage,
-  firstPage,
-  lastPage,
-}) => {
+const PaginationBar = ({ pageSize, totalPages, reloadPage }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage((prev) => prev + 1);
-      nextPage();
+      reloadPage(currentPage + 1, 10);
     }
   };
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
-      previousPage();
+      reloadPage(currentPage - 1, 10);
     }
   };
 
   const handleFirstPage = () => {
     setCurrentPage(1);
-    firstPage();
+    reloadPage(1, 10);
   };
 
   const handleLastPage = () => {
     setCurrentPage(totalPages);
-    lastPage();
+    reloadPage(totalPages, 10);
+  };
+
+  const handlePageNumberClick = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    reloadPage(pageNumber, 10);
   };
 
   return (
@@ -58,7 +56,7 @@ const PaginationBar = ({
         {Array.from({ length: totalPages }, (_, i) => (
           <button
             key={i}
-            onClick={() => setCurrentPage(i + 1)}
+            onClick={() => handlePageNumberClick(i + 1)}
             className={`${
               i + 1 === currentPage
                 ? "bg-green-700 text-white"
