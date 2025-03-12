@@ -6,7 +6,7 @@ import {
   MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
 
-const PaginationBar = ({ pageSize, totalPages, reloadPage }) => {
+const PaginationBar = ({ pageSize, totalPages, reloadPage, styles }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const handleNextPage = () => {
@@ -39,7 +39,7 @@ const PaginationBar = ({ pageSize, totalPages, reloadPage }) => {
   };
 
   return (
-    <div className="flex justify-center items-center">
+    <div className={`flex justify-center items-center ${styles}`}>
       <div
         className="px-2 py-[2px] m-1 rounded text-white cursor-pointer"
         onClick={handleFirstPage}

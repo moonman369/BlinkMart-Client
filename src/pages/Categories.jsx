@@ -141,6 +141,7 @@ const Categories = () => {
       )}
 
       <PaginationBar
+        styles={"mt-10"}
         pageSize={10}
         totalPages={
           categoryPageDetails?.totalCount / 10 +
