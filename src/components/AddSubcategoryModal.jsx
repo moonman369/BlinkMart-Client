@@ -6,6 +6,7 @@ import { apiSummary } from "../config/api/apiSummary.js";
 import { axiosToastError } from "../util/axiosToastError.js";
 import customAxios from "../util/customAxios.js";
 import toast from "react-hot-toast";
+import SelectionDropDown from "./SelectionDropDown.jsx";
 
 const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
   const [newSubcategoryData, setNewSubcategoryData] = useState({
@@ -30,39 +31,46 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
     }));
   };
 
-  const handleOnCategorySelect = (e) => {
-    e.preventDefault();
-    const newCategoryId = e.target.value;
-    const newCategory = categories.find(
-      (category) => category?._id === newCategoryId
-    );
-    console.log(newCategory);
+  // const handleOnCategorySelect = (e) => {
+  //   e.preventDefault();
+  //   const newCategoryId = e.target.value;
+  //   const newCategory = categories.find(
+  //     (category) => category?._id === newCategoryId
+  //   );
+  //   console.log(newCategory);
+  //   setNewSubcategoryData((prevData) => ({
+  //     ...prevData,
+  //     categories: [...prevData?.categories, newCategory],
+  //   }));
+
+  //   const newCategoryBucket = categoryBucket.filter(
+  //     (category) => category?._id !== newCategoryId
+  //   );
+  //   setCategoryBucket(newCategoryBucket);
+  //   e.target.value = "";
+  // };
+
+  const handleAddOrRemove = (newCollection) => {
     setNewSubcategoryData((prevData) => ({
       ...prevData,
-      categories: [...prevData?.categories, newCategory],
+      categories: newCollection,
     }));
-
-    const newCategoryBucket = categoryBucket.filter(
-      (category) => category?._id !== newCategoryId
-    );
-    setCategoryBucket(newCategoryBucket);
-    e.target.value = "";
   };
 
-  const removeCategory = (categoryId) => {
-    const newCategories = newSubcategoryData.categories.filter(
-      (category) => category?._id !== categoryId
-    );
-    setNewSubcategoryData((prevData) => ({
-      ...prevData,
-      categories: newCategories,
-    }));
+  // const removeCategory = (categoryId) => {
+  //   const newCategories = newSubcategoryData.categories.filter(
+  //     (category) => category?._id !== categoryId
+  //   );
+  //   setNewSubcategoryData((prevData) => ({
+  //     ...prevData,
+  //     categories: newCategories,
+  //   }));
 
-    setCategoryBucket((prevBucket) => [
-      ...prevBucket,
-      categories.find((category) => category?._id === categoryId),
-    ]);
-  };
+  //   setCategoryBucket((prevBucket) => [
+  //     ...prevBucket,
+  //     categories.find((category) => category?._id === categoryId),
+  //   ]);
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -179,7 +187,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
                 />
               </label>
             </div>
-            <div className="grid gap-2 mt-4">
+            {/* <div className="grid gap-2 mt-4">
               <label>Select Category*</label>
               <div className="bg-gray-800 border p-3 focus-within:border-primary-200 outline-none rounded w-full gap-2">
                 <div
@@ -224,7 +232,13 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
                   ))}
                 </select>
               </div>
-            </div>
+            </div> */}
+
+            <SelectionDropDown
+              collection={categories}
+              handleAddOrRemove={handleAddOrRemove}
+              newCollection={newSubcategoryData?.categories}
+            />
             <button
               className={`text-white p-4 rounded font-semibold mt-8 tracking-wider text-[17px] ${
                 newSubcategoryData?.name &&

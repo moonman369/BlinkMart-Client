@@ -119,6 +119,53 @@ const UploadProduct = () => {
               </label>
             </div>
           </div>
+
+          {/* <div className="grid gap-2 mt-4">
+            <label>Select Category*</label>
+            <div className="bg-gray-800 border p-3 focus-within:border-primary-200 outline-none rounded w-full gap-2">
+              <div
+                className={`flex gap-2 flex-wrap ${
+                  newSubcategoryData?.categories?.length > 0
+                    ? "border-b border-gray-500 pb-2"
+                    : ""
+                }`}
+              >
+                {newSubcategoryData?.categories?.map((category, index) => (
+                  <span
+                    key={index}
+                    className="bg-gray-700 text-[14px] text-secondary-200 font-semibold p-1 rounded flex items-center justify-center gap-1"
+                  >
+                    <p>{category?.name}</p>
+                    <IoClose
+                      size={15}
+                      className="cursor-pointer flex items-center justify-center text-primary-200 font-extrabold rounded-full"
+                      onClick={() => {
+                        removeCategory(category?._id);
+                      }}
+                    />
+                  </span>
+                ))}
+              </div>
+              <select
+                className="w-full outline-none bg-gray-800"
+                onChange={handleOnCategorySelect}
+                name="category"
+              >
+                <option className="text-[14px]" value={""} disabled selected>
+                  Select atleast one or more categories
+                </option>
+                {categoryBucket.map((category, index) => (
+                  <option
+                    className="text-[14px]"
+                    key={index}
+                    value={category?._id}
+                  >
+                    {category?.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div> */}
         </form>
       </div>
     </section>
