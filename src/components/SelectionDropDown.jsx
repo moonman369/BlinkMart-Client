@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 
 const SelectionDropDown = ({
@@ -7,6 +7,14 @@ const SelectionDropDown = ({
   newCollection,
 }) => {
   const [collectionBucket, setCollectionBucket] = useState(collection);
+
+  // console.log("collection", collection);
+
+  useEffect(() => {
+    setCollectionBucket(collection);
+  }, [collection]);
+
+  // console.log("collectionBucket", collectionBucket);
 
   const handleOnItemSelect = (e) => {
     e.preventDefault();

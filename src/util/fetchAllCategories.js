@@ -1,7 +1,21 @@
 import { apiSummary } from "../config/api/apiSummary";
 import customAxios from "./customAxios";
 
-export const fetchAllCategories = async (currentPage, pageSize) => {
+export const fetchAllCategories = async (
+  all = false,
+  currentPage,
+  pageSize
+) => {
+  if (all) {
+    const fetchAllCategoriesResponse = await customAxios({
+      url: apiSummary.endpoints.category.getAllCategories.path,
+      method: apiSummary.endpoints.category.getAllCategories.method,
+      params: {
+        all: true,
+      },
+    });
+    return fetchAllCategoriesResponse;
+  }
   const fetchCategoriesResponse = await customAxios({
     url: apiSummary.endpoints.category.getAllCategories.path,
     method: apiSummary.endpoints.category.getAllCategories.method,

@@ -7,6 +7,8 @@ import { axiosToastError } from "../util/axiosToastError.js";
 import customAxios from "../util/customAxios.js";
 import toast from "react-hot-toast";
 import SelectionDropDown from "./SelectionDropDown.jsx";
+import { fetchAllCategories } from "../util/fetchAllCategories.js";
+import { all } from "axios";
 
 const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
   const [newSubcategoryData, setNewSubcategoryData] = useState({
@@ -15,12 +17,18 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
     categories: [],
   });
   const [processing, setProcessing] = useState(false);
-  const categories = useSelector((state) => state.product.allCategories);
-  const [categoryBucket, setCategoryBucket] = useState([]);
-
+  // const categories = useSelector((state) => state.product.allCategories);
+  const [categories, setCategories] = useState([]);
   useEffect(() => {
-    setCategoryBucket(categories);
-  }, [categories]);
+    const performFetchCategories = async () => {
+      const fetchAllCategoriesResponse = await fetchAllCategories(true);
+      console.log("fetchAllCategoriesResponse", fetchAllCategoriesResponse);
+      setCategories(fetchAllCategoriesResponse?.data?.data);
+    };
+
+    performFetchCategories();
+  }, []);
+  console.log("categories", categories);
 
   const handleOnNameChange = (e) => {
     e.preventDefault();
@@ -31,46 +39,12 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
     }));
   };
 
-  // const handleOnCategorySelect = (e) => {
-  //   e.preventDefault();
-  //   const newCategoryId = e.target.value;
-  //   const newCategory = categories.find(
-  //     (category) => category?._id === newCategoryId
-  //   );
-  //   console.log(newCategory);
-  //   setNewSubcategoryData((prevData) => ({
-  //     ...prevData,
-  //     categories: [...prevData?.categories, newCategory],
-  //   }));
-
-  //   const newCategoryBucket = categoryBucket.filter(
-  //     (category) => category?._id !== newCategoryId
-  //   );
-  //   setCategoryBucket(newCategoryBucket);
-  //   e.target.value = "";
-  // };
-
   const handleAddOrRemove = (newCollection) => {
     setNewSubcategoryData((prevData) => ({
       ...prevData,
       categories: newCollection,
     }));
   };
-
-  // const removeCategory = (categoryId) => {
-  //   const newCategories = newSubcategoryData.categories.filter(
-  //     (category) => category?._id !== categoryId
-  //   );
-  //   setNewSubcategoryData((prevData) => ({
-  //     ...prevData,
-  //     categories: newCategories,
-  //   }));
-
-  //   setCategoryBucket((prevBucket) => [
-  //     ...prevBucket,
-  //     categories.find((category) => category?._id === categoryId),
-  //   ]);
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
