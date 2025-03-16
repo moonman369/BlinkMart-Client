@@ -30,8 +30,12 @@ function App() {
 
   const getAllCategories = async () => {
     try {
-      const allCategories = await fetchAllCategories(1, 10);
-      // console.log("allCategories", allCategories);
+      const allCategories = await fetchAllCategories({
+        all: false,
+        currentPage: 1,
+        pageSize: 10,
+      });
+      console.log("allCategories", allCategories);
       dispatch(setAllCategories(allCategories?.data?.data));
       dispatch(
         setCategoryPageDetails({

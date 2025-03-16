@@ -21,7 +21,9 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     const performFetchCategories = async () => {
-      const fetchAllCategoriesResponse = await fetchAllCategories(true);
+      const fetchAllCategoriesResponse = await fetchAllCategories({
+        all: true,
+      });
       console.log("fetchAllCategoriesResponse", fetchAllCategoriesResponse);
       setCategories(fetchAllCategoriesResponse?.data?.data);
     };
