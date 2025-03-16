@@ -221,6 +221,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
             </div> */}
 
             <SelectionDropDown
+              title={"Category"}
               collection={categories}
               handleAddOrRemove={handleAddOrRemove}
               newCollection={newSubcategoryData?.categories}

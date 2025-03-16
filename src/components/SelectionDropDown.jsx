@@ -5,6 +5,7 @@ const SelectionDropDown = ({
   collection,
   handleAddOrRemove,
   newCollection,
+  title,
 }) => {
   const [collectionBucket, setCollectionBucket] = useState(collection);
 
@@ -43,7 +44,7 @@ const SelectionDropDown = ({
 
   return (
     <div className="grid gap-2 mt-4">
-      <label>Select Category*</label>
+      <label>{`Select ${title}*`}</label>
       <div className="bg-gray-800 border p-3 focus-within:border-primary-200 outline-none rounded w-full gap-2">
         <div
           className={`flex gap-2 flex-wrap ${

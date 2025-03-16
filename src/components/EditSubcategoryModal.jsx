@@ -231,6 +231,7 @@ const EditSubcategoryModal = ({
             </div>
 
             <SelectionDropDown
+            title={"Category"}
               collection={categoryBucket}
               newCollection={editSubcategoryData?.category}
               handleAddOrRemove={handleAddOrRemove}

@@ -185,12 +185,14 @@ const UploadProduct = () => {
           </div>
 
           <SelectionDropDown
+            title={"Category"}
             collection={allCategories}
             newCollection={productData?.categories}
             handleAddOrRemove={handleAddOrRemoveCategories}
           />
 
           <SelectionDropDown
+            title={"Subcategory"}
             collection={allSubCategories}
             newCollection={productData?.subcategories}
             handleAddOrRemove={handleAddOrRemoveSubcategories}
