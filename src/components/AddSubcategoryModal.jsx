@@ -28,7 +28,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
 
     performFetchCategories();
   }, []);
-  console.log("categories", categories);
+  // console.log("categories", categories);
 
   const handleOnNameChange = (e) => {
     e.preventDefault();

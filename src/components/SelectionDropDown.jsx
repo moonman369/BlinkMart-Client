@@ -72,7 +72,7 @@ const SelectionDropDown = ({
           name="category"
         >
           <option className="text-[14px]" value={""} disabled selected>
-            Select atleast one or more categories
+            Select atleast one or more options
           </option>
           {collectionBucket?.map((bucketItem, index) => (
             <option className="text-[14px]" key={index} value={bucketItem?._id}>

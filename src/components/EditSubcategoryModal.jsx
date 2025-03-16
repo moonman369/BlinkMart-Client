@@ -7,6 +7,8 @@ import { axiosToastError } from "../util/axiosToastError.js";
 import customAxios from "../util/customAxios.js";
 import toast from "react-hot-toast";
 import { checkCategoriesArrayEquality } from "../util/checkCategoriesArrayEquality.js";
+import SelectionDropDown from "./SelectionDropDown.jsx";
+import { fetchAllCategories } from "../util/fetchAllCategories.js";
 
 const EditSubcategoryModal = ({
   fetchSubcategories,
@@ -15,8 +17,19 @@ const EditSubcategoryModal = ({
 }) => {
   const [editSubcategoryData, setEditSubcategoryData] = useState(subcategory);
   const [processing, setProcessing] = useState(false);
-  const categories = useSelector((state) => state.product.allCategories);
+  // const categories = useSelector((state) => state.product.allCategories);
   const [categoryBucket, setCategoryBucket] = useState([]);
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const performFetchCategories = async () => {
+      const fetchAllCategoriesResponse = await fetchAllCategories(true);
+      console.log("fetchAllCategoriesResponse", fetchAllCategoriesResponse);
+      setCategories(fetchAllCategoriesResponse?.data?.data);
+    };
+
+    performFetchCategories();
+  }, []);
+  console.log("categories", categories);
 
   useEffect(() => {
     setEditSubcategoryData(subcategory);
@@ -41,24 +54,24 @@ const EditSubcategoryModal = ({
     }));
   };
 
-  const handleOnCategorySelect = (e) => {
-    e.preventDefault();
-    const newCategoryId = e.target.value;
-    const newCategory = categories.find(
-      (category) => category?._id === newCategoryId
-    );
-    console.log(newCategory);
-    setEditSubcategoryData((prevData) => ({
-      ...prevData,
-      category: [...prevData?.category, newCategory],
-    }));
+  // const handleOnCategorySelect = (e) => {
+  //   e.preventDefault();
+  //   const newCategoryId = e.target.value;
+  //   const newCategory = categories.find(
+  //     (category) => category?._id === newCategoryId
+  //   );
+  //   console.log(newCategory);
+  //   setEditSubcategoryData((prevData) => ({
+  //     ...prevData,
+  //     category: [...prevData?.category, newCategory],
+  //   }));
 
-    const newCategoryBucket = categoryBucket.filter(
-      (category) => category?._id !== newCategoryId
-    );
-    setCategoryBucket(newCategoryBucket);
-    e.target.value = "";
-  };
+  //   const newCategoryBucket = categoryBucket.filter(
+  //     (category) => category?._id !== newCategoryId
+  //   );
+  //   setCategoryBucket(newCategoryBucket);
+  //   e.target.value = "";
+  // };
 
   // useEffect(() => {
   //   console.log(
@@ -74,6 +87,13 @@ const EditSubcategoryModal = ({
   //     )
   //   );
   // }, [editSubcategoryData, subcategory]);
+
+  const handleAddOrRemove = (newCollection) => {
+    setEditSubcategoryData((prevData) => ({
+      ...prevData,
+      category: newCollection,
+    }));
+  };
 
   const removeCategory = (categoryId) => {
     const newCategories = editSubcategoryData?.category.filter(
@@ -207,52 +227,12 @@ const EditSubcategoryModal = ({
                 />
               </label>
             </div>
-            <div className="grid gap-2 mt-4">
-              <label>Select Category*</label>
-              <div className="bg-gray-800 border p-3 focus-within:border-primary-200 outline-none rounded w-full gap-2">
-                <div
-                  className={`flex gap-2 flex-wrap ${
-                    editSubcategoryData?.category?.length > 0
-                      ? "border-b border-gray-500 pb-2"
-                      : ""
-                  }`}
-                >
-                  {editSubcategoryData?.category?.map((category, index) => (
-                    <span
-                      key={index}
-                      className="bg-gray-700 text-[14px] text-secondary-200 font-semibold p-1 rounded flex items-center justify-center gap-1"
-                    >
-                      <p>{category?.name}</p>
-                      <IoClose
-                        size={15}
-                        className="cursor-pointer flex items-center justify-center text-primary-200 font-extrabold rounded-full"
-                        onClick={() => {
-                          removeCategory(category?._id);
-                        }}
-                      />
-                    </span>
-                  ))}
-                </div>
-                <select
-                  className="w-full outline-none bg-gray-800"
-                  onChange={handleOnCategorySelect}
-                  name="category"
-                >
-                  <option className="text-[14px]" value={""} disabled selected>
-                    Select atleast one or more categories
-                  </option>
-                  {categoryBucket.map((category, index) => (
-                    <option
-                      className="text-[14px]"
-                      key={index}
-                      value={category?._id}
-                    >
-                      {category?.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+
+            <SelectionDropDown
+              collection={categoryBucket}
+              newCollection={editSubcategoryData?.category}
+              handleAddOrRemove={handleAddOrRemove}
+            />
             <button
               className={`text-white p-4 rounded font-semibold mt-8 tracking-wider text-[17px] ${
                 editSubcategoryData?.name &&
