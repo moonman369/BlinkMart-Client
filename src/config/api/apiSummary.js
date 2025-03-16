@@ -1,5 +1,5 @@
 export const apiSummary = {
-  baseUrl: import.meta.env["VITE_APP.SERVER.BASE_URL"],
+  baseUrl: import.meta.env["VITE_APP_SERVER_BASE_URL"],
   endpoints: {
     user: {
       register: {
