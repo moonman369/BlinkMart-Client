@@ -21,11 +21,21 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     const performFetchCategories = async () => {
-      const fetchAllCategoriesResponse = await fetchAllCategories({
-        all: true,
-      });
-      console.log("fetchAllCategoriesResponse", fetchAllCategoriesResponse);
-      setCategories(fetchAllCategoriesResponse?.data?.data);
+      try {
+        const fetchAllCategoriesResponse = await fetchAllCategories({
+          all: true,
+        });
+        console.log("fetchAllCategoriesResponse", fetchAllCategoriesResponse);
+        if (
+          fetchAllCategoriesResponse.status ===
+          apiSummary.endpoints.category.getAllCategories.successStatus
+        ) {
+          setCategories(fetchAllCategoriesResponse.data.data);
+        }
+      } catch (error) {
+        console.error(error);
+        axiosToastError(error);
+      }
     };
 
     performFetchCategories();

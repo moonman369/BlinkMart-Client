@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { RxCrossCircled } from "react-icons/rx";
+import { fetchAllCategories } from "../util/fetchAllCategories";
+import { fetchAllSubcategories } from "../util/fetchAllSubcategories";
+import { apiSummary } from "../config/api/apiSummary";
+import SelectionDropDown from "../components/SelectionDropDown";
 
 const UploadProduct = () => {
   const [productData, setProductData] = useState({
     name: "",
     image: [],
-    category: [],
-    subcategory: [],
+    categories: [],
+    subcategories: [],
     unit: "",
     stock: "",
     price: "",
@@ -19,6 +23,52 @@ const UploadProduct = () => {
   const handleChange = (e) => {
     setProductData({ ...productData, [e.target.name]: e.target.value });
   };
+
+  const [allCategories, setAllCategories] = useState([]);
+  const [allSubCategories, setAllSubCategories] = useState([]);
+
+  const loadAllCategories = async () => {
+    try {
+      const fetchAllCategoriesResponse = await fetchAllCategories({
+        all: true,
+      });
+      console.log("fetchAllCategoriesResponse", fetchAllCategoriesResponse);
+      if (
+        fetchAllCategoriesResponse?.status ===
+        apiSummary.endpoints.category.getAllCategories.successStatus
+      ) {
+        setAllCategories(fetchAllCategoriesResponse?.data?.data);
+      }
+    } catch (error) {
+      console.error(error);
+      axiosToastError(error);
+    }
+  };
+  const loadAllSubcategories = async () => {
+    try {
+      const fetchAllSubcategoriesResponse = await fetchAllSubcategories({
+        all: true,
+      });
+      console.log(
+        "fetchAllSubcategoriesResponse",
+        fetchAllSubcategoriesResponse
+      );
+      if (
+        fetchAllSubcategoriesResponse?.status ===
+        apiSummary.endpoints.subcategory.getAllSubcategories.successStatus
+      ) {
+        setAllSubCategories(fetchAllSubcategoriesResponse?.data?.data);
+      }
+    } catch (error) {
+      console.error(error);
+      axiosToastError(error);
+    }
+  };
+
+  useEffect(() => {
+    loadAllCategories();
+    loadAllSubcategories();
+  }, []);
 
   const handleUploadProductImage = (e) => {
     const files = e.target.files;
@@ -34,6 +84,20 @@ const UploadProduct = () => {
   const removeImage = (index) => {
     const newImages = productData.image.filter((img, i) => i !== index);
     setProductData({ ...productData, image: newImages });
+  };
+
+  const handleAddOrRemoveCategories = (newCollection) => {
+    setProductData((prevData) => ({
+      ...prevData,
+      categories: newCollection,
+    }));
+  };
+
+  const handleAddOrRemoveSubcategories = (newCollection) => {
+    setProductData((prevData) => ({
+      ...prevData,
+      subcategories: newCollection,
+    }));
   };
 
   return (
@@ -120,52 +184,17 @@ const UploadProduct = () => {
             </div>
           </div>
 
-          {/* <div className="grid gap-2 mt-4">
-            <label>Select Category*</label>
-            <div className="bg-gray-800 border p-3 focus-within:border-primary-200 outline-none rounded w-full gap-2">
-              <div
-                className={`flex gap-2 flex-wrap ${
-                  newSubcategoryData?.categories?.length > 0
-                    ? "border-b border-gray-500 pb-2"
-                    : ""
-                }`}
-              >
-                {newSubcategoryData?.categories?.map((category, index) => (
-                  <span
-                    key={index}
-                    className="bg-gray-700 text-[14px] text-secondary-200 font-semibold p-1 rounded flex items-center justify-center gap-1"
-                  >
-                    <p>{category?.name}</p>
-                    <IoClose
-                      size={15}
-                      className="cursor-pointer flex items-center justify-center text-primary-200 font-extrabold rounded-full"
-                      onClick={() => {
-                        removeCategory(category?._id);
-                      }}
-                    />
-                  </span>
-                ))}
-              </div>
-              <select
-                className="w-full outline-none bg-gray-800"
-                onChange={handleOnCategorySelect}
-                name="category"
-              >
-                <option className="text-[14px]" value={""} disabled selected>
-                  Select atleast one or more categories
-                </option>
-                {categoryBucket.map((category, index) => (
-                  <option
-                    className="text-[14px]"
-                    key={index}
-                    value={category?._id}
-                  >
-                    {category?.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div> */}
+          <SelectionDropDown
+            collection={allCategories}
+            newCollection={productData?.categories}
+            handleAddOrRemove={handleAddOrRemoveCategories}
+          />
+
+          <SelectionDropDown
+            collection={allSubCategories}
+            newCollection={productData?.subcategories}
+            handleAddOrRemove={handleAddOrRemoveSubcategories}
+          />
         </form>
       </div>
     </section>
