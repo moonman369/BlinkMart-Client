@@ -12,6 +12,7 @@ export const fetchAllCategories = async ({ all, currentPage, pageSize }) => {
     });
     return fetchAllCategoriesResponse;
   }
+
   const fetchCategoriesResponse = await customAxios({
     url: apiSummary.endpoints.category.getAllCategories.path,
     method: apiSummary.endpoints.category.getAllCategories.method,

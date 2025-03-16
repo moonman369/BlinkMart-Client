@@ -10,8 +10,14 @@ import { fetchUserDetails } from "./util/fetchUserDetails";
 import { setUserDetails } from "./store/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCategories } from "./util/fetchAllCategories";
-import { setAllCategories, setCategoryPageDetails } from "./store/productSlice";
+import {
+  setAllCategories,
+  setAllSubcategories,
+  setCategoryPageDetails,
+  setSubcategoryPageDetails,
+} from "./store/productSlice";
 import { all } from "axios";
+import { fetchAllSubcategories } from "./util/fetchAllSubcategories";
 
 function App() {
   const dispatch = useDispatch();
@@ -51,6 +57,29 @@ function App() {
     }
   };
 
+  const getAllSubcategories = async () => {
+    try {
+      const allSubcategories = await fetchAllSubcategories({
+        all: false,
+        currentPage: 1,
+        pageSize: 10,
+      });
+      console.log("allSubcategories", allSubcategories);
+      dispatch(setAllSubcategories(allSubcategories?.data?.data));
+      dispatch(
+        setSubcategoryPageDetails({
+          pageSize: allSubcategories?.data?.pageSize,
+          currentPage: allSubcategories?.data?.currentPage,
+          count: allSubcategories?.data?.count,
+          totalCount: allSubcategories?.data?.totalCount,
+        })
+      );
+    } catch (error) {
+      console.error("Fetch Subcategories Error: ", error);
+      toast.error("Error fetching subcategories!");
+    }
+  };
+
   useEffect(() => {
     getUser();
   }, []);
@@ -58,6 +87,7 @@ function App() {
   useEffect(() => {
     if (user && user?.role === "ADMIN") {
       getAllCategories();
+      getAllSubcategories();
     }
   }, [user]);
 

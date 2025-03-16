@@ -12,10 +12,22 @@ import { MdOutlineDelete } from "react-icons/md";
 import EditSubcategoryModal from "../components/EditSubcategoryModal";
 import DeleteCategoryModal from "../components/DeleteCategoryModal";
 import DeleteSubcategoryModal from "../components/DeleteSubcategoryModal";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllSubcategories } from "../util/fetchAllSubcategories";
+import {
+  setAllSubcategories,
+  setSubcategoryPageDetails,
+} from "../store/productSlice";
+import PaginationBar from "../components/PaginationBar";
 
 const SubCategories = () => {
+  const dispatch = useDispatch();
   const [openAddSubcategoryModal, setOpenAddSubcategoryModal] = useState(false);
-  const [subcategories, setSubcategories] = useState([]);
+  // const [subcategories, setSubcategories] = useState([]);
+  const subcategories = useSelector((state) => state.product.allSubcategories);
+  const subcategoryPageDetails = useSelector(
+    (state) => state.product.pageDetails.subcategories
+  );
   const [loading, setLoading] = useState(false);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [openEditSubcategoryModal, setOpenEditSubcategoryModal] =
@@ -87,25 +99,40 @@ const SubCategories = () => {
     }),
   ];
 
-  const fetchSubcategories = async () => {
+  const refreshSubcategories = async (currentPage, pageSize) => {
     try {
-      const subcategoryResponse = await customAxios({
-        url: apiSummary.endpoints.subcategory.getAllSubcategories.path,
-        method: apiSummary.endpoints.subcategory.getAllSubcategories.method,
+      setLoading(true);
+      const fetchSubcategoriesResponse = await fetchAllSubcategories({
+        all: false,
+        currentPage,
+        pageSize,
       });
+      console.log(fetchSubcategoriesResponse);
       if (
-        subcategoryResponse.status ===
+        fetchSubcategoriesResponse.status ===
         apiSummary.endpoints.subcategory.getAllSubcategories.successStatus
       ) {
-        setSubcategories(subcategoryResponse?.data?.data);
+        console.log("Refresh Subcategories", fetchSubcategoriesResponse);
+        dispatch(setAllSubcategories(fetchSubcategoriesResponse.data.data));
+        dispatch(
+          setSubcategoryPageDetails({
+            pageSize: fetchSubcategoriesResponse?.data?.pageSize,
+            currentPage: fetchSubcategoriesResponse?.data?.currentPage,
+            count: fetchSubcategoriesResponse?.data?.count,
+            totalCount: fetchSubcategoriesResponse?.data?.totalCount,
+          })
+        );
       }
     } catch (error) {
+      console.error("Fetch Subcategories Error: ", error);
       axiosToastError(error);
+    } finally {
+      setLoading(false);
     }
   };
-  useEffect(() => {
-    fetchSubcategories();
-  }, []);
+  // useEffect(() => {
+  //   fetchSubcategories();
+  // }, []);
 
   const handleEditClick = (subcategory) => {
     setOpenEditSubcategoryModal(true);
@@ -137,6 +164,11 @@ const SubCategories = () => {
   };
 
   console.log("subcategories", subcategories);
+  console.log(
+    `subcategoryPageDetails ${subcategoryPageDetails?.totalCount} ${Math.floor(
+      subcategoryPageDetails?.totalCount / 10
+    )} ${subcategoryPageDetails?.totalCount % 10 > 0 ? 1 : 0}`
+  );
 
   return (
     <section>
@@ -157,7 +189,9 @@ const SubCategories = () => {
       {openAddSubcategoryModal && (
         <AddSubcategoryModal
           closeModal={() => setOpenAddSubcategoryModal(false)}
-          fetchSubcategories={fetchSubcategories}
+          fetchSubcategories={() => {
+            refreshSubcategories(1, 10);
+          }}
         />
       )}
 
@@ -173,7 +207,9 @@ const SubCategories = () => {
         <EditSubcategoryModal
           closeModal={closeEditSubcategoryModal}
           subcategory={selectedSubcategory}
-          fetchSubcategories={fetchSubcategories}
+          fetchSubcategories={() => {
+            refreshSubcategories(1, 10);
+          }}
         />
       )}
 
@@ -181,9 +217,19 @@ const SubCategories = () => {
         <DeleteSubcategoryModal
           closeModal={closeDeleteSubcategoryModal}
           subcategory={selectedSubcategory}
-          fetchSubcategories={fetchSubcategories}
+          fetchSubcategories={refreshSubcategories}
         />
       )}
+
+      <PaginationBar
+        styles={"mt-10"}
+        pageSize={10}
+        totalPages={
+          Math.floor(subcategoryPageDetails?.totalCount / 10) +
+          (subcategoryPageDetails?.totalCount % 10 > 0 ? 1 : 0)
+        }
+        reloadPage={refreshSubcategories}
+      />
     </section>
   );
 };

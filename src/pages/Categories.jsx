@@ -10,7 +10,10 @@ import EditCategoryModal from "../components/EditCategoryModal";
 import DeleteCategoryModal from "../components/DeleteCategoryModal";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCategories } from "../util/fetchAllCategories";
-import { setAllCategories } from "../store/productSlice";
+import {
+  setAllCategories,
+  setCategoryPageDetails,
+} from "../store/productSlice";
 import PaginationBar from "../components/PaginationBar";
 
 const Categories = () => {
@@ -30,10 +33,11 @@ const Categories = () => {
   const refreshCategories = async (currentPage, pageSize) => {
     try {
       setLoading(true);
-      const fetchCategoriesResponse = await fetchAllCategories(
+      const fetchCategoriesResponse = await fetchAllCategories({
+        all: false,
         currentPage,
-        pageSize
-      );
+        pageSize,
+      });
       console.log(fetchCategoriesResponse);
       if (
         fetchCategoriesResponse.status ===
@@ -41,6 +45,14 @@ const Categories = () => {
       ) {
         console.log("Refresh Categories", fetchCategoriesResponse);
         dispatch(setAllCategories(fetchCategoriesResponse.data.data));
+        dispatch(
+          setCategoryPageDetails({
+            pageSize: fetchCategoriesResponse?.data?.pageSize,
+            currentPage: fetchCategoriesResponse?.data?.currentPage,
+            count: fetchCategoriesResponse?.data?.count,
+            totalCount: fetchCategoriesResponse?.data?.totalCount,
+          })
+        );
       }
     } catch (error) {
       console.error("Fetch Categories Error: ", error);
@@ -144,7 +156,7 @@ const Categories = () => {
         styles={"mt-10"}
         pageSize={10}
         totalPages={
-          categoryPageDetails?.totalCount / 10 +
+          Math.floor(categoryPageDetails?.totalCount / 10) +
           (categoryPageDetails?.totalCount % 10 > 0 ? 1 : 0)
         }
         reloadPage={refreshCategories}
