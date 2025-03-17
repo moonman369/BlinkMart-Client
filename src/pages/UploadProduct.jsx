@@ -5,6 +5,8 @@ import { fetchAllCategories } from "../util/fetchAllCategories";
 import { fetchAllSubcategories } from "../util/fetchAllSubcategories";
 import { apiSummary } from "../config/api/apiSummary";
 import SelectionDropDown from "../components/SelectionDropDown";
+import { LuCirclePlus } from "react-icons/lu";
+import AddCustomFieldModal from "../components/AddCustomFieldModal";
 
 const UploadProduct = () => {
   const [productData, setProductData] = useState({
@@ -26,6 +28,8 @@ const UploadProduct = () => {
 
   const [allCategories, setAllCategories] = useState([]);
   const [allSubCategories, setAllSubCategories] = useState([]);
+  const [customFields, setCustomFields] = useState([]);
+  const [openAddCustomField, setOpenAddCustomField] = useState(false);
 
   const loadAllCategories = async () => {
     try {
@@ -100,6 +104,8 @@ const UploadProduct = () => {
     }));
   };
 
+  console.log("customFields", customFields);
+
   return (
     <section>
       <div className="p-3 font-semibold bg-gray-900 shadow-secondary-200 shadow-md rounded-md flex items-center justify-between">
@@ -157,7 +163,7 @@ const UploadProduct = () => {
                 ) : (
                   <div className="text-center flex flex-col items-center justify-center h-full px-10">
                     <FaCloudUploadAlt size={35} />
-                    <p className="text-xs">Upload Image</p>
+                    <p className="text-xs">Upload Image/s</p>
                   </div>
                 )}
               </div>
@@ -197,6 +203,79 @@ const UploadProduct = () => {
             newCollection={productData?.subcategories}
             handleAddOrRemove={handleAddOrRemoveSubcategories}
           />
+
+          <div className="grid gap-2">
+            <label htmlFor="unit">Unit*</label>
+            <input
+              type="text"
+              placeholder="Enter product unit"
+              value={productData?.unit}
+              onChange={handleChange}
+              name="unit"
+              required
+              className="p-2 border rounded bg-gray-700 flex items-center outline-none focus-within:border-highlight-100"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <label htmlFor="stock">Stock*</label>
+            <input
+              type="number"
+              min={0}
+              placeholder="Enter product stock"
+              value={productData?.stock}
+              onChange={handleChange}
+              name="stock"
+              required
+              className="p-2 border rounded bg-gray-700 flex items-center outline-none focus-within:border-highlight-100"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <label htmlFor="price">Price*</label>
+            <input
+              type="number"
+              min={0}
+              placeholder="Enter product price"
+              value={productData?.price}
+              onChange={handleChange}
+              name="price"
+              required
+              className="p-2 border rounded bg-gray-700 flex items-center outline-none focus-within:border-highlight-100"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <label htmlFor="discount">Discount</label>
+            <input
+              type="number"
+              min={0}
+              max={100}
+              placeholder="Enter discount if applicable"
+              value={productData?.discount}
+              onChange={handleChange}
+              name="discount"
+              className="p-2 border rounded bg-gray-700 flex items-center outline-none focus-within:border-highlight-100"
+            />
+          </div>
+
+          <div
+            className="mt-4 bg-primary-100 hover:bg-primary-200 py-1 px-2 w-[200px] text-gray-800 rounded font-semibold tracking-wider cursor-pointer"
+            onClick={() => setOpenAddCustomField(true)}
+          >
+            <span className="flex items-center justify-center gap-2">
+              <LuCirclePlus size={20} />
+              <p>Add Custom Fields</p>
+            </span>
+          </div>
+
+          {openAddCustomField && (
+            <AddCustomFieldModal
+              closeModal={() => setOpenAddCustomField(false)}
+              customFields={customFields}
+              setCustomFields={setCustomFields}
+            />
+          )}
         </form>
       </div>
     </section>
