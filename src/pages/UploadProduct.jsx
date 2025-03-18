@@ -290,7 +290,18 @@ const UploadProduct = () => {
             />
           </div>
 
-          <div className="grid gap-2">
+          <div
+            className={`grid gap-2 ${
+              Object.keys(productData?.more_details)?.length > 0
+                ? "p-4 shadow-primary-100 shadow-sm rounded-md mt-3"
+                : ""
+            }`}
+          >
+            {Object.keys(productData?.more_details)?.length > 0 && (
+              <p className="font-semibold text-[20px] mb-3 text-primary-100">
+                Custom Fields
+              </p>
+            )}
             {Object.keys(productData?.more_details)?.map((k, index) => (
               <div key={index} className="grid gap-2">
                 <div className="flex items-center justify-between">
