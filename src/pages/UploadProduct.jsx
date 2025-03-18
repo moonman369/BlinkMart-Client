@@ -156,7 +156,7 @@ const UploadProduct = () => {
               placeholder="Enter product description"
               value={productData?.description}
               onChange={handleChange}
-              name="name"
+              name="description"
               rows={2}
               required
               className="p-2 border rounded bg-gray-700 flex items-center outline-none focus-within:border-highlight-100"
@@ -331,11 +331,18 @@ const UploadProduct = () => {
             className="mt-4 bg-primary-100 hover:bg-primary-200 py-1 px-2 w-[200px] text-gray-800 rounded font-semibold tracking-wider cursor-pointer"
             onClick={() => setOpenAddCustomField(true)}
           >
-            <span className="flex items-center justify-center gap-2">
+            <span className="flex items-center justify-center">
               <LuCirclePlus size={20} />
               <p>Add Custom Field</p>
             </span>
           </div>
+
+          <button
+            type="submit"
+            className="text-white p-3 rounded font-semibold tracking-wider bg-green-700 hover:bg-green-800 mt-10"
+          >
+            Submit
+          </button>
 
           {openAddCustomField && (
             <AddCustomFieldModal
