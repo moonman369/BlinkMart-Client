@@ -7,6 +7,7 @@ import { apiSummary } from "../config/api/apiSummary";
 import SelectionDropDown from "../components/SelectionDropDown";
 import { LuCirclePlus } from "react-icons/lu";
 import AddCustomFieldModal from "../components/AddCustomFieldModal";
+import { MdOutlineDelete } from "react-icons/md";
 
 const UploadProduct = () => {
   const [productData, setProductData] = useState({
@@ -19,17 +20,15 @@ const UploadProduct = () => {
     price: "",
     discount: "",
     description: "",
-    more_details: "",
+    more_details: {},
   });
+  const [allCategories, setAllCategories] = useState([]);
+  const [allSubCategories, setAllSubCategories] = useState([]);
+  const [openAddCustomField, setOpenAddCustomField] = useState(false);
 
   const handleChange = (e) => {
     setProductData({ ...productData, [e.target.name]: e.target.value });
   };
-
-  const [allCategories, setAllCategories] = useState([]);
-  const [allSubCategories, setAllSubCategories] = useState([]);
-  const [customFields, setCustomFields] = useState([]);
-  const [openAddCustomField, setOpenAddCustomField] = useState(false);
 
   const loadAllCategories = async () => {
     try {
@@ -68,7 +67,6 @@ const UploadProduct = () => {
       axiosToastError(error);
     }
   };
-
   useEffect(() => {
     loadAllCategories();
     loadAllSubcategories();
@@ -104,7 +102,28 @@ const UploadProduct = () => {
     }));
   };
 
-  console.log("customFields", customFields);
+  const handleDeleteCustomField = (index) => {
+    setProductData((prevData) => {
+      const newCustomFields = { ...prevData.more_details };
+      delete newCustomFields[Object.keys(newCustomFields)[index]];
+      return {
+        ...prevData,
+        more_details: newCustomFields,
+      };
+    });
+  };
+
+  const handleCustomFieldChange = (e) => {
+    setProductData({
+      ...productData,
+      more_details: {
+        ...productData.more_details,
+        [e.target.name]: e.target.value,
+      },
+    });
+  };
+
+  console.log("productData", productData);
 
   return (
     <section>
@@ -114,7 +133,9 @@ const UploadProduct = () => {
       <div className="mt-10 p-5 bg-gray-800 shadow-secondary-200 shadow-sm rounded-md">
         <form className="grid gap-5">
           <div className="grid gap-2">
-            <label htmlFor="name">Name*</label>
+            <label htmlFor="name" className="font-semibold">
+              Name*
+            </label>
             <input
               type="text"
               placeholder="Enter product name"
@@ -127,7 +148,9 @@ const UploadProduct = () => {
           </div>
 
           <div className="grid gap-2">
-            <label htmlFor="description">Description*</label>
+            <label htmlFor="description" className="font-semibold">
+              Description*
+            </label>
             <textarea
               type="text"
               placeholder="Enter product description"
@@ -141,7 +164,7 @@ const UploadProduct = () => {
           </div>
 
           <div>
-            <p>Images (Optional)</p>
+            <p className="font-semibold">Images (Optional)</p>
             <div className="flex gap-4 flex-col items-center">
               <div className="border bg-gray-800 h-36 w-full lg:w-50 rounded focus-within:border-primary-200 outline-none flex items-center justify-center text-neutral-500">
                 {productData?.image?.length > 0 ? (
@@ -205,7 +228,9 @@ const UploadProduct = () => {
           />
 
           <div className="grid gap-2">
-            <label htmlFor="unit">Unit*</label>
+            <label htmlFor="unit" className="font-semibold">
+              Unit*
+            </label>
             <input
               type="text"
               placeholder="Enter product unit"
@@ -218,7 +243,9 @@ const UploadProduct = () => {
           </div>
 
           <div className="grid gap-2">
-            <label htmlFor="stock">Stock*</label>
+            <label htmlFor="stock" className="font-semibold">
+              Stock*
+            </label>
             <input
               type="number"
               min={0}
@@ -232,7 +259,9 @@ const UploadProduct = () => {
           </div>
 
           <div className="grid gap-2">
-            <label htmlFor="price">Price*</label>
+            <label htmlFor="price" className="font-semibold">
+              Price*
+            </label>
             <input
               type="number"
               min={0}
@@ -246,7 +275,9 @@ const UploadProduct = () => {
           </div>
 
           <div className="grid gap-2">
-            <label htmlFor="discount">Discount</label>
+            <label htmlFor="discount" className="font-semibold">
+              Discount
+            </label>
             <input
               type="number"
               min={0}
@@ -259,21 +290,47 @@ const UploadProduct = () => {
             />
           </div>
 
+          <div className="grid gap-2">
+            {Object.keys(productData?.more_details)?.map((k, index) => (
+              <div key={index} className="grid gap-2">
+                <div className="flex items-center justify-between">
+                  <label htmlFor={k} className="font-semibold">
+                    {k}
+                  </label>
+                  <div
+                    className="text-gray-800 p-1 bg-red-500 rounded-md hover:bg-red-700 ml-2 cursor-pointer"
+                    onClick={() => handleDeleteCustomField(index)}
+                  >
+                    <MdOutlineDelete size={16} />
+                  </div>
+                </div>
+                <input
+                  type="text"
+                  placeholder={`Enter ${k}`}
+                  value={productData?.more_details[k]}
+                  onChange={handleCustomFieldChange}
+                  name={k}
+                  className="p-2 border rounded bg-gray-700 flex items-center outline-none focus-within:border-highlight-100"
+                />
+              </div>
+            ))}
+          </div>
+
           <div
             className="mt-4 bg-primary-100 hover:bg-primary-200 py-1 px-2 w-[200px] text-gray-800 rounded font-semibold tracking-wider cursor-pointer"
             onClick={() => setOpenAddCustomField(true)}
           >
             <span className="flex items-center justify-center gap-2">
               <LuCirclePlus size={20} />
-              <p>Add Custom Fields</p>
+              <p>Add Custom Field</p>
             </span>
           </div>
 
           {openAddCustomField && (
             <AddCustomFieldModal
               closeModal={() => setOpenAddCustomField(false)}
-              customFields={customFields}
-              setCustomFields={setCustomFields}
+              customFields={productData?.more_details}
+              setCustomFields={setProductData}
             />
           )}
         </form>
