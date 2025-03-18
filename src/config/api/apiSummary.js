@@ -102,5 +102,12 @@ export const apiSummary = {
         successStatus: 200,
       },
     },
+    product: {
+      addProduct: {
+        path: "api/v1/product/add-product",
+        method: "post",
+        successStatus: 201,
+      },
+    },
   },
 };

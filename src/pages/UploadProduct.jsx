@@ -8,6 +8,9 @@ import SelectionDropDown from "../components/SelectionDropDown";
 import { LuCirclePlus } from "react-icons/lu";
 import AddCustomFieldModal from "../components/AddCustomFieldModal";
 import { MdOutlineDelete } from "react-icons/md";
+import { axiosToastError } from "../util/axiosToastError";
+import toast from "react-hot-toast";
+import customAxios from "../util/customAxios";
 
 const UploadProduct = () => {
   const [productData, setProductData] = useState({
@@ -25,6 +28,7 @@ const UploadProduct = () => {
   const [allCategories, setAllCategories] = useState([]);
   const [allSubCategories, setAllSubCategories] = useState([]);
   const [openAddCustomField, setOpenAddCustomField] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   const handleChange = (e) => {
     setProductData({ ...productData, [e.target.name]: e.target.value });
@@ -121,6 +125,84 @@ const UploadProduct = () => {
         [e.target.name]: e.target.value,
       },
     });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setProcessing(true);
+
+    try {
+      if (
+        !productData.name ||
+        !productData.description ||
+        !productData.unit ||
+        !productData.stock ||
+        !productData.price ||
+        !productData.categories.length ||
+        !productData.subcategories.length ||
+        !productData.image.length
+      ) {
+        toast.error(
+          "Missing one or more required fields: [name, image, categories, subcategories, unit, stock, price, description]"
+        );
+        setProcessing(false);
+        return;
+      }
+      const formData = new FormData();
+      formData.append("name", productData?.name);
+      formData.append("description", productData?.description);
+      formData.append(
+        "categories",
+        JSON.stringify(
+          productData?.categories?.map((category) => category?._id)
+        )
+      );
+      formData.append(
+        "subcategories",
+        JSON.stringify(
+          productData?.subcategories?.map((subcategory) => subcategory?._id)
+        )
+      );
+      formData.append("unit", productData?.unit);
+      formData.append("stock", productData?.stock);
+      formData.append("price", productData?.price);
+      formData.append("discount", productData?.discount);
+      formData.append(
+        "more_details",
+        JSON.stringify(productData?.more_details)
+      );
+      formData.append("image", JSON.stringify(productData?.image));
+      formData.append("publish", true);
+      const response = await customAxios({
+        url: apiSummary.endpoints.product.addProduct.path,
+        method: apiSummary.endpoints.product.addProduct.method,
+        data: formData,
+      });
+      console.log("add product response", response);
+      if (
+        response.status ===
+        apiSummary.endpoints.product.addProduct.successStatus
+      ) {
+        toast.success(response.data.message);
+        setProductData({
+          name: "",
+          image: [],
+          categories: [],
+          subcategories: [],
+          unit: "",
+          stock: "",
+          price: "",
+          discount: "",
+          description: "",
+          more_details: {},
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      axiosToastError(error);
+    } finally {
+      setProcessing(false);
+    }
   };
 
   console.log("productData", productData);
@@ -340,6 +422,7 @@ const UploadProduct = () => {
           <button
             type="submit"
             className="text-white p-3 rounded font-semibold tracking-wider bg-green-700 hover:bg-green-800 mt-10"
+            onClick={handleSubmit}
           >
             Submit
           </button>
