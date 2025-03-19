@@ -171,13 +171,18 @@ const UploadProduct = () => {
         "more_details",
         JSON.stringify(productData?.more_details)
       );
-      formData.append("image", JSON.stringify(productData?.image));
+      for (let i = 0; i < productData?.image?.length; i++) {
+        formData.append("images", productData?.image[i]);
+      }
       formData.append("publish", true);
+      console.log("formdata", formData.getAll("images"));
+
       const response = await customAxios({
         url: apiSummary.endpoints.product.addProduct.path,
         method: apiSummary.endpoints.product.addProduct.method,
         data: formData,
       });
+
       console.log("add product response", response);
       if (
         response.status ===
@@ -213,7 +218,7 @@ const UploadProduct = () => {
         <h2 className="text-[20px]">Add Product</h2>
       </div>
       <div className="mt-10 p-5 bg-gray-800 shadow-secondary-200 shadow-sm rounded-md">
-        <form className="grid gap-5">
+        <form className="grid gap-5" onSubmit={handleSubmit}>
           <div className="grid gap-2">
             <label htmlFor="name" className="font-semibold">
               Name*
@@ -422,7 +427,6 @@ const UploadProduct = () => {
           <button
             type="submit"
             className="text-white p-3 rounded font-semibold tracking-wider bg-green-700 hover:bg-green-800 mt-10"
-            onClick={handleSubmit}
           >
             Submit
           </button>
