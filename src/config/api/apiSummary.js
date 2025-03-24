@@ -108,6 +108,11 @@ export const apiSummary = {
         method: "post",
         successStatus: 201,
       },
+      getProducts: {
+        path: "api/v1/product/get-products",
+        method: "get",
+        successStatus: 200,
+      },
     },
   },
 };

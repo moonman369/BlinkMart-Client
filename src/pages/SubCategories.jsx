@@ -224,10 +224,7 @@ const SubCategories = () => {
       <PaginationBar
         styles={"mt-10"}
         pageSize={10}
-        totalPages={
-          Math.floor(subcategoryPageDetails?.totalCount / 10) +
-          (subcategoryPageDetails?.totalCount % 10 > 0 ? 1 : 0)
-        }
+        totalPages={Math.ceil(subcategoryPageDetails?.totalCount / 10)}
         reloadPage={refreshSubcategories}
       />
     </section>

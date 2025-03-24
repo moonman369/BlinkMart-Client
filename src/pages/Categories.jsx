@@ -155,10 +155,7 @@ const Categories = () => {
       <PaginationBar
         styles={"mt-10"}
         pageSize={10}
-        totalPages={
-          Math.floor(categoryPageDetails?.totalCount / 10) +
-          (categoryPageDetails?.totalCount % 10 > 0 ? 1 : 0)
-        }
+        totalPages={Math.ceil(categoryPageDetails?.totalCount / 10)}
         reloadPage={refreshCategories}
       />
     </section>
