@@ -201,6 +201,8 @@ const UploadProduct = () => {
           description: "",
           more_details: {},
         });
+        loadAllCategories();
+        loadAllSubcategories();
       }
     } catch (error) {
       console.error(error);
