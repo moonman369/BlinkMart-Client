@@ -73,7 +73,7 @@ const Categories = () => {
 
   useEffect(() => {
     // fetchAllCategories();
-    console.log("categoriesPageDetails", categoryPageDetails);
+    // console.log("categoriesPageDetails", categoryPageDetails);
   }, []);
 
   return (

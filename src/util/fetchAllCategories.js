@@ -21,6 +21,6 @@ export const fetchAllCategories = async ({ all, currentPage, pageSize }) => {
       pageSize: pageSize ?? 20,
     },
   });
-  console.log(fetchCategoriesResponse);
+  // console.log(fetchCategoriesResponse);
   return fetchCategoriesResponse;
 };
