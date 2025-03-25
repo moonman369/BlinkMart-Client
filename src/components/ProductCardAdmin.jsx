@@ -2,7 +2,7 @@ import React from "react";
 
 const ProductCardAdmin = ({ data }) => {
   return (
-    <div className="w-32 overflow-hidden rounded shadow-md p-2 bg-gray-700 group">
+    <div className="w-32 overflow-hidden rounded shadow-md p-2 bg-gray-700 group mb-7">
       <div>
         <img
           src={data?.image[0]}
@@ -11,7 +11,7 @@ const ProductCardAdmin = ({ data }) => {
         />
       </div>
       <p className="text-ellipsis line-clamp-2 font-semibold">{data?.name}</p>
-      <p>{data?.unit}</p>
+      <p className="font-light text-green-500">{data?.unit}</p>
     </div>
   );
 };

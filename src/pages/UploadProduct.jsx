@@ -11,6 +11,7 @@ import { MdOutlineDelete } from "react-icons/md";
 import { axiosToastError } from "../util/axiosToastError";
 import toast from "react-hot-toast";
 import customAxios from "../util/customAxios";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const UploadProduct = () => {
   const [productData, setProductData] = useState({
@@ -219,6 +220,7 @@ const UploadProduct = () => {
       <div className="p-3 font-semibold bg-gray-900 shadow-secondary-200 shadow-md rounded-md flex items-center justify-between">
         <h2 className="text-[20px]">Add Product</h2>
       </div>
+      {processing && <LoadingSpinner />}
       <div className="mt-10 p-5 bg-gray-800 shadow-secondary-200 shadow-sm rounded-md">
         <form className="grid gap-5" onSubmit={handleSubmit}>
           <div className="grid gap-2">

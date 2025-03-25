@@ -5,6 +5,7 @@ import { apiSummary } from "../config/api/apiSummary";
 import { setAllProducts, setProductPageDetails } from "../store/productSlice";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ProductCardAdmin from "../components/ProductCardAdmin";
+import PaginationBar from "../components/PaginationBar";
 
 const ProductAdmin = () => {
   const products = useSelector((state) => state.product.allProducts);
@@ -54,11 +55,18 @@ const ProductAdmin = () => {
 
       {loading && <LoadingSpinner />}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-1 p-8 mb-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-1 p-8">
         {products.map((product, index) => {
           return <ProductCardAdmin data={product} key={index} />;
         })}
       </div>
+
+      <PaginationBar
+        styles={"mt-10"}
+        pageSize={12}
+        totalPages={Math.ceil(productPageDetails?.totalCount / 12)}
+        reloadPage={refreshProducts}
+      />
     </section>
   );
 };
