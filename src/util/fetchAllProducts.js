@@ -1,7 +1,12 @@
 import { apiSummary } from "../config/api/apiSummary";
 import customAxios from "./customAxios";
 
-export const fetchAllProducts = async ({ all, currentPage, pageSize }) => {
+export const fetchAllProducts = async ({
+  all,
+  currentPage,
+  pageSize,
+  searchText,
+}) => {
   if (all) {
     const productResponse = await customAxios({
       url: apiSummary.endpoints.product.getProducts.path,
@@ -19,6 +24,7 @@ export const fetchAllProducts = async ({ all, currentPage, pageSize }) => {
     params: {
       currentPage: currentPage ?? 1,
       pageSize: pageSize ?? 20,
+      ...(searchText && { search: searchText }),
     },
   });
   // console.log(productResponse);

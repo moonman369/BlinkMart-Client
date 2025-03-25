@@ -6,6 +6,8 @@ import { setAllProducts, setProductPageDetails } from "../store/productSlice";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ProductCardAdmin from "../components/ProductCardAdmin";
 import PaginationBar from "../components/PaginationBar";
+import { IoSearch } from "react-icons/io5";
+import { BiHandicap } from "react-icons/bi";
 
 const ProductAdmin = () => {
   const products = useSelector((state) => state.product.allProducts);
@@ -13,15 +15,17 @@ const ProductAdmin = () => {
     (state) => state.product.pageDetails.products
   );
   const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch();
 
-  const refreshProducts = async (currentPage, pageSize) => {
+  const refreshProducts = async (currentPage, pageSize, searchText) => {
     try {
       setLoading(true);
       const fetchProductsResponse = await fetchAllProducts({
         all: false,
         currentPage,
         pageSize,
+        searchText,
       });
       console.log(fetchProductsResponse);
       if (
@@ -47,10 +51,33 @@ const ProductAdmin = () => {
     }
   };
 
+  const handleSearchTextChange = (e) => {
+    e.preventDefault();
+    setSearchText(e.target.value);
+  };
+
+  const handleSearchBarEnterPress = async (e) => {
+    if (e.key === "Enter") {
+      await refreshProducts(1, 12, searchText);
+    }
+  };
+
   return (
     <section>
       <div className="p-3 font-semibold bg-gray-900 shadow-secondary-200 shadow-md rounded-md flex items-center justify-between">
         <h2 className="text-[20px]">Products</h2>
+        <div
+          className="text-neutral-400 px-2 bg-gray-700 group focus-within:border-primary-200 rounded border overflow-hidden flex items-center"
+          onKeyUp={handleSearchBarEnterPress}
+        >
+          <IoSearch />
+          <input
+            type="text"
+            placeholder="Admin Product Search"
+            className="bg-gray-700 px-4 py-1 h-full outline-none"
+            onChange={handleSearchTextChange}
+          />
+        </div>
       </div>
 
       {loading && <LoadingSpinner />}
