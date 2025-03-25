@@ -21,6 +21,6 @@ export const fetchAllSubcategories = async ({ all, currentPage, pageSize }) => {
       pageSize: pageSize ?? 20,
     },
   });
-  console.log(subcategoryResponse);
+  // console.log(subcategoryResponse);
   return subcategoryResponse;
 };

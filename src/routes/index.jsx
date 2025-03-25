@@ -17,6 +17,7 @@ import Categories from "../pages/Categories";
 import SubCategories from "../pages/SubCategories";
 import UploadProduct from "../pages/UploadProduct";
 import AdminView from "../layouts/AdminView";
+import ProductAdmin from "../pages/ProductAdmin";
 
 const router = createBrowserRouter([
   {
@@ -75,7 +76,7 @@ const router = createBrowserRouter([
             path: "products",
             element: (
               <AdminView>
-                <Products />
+                <ProductAdmin />
               </AdminView>
             ),
           },

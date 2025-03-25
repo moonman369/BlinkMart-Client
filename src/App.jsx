@@ -12,12 +12,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCategories } from "./util/fetchAllCategories";
 import {
   setAllCategories,
+  setAllProducts,
   setAllSubcategories,
   setCategoryPageDetails,
+  setProductPageDetails,
   setSubcategoryPageDetails,
 } from "./store/productSlice";
 import { all } from "axios";
 import { fetchAllSubcategories } from "./util/fetchAllSubcategories";
+import { fetchAllProducts } from "./util/fetchAllProducts";
 
 function App() {
   const dispatch = useDispatch();
@@ -80,6 +83,29 @@ function App() {
     }
   };
 
+  const getAllProducts = async () => {
+    try {
+      const allProducts = await fetchAllProducts({
+        all: false,
+        currentPage: 1,
+        pageSize: 10,
+      });
+      console.log("allProducts", allProducts);
+      dispatch(setAllProducts(allProducts?.data?.data));
+      dispatch(
+        setProductPageDetails({
+          pageSize: allProducts?.data?.pageSize,
+          currentPage: allProducts?.data?.currentPage,
+          count: allProducts?.data?.count,
+          totalCount: allProducts?.data?.totalCount,
+        })
+      );
+    } catch (error) {
+      console.error("Fetch Products Error: ", error);
+      toast.error("Error fetching products!");
+    }
+  };
+
   useEffect(() => {
     getUser();
   }, []);
@@ -90,6 +116,10 @@ function App() {
       getAllSubcategories();
     }
   }, [user]);
+
+  useEffect(() => {
+    getAllProducts();
+  }, []);
 
   return (
     <>
