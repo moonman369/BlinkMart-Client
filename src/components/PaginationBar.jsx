@@ -6,8 +6,15 @@ import {
   MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
 
-const PaginationBar = ({ pageSize, totalPages, reloadPage, styles }) => {
-  const [currentPage, setCurrentPage] = useState(1);
+const PaginationBar = ({
+  currentPage,
+  setCurrentPage,
+  pageSize,
+  totalPages,
+  reloadPage,
+  styles,
+}) => {
+  // const [currentPage, setCurrentPage] = useState(1);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -39,18 +46,20 @@ const PaginationBar = ({ pageSize, totalPages, reloadPage, styles }) => {
   };
 
   return (
-    <div className={`flex justify-center items-center ${styles}`}>
+    <div
+      className={`flex justify-center items-center text-[12px] lg:text-[16px] ${styles}`}
+    >
       <div
         className="px-2 py-[2px] m-1 rounded text-white cursor-pointer hover:text-secondary-200"
         onClick={handleFirstPage}
       >
-        <MdKeyboardDoubleArrowLeft size={24} />
+        <MdKeyboardDoubleArrowLeft />
       </div>
       <div
         className="px-2 py-[2px] m-1 rounded text-white cursor-pointer hover:text-secondary-200"
         onClick={handlePreviousPage}
       >
-        <MdKeyboardArrowLeft size={24} />
+        <MdKeyboardArrowLeft />
       </div>
       <div>
         {Array.from({ length: totalPages }, (_, i) => (
@@ -71,13 +80,13 @@ const PaginationBar = ({ pageSize, totalPages, reloadPage, styles }) => {
         className="px-2 py-[2px] m-1 rounde text-white cursor-pointer hover:text-secondary-200"
         onClick={handleNextPage}
       >
-        <MdKeyboardArrowRight size={24} />
+        <MdKeyboardArrowRight />
       </div>
       <div
         className="px-2 py-[2px] m-1 rounded text-white cursor-pointer hover:text-secondary-200"
         onClick={handleLastPage}
       >
-        <MdKeyboardDoubleArrowRight size={24} />
+        <MdKeyboardDoubleArrowRight />
       </div>
     </div>
   );

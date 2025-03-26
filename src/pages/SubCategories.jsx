@@ -35,6 +35,7 @@ const SubCategories = () => {
   const [openViewImageModal, setOpenViewImageModal] = useState(false);
   const [openDeleteSubcategoryModal, setOpenDeleteSubcategoryModal] =
     useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const columnHelper = createColumnHelper();
   const columns = [
@@ -222,6 +223,8 @@ const SubCategories = () => {
       )}
 
       <PaginationBar
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
         styles={"mt-10"}
         pageSize={10}
         totalPages={Math.ceil(subcategoryPageDetails?.totalCount / 10)}

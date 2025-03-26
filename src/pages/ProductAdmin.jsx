@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllProducts } from "../util/fetchAllProducts";
 import { apiSummary } from "../config/api/apiSummary";
@@ -16,6 +16,8 @@ const ProductAdmin = () => {
   );
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentSearchPage, setSearchCurrentPage] = useState(1);
   const dispatch = useDispatch();
 
   const refreshProducts = async (currentPage, pageSize, searchText) => {
@@ -51,6 +53,19 @@ const ProductAdmin = () => {
     }
   };
 
+  useEffect(() => {
+    if (!products || products.length <= 0) {
+      refreshProducts(currentPage, 12);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!searchText || searchText === "") {
+      refreshProducts(currentPage, 12);
+      setSearchCurrentPage(1);
+    }
+  }, [searchText]);
+
   const handleSearchTextChange = (e) => {
     e.preventDefault();
     setSearchText(e.target.value);
@@ -58,7 +73,7 @@ const ProductAdmin = () => {
 
   const handleSearchBarEnterPress = async (e) => {
     if (e.key === "Enter") {
-      await refreshProducts(1, 12, searchText);
+      await refreshProducts(currentSearchPage, 12, searchText);
     }
   };
 
@@ -67,7 +82,7 @@ const ProductAdmin = () => {
       <div className="p-3 font-semibold bg-gray-900 shadow-secondary-200 shadow-md rounded-md flex items-center justify-between">
         <h2 className="text-[20px]">Products</h2>
         <div
-          className="text-neutral-400 px-2 bg-gray-700 group focus-within:border-primary-200 rounded border overflow-hidden flex items-center"
+          className="text-neutral-400 px-2 bg-gray-700 focus-within:border-primary-200 rounded border overflow-hidden flex items-center w-[200px] lg:w-150"
           onKeyUp={handleSearchBarEnterPress}
         >
           <IoSearch />
@@ -90,6 +105,8 @@ const ProductAdmin = () => {
 
       <PaginationBar
         styles={"mt-10"}
+        currentPage={searchText ? currentSearchPage : currentPage}
+        setCurrentPage={searchText ? setSearchCurrentPage : setCurrentPage}
         pageSize={12}
         totalPages={Math.ceil(productPageDetails?.totalCount / 12)}
         reloadPage={refreshProducts}
