@@ -15,6 +15,7 @@ import {
   setAllProducts,
   setAllSubcategories,
   setCategoryPageDetails,
+  setLoadingCategory,
   setProductPageDetails,
   setSubcategoryPageDetails,
 } from "./store/productSlice";
@@ -39,6 +40,7 @@ function App() {
 
   const getAllCategories = async () => {
     try {
+      dispatch(setLoadingCategory(true));
       const allCategories = await fetchAllCategories({
         all: false,
         currentPage: 1,
@@ -57,6 +59,8 @@ function App() {
     } catch (error) {
       console.error("Fetch Categories Error: ", error);
       toast.error("Error fetching categories!");
+    } finally {
+      dispatch(setLoadingCategory(false));
     }
   };
 
