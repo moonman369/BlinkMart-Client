@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { act } from "react-dom/test-utils";
 
 const initialState = {
   allCategories: [],
+  loadingCategory: false,
   allSubcategories: [],
   allProducts: [],
   pageDetails: {
@@ -20,6 +22,9 @@ const productSlice = createSlice({
     },
     setCategoryPageDetails: (state, action) => {
       state.pageDetails.categories = { ...action.payload };
+    },
+    setLoadingCategory: (state, action) => {
+      state.loadingCategory = action.payload;
     },
 
     setAllSubcategories: (state, action) => {
@@ -41,6 +46,7 @@ const productSlice = createSlice({
 export const {
   setAllCategories,
   setAllSubcategories,
+  setLoadingCategory,
   setAllProducts,
   setCategoryPageDetails,
   setSubcategoryPageDetails,

@@ -27,6 +27,7 @@ const Categories = () => {
   const [openEditCategoryModal, setOpenEditCategoryModal] = useState(false);
   const [categoryProp, setCategoryProp] = useState({});
   const [openDeleteCategoryModal, setOpenDeleteCategoryModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const dispatch = useDispatch();
 
@@ -153,6 +154,8 @@ const Categories = () => {
       )}
 
       <PaginationBar
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
         styles={"mt-10"}
         pageSize={10}
         totalPages={Math.ceil(categoryPageDetails?.totalCount / 10)}
