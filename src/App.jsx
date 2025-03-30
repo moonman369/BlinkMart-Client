@@ -42,9 +42,9 @@ function App() {
     try {
       dispatch(setLoadingCategory(true));
       const allCategories = await fetchAllCategories({
-        all: false,
-        currentPage: 1,
-        pageSize: 10,
+        all: true,
+        // currentPage: 1,
+        // pageSize: 10,
       });
       console.log("allCategories", allCategories);
       dispatch(setAllCategories(allCategories?.data?.data));

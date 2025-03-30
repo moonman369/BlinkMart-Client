@@ -1,31 +1,45 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import banner from "../assets/banner_cropped.JPG";
 import bannerMobile from "../assets/banner-mobile_cropped.JPG";
 import { useSelector } from "react-redux";
+import { fetchAllCategories } from "../util/fetchAllCategories";
+import { fetchAllSubcategories } from "../util/fetchAllSubcategories";
 
 const Home = () => {
   const loadingCategory = useSelector((state) => state.product.loadingCategory);
   const categories = useSelector((state) => state.product.allCategories);
+  const [subcategories, setSubcategories] = useState([]);
+
+  const loadAllSubcategories = async () => {
+    try {
+      const fetchAllSubcategoriesResponse = await fetchAllSubcategories({
+        all: true,
+      });
+      console.log(
+        "fetchAllSubcategoriesResponse",
+        fetchAllSubcategoriesResponse
+      );
+      if (
+        fetchAllSubcategoriesResponse?.status ===
+        apiSummary.endpoints.subcategory.getAllSubcategories.successStatus
+      ) {
+        setSubcategories(fetchAllSubcategoriesResponse?.data?.data);
+      }
+    } catch (error) {
+      console.error(error);
+      axiosToastError(error);
+    }
+  };
+  useEffect(() => {
+    loadAllSubcategories();
+  }, []);
+
+  const handleRedirectProductCategorizedPage = (categoryId, categoryName) => {
+    console.log(categoryId);
+  };
+
   return (
     <section>
-      {/* <div className="container mx-auto">
-        <div
-          className={`min-h-48 w-full h-full bg-gray-700 rounded ${
-            !banner && "animate-pulse my-2"
-          }`}
-        >
-          <img
-            src={banner}
-            alt="banner"
-            className="h-full w-full hidden lg:block"
-          />
-          <img
-            src={bannerMobile}
-            alt="banner-mobile"
-            className="h-full w-full lg:hidden"
-          />
-        </div>
-      </div> */}
       <div className="container mx-auto">
         <div
           className={`w-full h-full min-h-48 bg-blue-100 rounded ${
@@ -45,7 +59,7 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="container mx-auto p-4 my-2 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div className="container mx-auto p-4 my-2 grid grid-cols-4 md:grid-cols-8 lg:grid-cols-10 gap-4">
         {loadingCategory
           ? new Array(12).fill(null).map((_, index) => {
               return (
@@ -62,15 +76,18 @@ const Home = () => {
               return (
                 <div
                   key={category._id + "displayCategory"}
-                  className="w-full h-full object-scale-down"
-                  // onClick={() =>
-                  //   handleRedirectProductListpage(category._id, category.name)
-                  // }
+                  className="w-full h-full object-scale-down rounded cursor-pointer"
+                  onClick={() => {
+                    handleRedirectProductCategorizedPage(
+                      category._id,
+                      category.name
+                    );
+                  }}
                 >
                   <div>
                     <img
                       src={category.image}
-                      className="w-full h-full object-scale-down"
+                      className="w-full object-scale-down rounded"
                     />
                   </div>
                 </div>
