@@ -18,6 +18,7 @@ import SubCategories from "../pages/SubCategories";
 import UploadProduct from "../pages/UploadProduct";
 import AdminView from "../layouts/AdminView";
 import ProductAdmin from "../pages/ProductAdmin";
+import ProductCategorized from "../pages/ProductCategorized";
 
 const router = createBrowserRouter([
   {
@@ -106,6 +107,15 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: ":category",
+        children: [
+          {
+            path: ":subcategory",
+            element: <ProductCategorized />
+          }
+        ]
+      }
     ],
   },
 ]);

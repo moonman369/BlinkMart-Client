@@ -153,14 +153,14 @@ const Categories = () => {
         />
       )}
 
-      <PaginationBar
+      {/* <PaginationBar
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         styles={"mt-10"}
         pageSize={10}
         totalPages={Math.ceil(categoryPageDetails?.totalCount / 10)}
         reloadPage={refreshCategories}
-      />
+      /> */}
     </section>
   );
 };
