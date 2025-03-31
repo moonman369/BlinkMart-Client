@@ -4,6 +4,10 @@ import bannerMobile from "../assets/banner-mobile_cropped.JPG";
 import { useSelector } from "react-redux";
 import { fetchAllCategories } from "../util/fetchAllCategories";
 import { fetchAllSubcategories } from "../util/fetchAllSubcategories";
+import { Link } from "react-router-dom";
+import { apiSummary } from "../config/api/apiSummary";
+import DisplayProductsByCategory from "../components/DisplayProductsByCategory";
+import { axiosToastError } from "../util/axiosToastError.js";
 
 const Home = () => {
   const loadingCategory = useSelector((state) => state.product.loadingCategory);
@@ -34,9 +38,7 @@ const Home = () => {
     loadAllSubcategories();
   }, []);
 
-  const handleRedirectProductCategorizedPage = (categoryId, categoryName) => {
-    console.log(categoryId);
-  };
+  const handleRedirectProductCategorizedPage = (categoryId, categoryName) => {};
 
   return (
     <section>
@@ -94,6 +96,16 @@ const Home = () => {
               );
             })}
       </div>
+
+      {categories.map((category, index) => {
+        return (
+          <DisplayProductsByCategory
+            key={`${category?._id}-${category.name}`}
+            id={category?._id}
+            name={category?.name}
+          />
+        );
+      })}
     </section>
   );
 };

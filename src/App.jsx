@@ -118,12 +118,13 @@ function App() {
     if (user && user?.role === "ADMIN") {
       getAllCategories();
       getAllSubcategories();
+      getAllProducts();
     }
   }, [user]);
 
-  useEffect(() => {
-    getAllProducts();
-  }, []);
+  // useEffect(() => {
+  //   getAllProducts();
+  // }, []);
 
   return (
     <>
