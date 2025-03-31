@@ -30,3 +30,34 @@ export const fetchAllProducts = async ({
   // console.log(productResponse);
   return productResponse;
 };
+
+export const fetchProductsByCategory = async ({
+  all,
+  currentPage,
+  pageSize,
+  categoryId,
+}) => {
+  if (all) {
+    const productResponse = await customAxios({
+      url: apiSummary.endpoints.product.getProductsByCategory.path,
+      method: apiSummary.endpoints.product.getProductsByCategory.method,
+      params: {
+        categoryId: categoryId,
+        all: true,
+      },
+    });
+    return productResponse;
+  }
+
+  const productResponse = await customAxios({
+    url: apiSummary.endpoints.product.getProductsByCategory.path,
+    method: apiSummary.endpoints.product.getProductsByCategory.method,
+    params: {
+      categoryId: categoryId,
+      currentPage: currentPage ?? 1,
+      pageSize: pageSize ?? 20,
+    },
+  });
+  // console.log(productResponse);
+  return productResponse;
+};
