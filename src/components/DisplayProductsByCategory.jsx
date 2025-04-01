@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { axiosToastError } from "../util/axiosToastError.js";
 import { fetchProductsByCategory } from "../util/fetchAllProducts.js";
 import { apiSummary } from "../config/api/apiSummary.js";
+import CardLoading from "./CardLoading.jsx";
+import ProductCard from "./ProductCard.jsx";
 
 const DisplayProductsByCategory = ({ id, name }) => {
   const [products, setProducts] = useState([]);
@@ -17,7 +19,7 @@ const DisplayProductsByCategory = ({ id, name }) => {
         pageSize: 20,
         currentPage: 1,
       });
-      //   console.log(productResponse);
+
       if (
         productResponse.status ===
         apiSummary.endpoints.product.getProductsByCategory.successStatus
@@ -35,15 +37,26 @@ const DisplayProductsByCategory = ({ id, name }) => {
     loadProductsByCategory();
   }, []);
 
+  const loadingCardCount = new Array(6).fill(null);
   return (
-    <div>
+    <div className="p-5">
       <div className="container mx-auto p-4 flex items-center justify-between gap-4">
         <h3 className="font-bold text-lg md:text-xl">{name}</h3>
         <Link to="/" className="text-green-700 hover:text-secondary-200">
           See All
         </Link>
       </div>
-      <div></div>
+      <div className="flex items-center gap-4 md:gap-6 lg:gap-10 ">
+        {loading &&
+          loadingCardCount.map((_, i) => {
+            return <CardLoading key={`Prod-Loading-${i}`} />;
+          })}
+        {products.map((product, i) => {
+          return (
+            <ProductCard key={`${product._id}-Prod-${i}`} product={product} />
+          );
+        })}
+      </div>
     </div>
   );
 };
