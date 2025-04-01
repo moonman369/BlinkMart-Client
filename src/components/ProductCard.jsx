@@ -7,7 +7,7 @@ import { axiosToastError } from "../util/axiosToastError";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { apiSummary } from "../config/api/apiSummary";
-import { getINRString } from "../util/getInrString";
+import { getINRString } from "../util/getINRString.js";
 
 const ProductCard = ({ product }) => {
   const [loading, setLoading] = useState(false);
