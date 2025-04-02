@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { axiosToastError } from "../util/axiosToastError.js";
 import { fetchProductsByCategory } from "../util/fetchAllProducts.js";
@@ -10,6 +10,7 @@ import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 const DisplayProductsByCategory = ({ id, name }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const containerRef = useRef();
   const [currentPage, setCurrentPage] = useState(1);
 
   const loadProductsByCategory = async () => {
@@ -38,6 +39,14 @@ const DisplayProductsByCategory = ({ id, name }) => {
     loadProductsByCategory();
   }, []);
 
+  const handleScrollRight = () => {
+    containerRef.current.scrollLeft += 200;
+  };
+
+  const handleScrollLeft = () => {
+    containerRef.current.scrollLeft -= 200;
+  };
+
   const loadingCardCount = new Array(6).fill(null);
   return (
     <div className="p-5">
@@ -47,7 +56,11 @@ const DisplayProductsByCategory = ({ id, name }) => {
           See All
         </Link>
       </div>
-      <div className="flex items-center gap-4 md:gap-6 lg:gap-10 mx-auto px-4 overflow-hidden">
+
+      <div
+        ref={containerRef}
+        className="flex items-center gap-4 md:gap-6 lg:gap-10 mx-auto px-4 overflow-hidden scroll-smooth"
+      >
         {loading &&
           loadingCardCount.map((_, i) => {
             return <CardLoading key={`Prod-Loading-${i}`} />;
@@ -58,10 +71,16 @@ const DisplayProductsByCategory = ({ id, name }) => {
           );
         })}
         <div className="w-full absolute hidden px-4 lg:flex justify-between left-0 right-0 container mx-auto">
-          <button className="z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-45 hover:bg-opacity-100 text-lg">
+          <button
+            className="z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-45 hover:bg-opacity-100 text-lg"
+            onClick={handleScrollLeft}
+          >
             <FaAngleLeft />
           </button>
-          <button className="z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-45 hover:bg-opacity-100 text-lg">
+          <button
+            className="z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-45 hover:bg-opacity-100 text-lg"
+            onClick={handleScrollRight}
+          >
             <FaAngleRight />
           </button>
         </div>

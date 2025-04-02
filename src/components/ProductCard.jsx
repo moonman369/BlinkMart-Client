@@ -17,7 +17,7 @@ const ProductCard = ({ product }) => {
   return (
     <Link
       to={url}
-      className="border py-3 px-2 lg:p-4 grid gap-1 lg:gap-3 max-w-44 lg:max-w-52 rounded cursor-pointer bg-gray-700"
+      className="border hover:border-secondary-200 py-3 px-2 lg:p-4 grid gap-1 lg:gap-3 max-w-44 lg:max-w-52 rounded cursor-pointer bg-gray-700"
     >
       <div className="min-h-24 max-h-32 rounded">
         <img
