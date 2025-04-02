@@ -5,6 +5,7 @@ import { fetchProductsByCategory } from "../util/fetchAllProducts.js";
 import { apiSummary } from "../config/api/apiSummary.js";
 import CardLoading from "./CardLoading.jsx";
 import ProductCard from "./ProductCard.jsx";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 
 const DisplayProductsByCategory = ({ id, name }) => {
   const [products, setProducts] = useState([]);
@@ -46,7 +47,7 @@ const DisplayProductsByCategory = ({ id, name }) => {
           See All
         </Link>
       </div>
-      <div className="flex items-center gap-4 md:gap-6 lg:gap-10 ">
+      <div className="flex items-center gap-4 md:gap-6 lg:gap-10 mx-auto px-4 overflow-hidden">
         {loading &&
           loadingCardCount.map((_, i) => {
             return <CardLoading key={`Prod-Loading-${i}`} />;
@@ -56,6 +57,14 @@ const DisplayProductsByCategory = ({ id, name }) => {
             <ProductCard key={`${product._id}-Prod-${i}`} product={product} />
           );
         })}
+        <div className="w-full absolute hidden px-4 lg:flex justify-between left-0 right-0 container mx-auto">
+          <button className="z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-50 hover:bg-opacity-100 text-lg">
+            <FaAngleLeft />
+          </button>
+          <button className="z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-50 hover:bg-opacity-100 text-lg">
+            <FaAngleRight />
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -13,7 +13,7 @@ const ProductCard = ({ product }) => {
   const [loading, setLoading] = useState(false);
 
   return (
-    <div className="border py-2 lg:p-4 grid gap-1 lg:gap-3 max-w-36 lg:max-w-52 rounded cursor-pointer bg-gray-700">
+    <div className="border py-3 px-2 lg:p-4 grid gap-1 lg:gap-3 max-w-44 lg:max-w-52 rounded cursor-pointer bg-gray-700">
       <div className="min-h-24 max-h-32 rounded">
         <img
           src={product.image[0]}
