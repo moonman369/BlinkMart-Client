@@ -59,7 +59,7 @@ const DisplayProductsByCategory = ({ id, name }) => {
 
       <div
         ref={containerRef}
-        className="flex items-center gap-4 md:gap-6 lg:gap-10 mx-auto px-4 overflow-hidden scroll-smooth"
+        className="flex items-center gap-4 md:gap-6 lg:gap-10 mx-auto px-4 overflow-x-scroll scroll-smooth"
       >
         {loading &&
           loadingCardCount.map((_, i) => {
