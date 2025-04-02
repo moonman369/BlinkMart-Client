@@ -19,6 +19,7 @@ import UploadProduct from "../pages/UploadProduct";
 import AdminView from "../layouts/AdminView";
 import ProductAdmin from "../pages/ProductAdmin";
 import ProductCategorized from "../pages/ProductCategorized";
+import ProductDisplay from "../pages/ProductDisplay";
 
 const router = createBrowserRouter([
   {
@@ -112,10 +113,14 @@ const router = createBrowserRouter([
         children: [
           {
             path: ":subcategory",
-            element: <ProductCategorized />
-          }
-        ]
-      }
+            element: <ProductCategorized />,
+          },
+        ],
+      },
+      {
+        path: "/product:product",
+        element: <ProductDisplay />,
+      },
     ],
   },
 ]);

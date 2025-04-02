@@ -58,10 +58,10 @@ const DisplayProductsByCategory = ({ id, name }) => {
           );
         })}
         <div className="w-full absolute hidden px-4 lg:flex justify-between left-0 right-0 container mx-auto">
-          <button className="z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-50 hover:bg-opacity-100 text-lg">
+          <button className="z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-45 hover:bg-opacity-100 text-lg">
             <FaAngleLeft />
           </button>
-          <button className="z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-50 hover:bg-opacity-100 text-lg">
+          <button className="z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-45 hover:bg-opacity-100 text-lg">
             <FaAngleRight />
           </button>
         </div>
