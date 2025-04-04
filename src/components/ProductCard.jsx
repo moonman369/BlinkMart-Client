@@ -8,12 +8,17 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { apiSummary } from "../config/api/apiSummary";
 import { getINRString } from "../util/getINRString.js";
+import { convertToUrlString } from "../util/convertToUrlString.js";
 
 const ProductCard = ({ product }) => {
   const [loading, setLoading] = useState(false);
+  const url = `/product/${convertToUrlString(product?.name)}-${product._id}`;
 
   return (
-    <div className="border py-2 lg:p-4 grid gap-1 lg:gap-3 max-w-36 lg:max-w-52 rounded cursor-pointer bg-gray-700">
+    <Link
+      to={url}
+      className="border hover:border-secondary-200 py-3 px-2 lg:p-4 grid gap-1 lg:gap-3 max-w-44 lg:max-w-52 rounded cursor-pointer bg-gray-700"
+    >
       <div className="min-h-24 max-h-32 rounded">
         <img
           src={product.image[0]}
@@ -36,7 +41,7 @@ const ProductCard = ({ product }) => {
           <button>Add</button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
