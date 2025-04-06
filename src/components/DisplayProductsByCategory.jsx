@@ -70,15 +70,15 @@ const DisplayProductsByCategory = ({ id, name }) => {
             <ProductCard key={`${product._id}-Prod-${i}`} product={product} />
           );
         })}
-        <div className="w-full absolute hidden px-4 lg:flex justify-between left-0 right-0 container mx-auto">
+        <div className="w-full absolute hidden px-4 lg:flex justify-between left-0 right-0 container mx-auto pointer-events-none">
           <button
-            className="z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-45 hover:bg-opacity-100 text-lg"
+            className="pointer-events-auto z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-45 hover:bg-opacity-100 text-lg"
             onClick={handleScrollLeft}
           >
             <FaAngleLeft />
           </button>
           <button
-            className="z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-45 hover:bg-opacity-100 text-lg"
+            className="pointer-events-auto z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-45 hover:bg-opacity-100 text-lg"
             onClick={handleScrollRight}
           >
             <FaAngleRight />
