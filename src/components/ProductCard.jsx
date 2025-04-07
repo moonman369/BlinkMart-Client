@@ -42,14 +42,15 @@ const ProductCard = ({ product }) => {
     //     </div>
     //   </div>
     // </Link>
+
     <Link
       to={url}
-      className="border hover:border-secondary-200 py-1 px-1 lg:p-4 grid gap-0.5 lg:gap-3 max-w-28 lg:max-w-52 rounded cursor-pointer bg-gray-700"
+      className="border hover:border-secondary-200 p-2 lg:p-4 grid gap-0.5 lg:gap-3 max-w-32 lg:max-w-64 rounded cursor-pointer bg-gray-700"
     >
-      <div className="min-h-16 max-h-24 rounded">
+      <div className="min-h-20 max-h-28 rounded">
         <img
           src={product.image[0]}
-          className="object-scale-down scale-100 h-full w-full rounded"
+          className="object-scale-down scale-75 lg:scale-105 overflow-hidden h-full w-full rounded"
           loading="lazy"
         />
       </div>
