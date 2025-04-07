@@ -6,6 +6,7 @@ import { apiSummary } from "../config/api/apiSummary.js";
 import CardLoading from "./CardLoading.jsx";
 import ProductCard from "./ProductCard.jsx";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 const DisplayProductsByCategory = ({ id, name }) => {
   const [products, setProducts] = useState([]);
@@ -64,7 +65,6 @@ const DisplayProductsByCategory = ({ id, name }) => {
         >
           {loading &&
             loadingCardCount.map((_, i) => {
-              console.log(loading);
               return <CardLoading key={`Prod-Loading-${i}`} />;
             })}
           {products.map((product, i) => {

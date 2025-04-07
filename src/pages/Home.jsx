@@ -4,15 +4,17 @@ import bannerMobile from "../assets/banner-mobile_cropped.JPG";
 import { useSelector } from "react-redux";
 import { fetchAllCategories } from "../util/fetchAllCategories";
 import { fetchAllSubcategories } from "../util/fetchAllSubcategories";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { apiSummary } from "../config/api/apiSummary";
 import DisplayProductsByCategory from "../components/DisplayProductsByCategory";
 import { axiosToastError } from "../util/axiosToastError.js";
+import { convertToUrlString } from "../util/convertToUrlString.js";
 
 const Home = () => {
   const loadingCategory = useSelector((state) => state.product.loadingCategory);
   const categories = useSelector((state) => state.product.allCategories);
   const [subcategories, setSubcategories] = useState([]);
+  const navigate = useNavigate();
 
   const loadAllSubcategories = async () => {
     try {
@@ -38,7 +40,27 @@ const Home = () => {
     loadAllSubcategories();
   }, []);
 
-  const handleRedirectProductCategorizedPage = (categoryId, categoryName) => {};
+  const handleRedirectProductCategorizedPage = (categoryId, categoryName) => {
+    const subcategory = subcategories.find((sub) => {
+      const filterData = sub.category.some((c) => {
+        return c._id == categoryId;
+      });
+      return filterData ? true : null;
+    });
+
+    const url = `/${convertToUrlString(
+      categoryName
+    )}-${categoryId}/${convertToUrlString(subcategory?.name)}-${
+      subcategory?._id
+    }`;
+    console.log(url);
+    navigate(url, {
+      state: {
+        categoryId: categoryId,
+        subcategoryId: subcategory?._id,
+      },
+    });
+  };
 
   return (
     <section>
