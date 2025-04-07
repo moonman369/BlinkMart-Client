@@ -57,19 +57,22 @@ const DisplayProductsByCategory = ({ id, name }) => {
         </Link>
       </div>
 
-      <div
-        ref={containerRef}
-        className="flex items-center gap-4 md:gap-6 lg:gap-10 mx-auto overflow-x-scroll scrollbar-hide scroll-smooth"
-      >
-        {loading &&
-          loadingCardCount.map((_, i) => {
-            return <CardLoading key={`Prod-Loading-${i}`} />;
+      <div className="relative flex items-center justify-between">
+        <div
+          ref={containerRef}
+          className="flex gap-4 md:gap-6 lg:gap-10 mx-auto overflow-x-scroll scrollbar-hide scroll-smooth"
+        >
+          {loading &&
+            loadingCardCount.map((_, i) => {
+              console.log(loading);
+              return <CardLoading key={`Prod-Loading-${i}`} />;
+            })}
+          {products.map((product, i) => {
+            return (
+              <ProductCard key={`${product._id}-Prod-${i}`} product={product} />
+            );
           })}
-        {products.map((product, i) => {
-          return (
-            <ProductCard key={`${product._id}-Prod-${i}`} product={product} />
-          );
-        })}
+        </div>
         <div className="w-full absolute hidden px-4 lg:flex justify-between left-0 right-0 container mx-auto pointer-events-none">
           <button
             className="pointer-events-auto z-10 relative bg-black rounded-full p-2 shadow-sm shadow-primary-200 bg-opacity-45 hover:bg-opacity-100 text-lg"
