@@ -40,7 +40,14 @@ const Home = () => {
     loadAllSubcategories();
   }, []);
 
-  const handleRedirectProductCategorizedPage = (categoryId, categoryName) => {
+  const handleRedirectProductCategorizedPage = (category) => {
+    const categoryId = category?._id;
+    const categoryName = category?.name;
+    if (!categoryId || !categoryName) {
+      console.error("Invalid category data:", category);
+      return;
+    }
+
     const subcategory = subcategories.find((subcategory) =>
       subcategory.category.some((cat) => cat._id === categoryId)
     );
@@ -58,8 +65,8 @@ const Home = () => {
     console.log(url);
     navigate(url, {
       state: {
-        categoryId: categoryId,
-        subcategoryId: subcategory?._id,
+        category: category,
+        subcategory: subcategory,
       },
     });
   };
@@ -104,10 +111,7 @@ const Home = () => {
                   key={category._id + "displayCategory"}
                   className="w-full h-full object-scale-down rounded cursor-pointer"
                   onClick={() => {
-                    handleRedirectProductCategorizedPage(
-                      category._id,
-                      category.name
-                    );
+                    handleRedirectProductCategorizedPage(category);
                   }}
                 >
                   <div>

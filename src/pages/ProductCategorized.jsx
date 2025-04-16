@@ -6,7 +6,7 @@ import { apiSummary } from "../config/api/apiSummary";
 
 const ProductCategorized = () => {
   const location = useLocation();
-  const { categoryId, subcategoryId } = location.state || {};
+  const { category, subcategory } = location.state || {};
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,7 +15,7 @@ const ProductCategorized = () => {
     try {
       setLoading(true);
       const productResponse = await fetchProductsBySubcategory({
-        subcategoryId: subcategoryId,
+        subcategoryId: subcategory?._id,
         currentPage: currentPage,
         pageSize: 20,
       });
@@ -27,7 +27,7 @@ const ProductCategorized = () => {
       }
     } catch (error) {
       console.error(error);
-      axiosToastError(error);
+      // axiosToastError(error);
     } finally {
       setLoading(false);
     }
@@ -44,7 +44,11 @@ const ProductCategorized = () => {
         <div className=" h-full min-h-[90vh] lg:min-h-[80vh]">sub</div>
 
         {/* products */}
-        <div className="">prod</div>
+        <div className="">
+          <div className="shadow-green-700 shadow-md p-2">
+            <h3>{subcategory.name}</h3>
+          </div>
+        </div>
       </div>
     </section>
   );
