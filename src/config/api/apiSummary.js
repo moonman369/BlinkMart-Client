@@ -118,6 +118,11 @@ export const apiSummary = {
         method: "get",
         successStatus: 200,
       },
+      getProductsBySubategory: {
+        path: "api/v1/product/get-products-by-subcategory",
+        method: "get",
+        successStatus: 200,
+      },
     },
   },
 };

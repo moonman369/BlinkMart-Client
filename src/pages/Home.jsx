@@ -41,12 +41,14 @@ const Home = () => {
   }, []);
 
   const handleRedirectProductCategorizedPage = (categoryId, categoryName) => {
-    const subcategory = subcategories.find((sub) => {
-      const filterData = sub.category.some((c) => {
-        return c._id == categoryId;
-      });
-      return filterData ? true : null;
-    });
+    const subcategory = subcategories.find((subcategory) =>
+      subcategory.category.some((cat) => cat._id === categoryId)
+    );
+    console.log("matchedSubcategories", subcategory);
+    if (!subcategory) {
+      console.error("No subcategory found for this categoryId:", categoryId);
+      return;
+    }
 
     const url = `/${convertToUrlString(
       categoryName
