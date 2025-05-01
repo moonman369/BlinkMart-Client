@@ -13,6 +13,7 @@ import { convertToUrlString } from "../util/convertToUrlString.js";
 const ProductCard = ({ product }) => {
   const [loading, setLoading] = useState(false);
   const url = `/product/${convertToUrlString(product?.name)}-${product._id}`;
+  // console.log("product", product);
 
   return (
     // <Link
@@ -45,6 +46,11 @@ const ProductCard = ({ product }) => {
 
     <Link
       to={url}
+      state={{
+        product: product,
+        category: product?.category_id[0],
+        subcategory: product?.sub_category_id[0],
+      }}
       className="border hover:border-secondary-200 p-2 lg:p-4 grid gap-0.5 lg:gap-3 max-w-32 lg:max-w-64 rounded cursor-pointer bg-gray-700"
     >
       <div className="min-h-20 max-h-28 rounded">

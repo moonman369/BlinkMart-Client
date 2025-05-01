@@ -37,6 +37,7 @@ const ProductCategorized = () => {
   }, [currentPage]);
 
   console.log("products", products);
+  console.log("location.state", location.state);
   return (
     <section className="sticky top-24 lg:top-20">
       <div className="container mx-auto grid grid-cols-[100px,1fr] md:grid-cols-[200px,1fr] lg:grid-cols-[300px,1fr]">
