@@ -81,22 +81,27 @@ const ProductCategorized = () => {
     <section className="sticky top-24 lg:top-20">
       <div className="container mx-auto grid grid-cols-[100px,1fr] md:grid-cols-[200px,1fr] lg:grid-cols-[300px,1fr]">
         {/* subcategories */}
-        <div className="h-[calc(100vh-10rem)] overflow-y-auto scrollbar-hide bg-black rounded-lg p-4">
-          <div className="sticky top-0 bg-black shadow-green-700 shadow-md p-2 mb-4 rounded z-10">
+        <div className="h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide bg-black rounded-lg">
+          <div className="sticky top-0 bg-black shadow-green-700 shadow-md p-2 rounded-t-lg z-10">
             <h3 className="font-semibold text-lg">Subcategories</h3>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 p-4">
             {loadingSubcategories ? (
               <LoadingSpinner />
             ) : categorySubcategories && categorySubcategories.length > 0 ? (
               categorySubcategories.map((sub) => (
                 <div
                   key={sub._id}
-                  className={`p-3 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-800 ${
+                  className={`p-3 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-800 flex items-center gap-3 ${
                     sub._id === subcategory?._id ? "bg-gray-800" : ""
                   }`}
                 >
-                  {sub.name}
+                  <img 
+                    src={sub.image} 
+                    alt={sub.name} 
+                    className="w-8 h-8 object-cover rounded"
+                  />
+                  <span>{sub.name}</span>
                 </div>
               ))
             ) : (
@@ -106,9 +111,9 @@ const ProductCategorized = () => {
         </div>
 
         {/* products */}
-        <div className="overflow-y-auto">
-          <div className="shadow-green-700 shadow-md p-2">
-            <h3 className="font-semibold">{subcategory.name}</h3>
+        <div className="h-[calc(100vh-8rem)] overflow-y-auto ml-4">
+          <div className="shadow-green-700 shadow-md p-4 rounded-lg bg-gray-900 mt-4">
+            <h3 className="font-semibold text-xl">{subcategory.name}</h3>
           </div>
           <div className="grid grid-cols-2 w-full md:grid-cols-3 lg:grid-cols-4 gap-4 p-2 my-4">
             {loading && <LoadingSpinner />}
