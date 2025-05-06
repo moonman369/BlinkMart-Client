@@ -22,11 +22,20 @@ const Header = () => {
   const [openUserMenu, setOpenUserMenu] = useState(false);
   const userMenuRef = useRef(null);
   const accountRef = useRef(null);
-  // useCloseOnOutsideClick([userMenuRef, accountRef], () => {
-  //   setOpenUserMenu(false);
-  // });
 
-  // console.log(`User From store: `, user);
+  // Close menu on outside click
+  useCloseOnOutsideClick([userMenuRef, accountRef], (event) => {
+    // Don't close if clicking on a Link component
+    if (event.target.tagName === 'A' || event.target.closest('a')) {
+      return;
+    }
+    setOpenUserMenu(false);
+  });
+
+  // Close menu on navigation
+  useEffect(() => {
+    setOpenUserMenu(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     setIsSearchPage(location?.pathname === "/search");
@@ -35,6 +44,8 @@ const Header = () => {
   useEffect(() => {
     setOpenUserMenu(false);
   }, [user]);
+
+  // console.log(`User From store: `, user);
 
   const redirectToLoginPage = () => {
     navigate("/login");
@@ -117,7 +128,7 @@ const Header = () => {
                   {openUserMenu ? (
                     <div className="absolute right-0 top-16">
                       <div
-                        className="bg-black rounded p-4 min-w-52 shadow-sm shadow-secondary-200 "
+                        className="bg-black rounded p-4 min-w-52 shadow-sm shadow-secondary-200"
                         ref={userMenuRef}
                       >
                         <UserMenu

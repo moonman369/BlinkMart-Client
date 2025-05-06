@@ -61,3 +61,34 @@ export const fetchProductsByCategory = async ({
   // console.log(productResponse);
   return productResponse;
 };
+
+export const fetchProductsBySubcategory = async ({
+  all,
+  currentPage,
+  pageSize,
+  subcategoryId,
+}) => {
+  if (all) {
+    const productResponse = await customAxios({
+      url: apiSummary.endpoints.product.getProductsBySubategory.path,
+      method: apiSummary.endpoints.product.getProductsBySubategory.method,
+      params: {
+        subcategoryId: subcategoryId,
+        all: true,
+      },
+    });
+    return productResponse;
+  }
+
+  const productResponse = await customAxios({
+    url: apiSummary.endpoints.product.getProductsBySubategory.path,
+    method: apiSummary.endpoints.product.getProductsBySubategory.method,
+    params: {
+      subcategoryId: subcategoryId,
+      currentPage: currentPage ?? 1,
+      pageSize: pageSize ?? 20,
+    },
+  });
+  // console.log(productResponse);
+  return productResponse;
+};

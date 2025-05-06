@@ -12,7 +12,7 @@ const useCloseOnOutsideClick = (refList, callback) => {
         }
       }
       if (refExclusionCondition) {
-        callback();
+        callback(event);
       }
     };
 

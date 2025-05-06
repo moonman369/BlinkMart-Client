@@ -91,6 +91,11 @@ export const apiSummary = {
         method: "get",
         successStatus: 200,
       },
+      getSubcategoriesByCategory: {
+        path: "api/v1/subcategory/get-subcategories-by-category",
+        method: "get",
+        successStatus: 200,
+      },
       updateSubcategory: {
         path: "api/v1/subcategory/update-subcategory",
         method: "put",
@@ -115,6 +120,11 @@ export const apiSummary = {
       },
       getProductsByCategory: {
         path: "api/v1/product/get-products-by-category",
+        method: "get",
+        successStatus: 200,
+      },
+      getProductsBySubategory: {
+        path: "api/v1/product/get-products-by-subcategory",
         method: "get",
         successStatus: 200,
       },

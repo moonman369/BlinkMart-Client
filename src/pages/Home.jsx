@@ -4,15 +4,17 @@ import bannerMobile from "../assets/banner-mobile_cropped.JPG";
 import { useSelector } from "react-redux";
 import { fetchAllCategories } from "../util/fetchAllCategories";
 import { fetchAllSubcategories } from "../util/fetchAllSubcategories";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { apiSummary } from "../config/api/apiSummary";
 import DisplayProductsByCategory from "../components/DisplayProductsByCategory";
 import { axiosToastError } from "../util/axiosToastError.js";
+import { convertToUrlString } from "../util/convertToUrlString.js";
 
 const Home = () => {
   const loadingCategory = useSelector((state) => state.product.loadingCategory);
   const categories = useSelector((state) => state.product.allCategories);
   const [subcategories, setSubcategories] = useState([]);
+  const navigate = useNavigate();
 
   const loadAllSubcategories = async () => {
     try {
@@ -38,7 +40,36 @@ const Home = () => {
     loadAllSubcategories();
   }, []);
 
-  const handleRedirectProductCategorizedPage = (categoryId, categoryName) => {};
+  const handleRedirectProductCategorizedPage = (category) => {
+    const categoryId = category?._id;
+    const categoryName = category?.name;
+    if (!categoryId || !categoryName) {
+      console.error("Invalid category data:", category);
+      return;
+    }
+
+    const subcategory = subcategories.find((subcategory) =>
+      subcategory.category.some((cat) => cat._id === categoryId)
+    );
+    console.log("matchedSubcategories", subcategory);
+    if (!subcategory) {
+      console.error("No subcategory found for this categoryId:", categoryId);
+      return;
+    }
+
+    const url = `/${convertToUrlString(
+      categoryName
+    )}-${categoryId}/${convertToUrlString(subcategory?.name)}-${
+      subcategory?._id
+    }`;
+    console.log(url);
+    navigate(url, {
+      state: {
+        category: category,
+        subcategory: subcategory,
+      },
+    });
+  };
 
   return (
     <section>
@@ -80,10 +111,7 @@ const Home = () => {
                   key={category._id + "displayCategory"}
                   className="w-full h-full object-scale-down rounded cursor-pointer"
                   onClick={() => {
-                    handleRedirectProductCategorizedPage(
-                      category._id,
-                      category.name
-                    );
+                    handleRedirectProductCategorizedPage(category);
                   }}
                 >
                   <div>

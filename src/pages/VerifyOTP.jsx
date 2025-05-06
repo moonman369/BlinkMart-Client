@@ -83,15 +83,45 @@ const VerifyOTP = () => {
                   <input
                     key={`otp_${index}`}
                     type="text"
+                    inputMode="numeric"
                     id="otp"
                     ref={(ref) => {
                       inputRef.current[index] = ref;
                       return ref;
                     }}
                     value={userData[index]}
+                    onKeyUp={(e) => {
+                      if (e.key === "Backspace" && index > 0) {
+                        const newData = [...userData];
+                        newData[index] = "";
+                        setUserData(newData);
+                        inputRef.current[index - 1].focus();
+                      }
+                    }}
+                    onPaste={(e) => {
+                      console.log(e.clipboardData.getData("text"));
+                      e.preventDefault();
+                      if (e.clipboardData.getData("text").length > 6) {
+                        toast.error("OTP should be 6 digits long!");
+                        return;
+                      }
+                      if (isNaN(e.clipboardData.getData("text"))) {
+                        toast.error("OTP should be a number!");
+                        return;
+                      }
+
+                      const value = e.clipboardData.getData("text").split("");
+                      const newData = [...userData];
+                      for (let i = 0; i < value.length; i++) {
+                        if (i < 6) {
+                          newData[i] = value[i];
+                        }
+                      }
+                      setUserData(newData);
+                      inputRef.current[5].focus();
+                    }}
                     onChange={(e) => {
                       const value = e.target.value;
-                      //   console.log(value);
                       const newData = [...userData];
                       newData[index] = value;
                       setUserData(newData);

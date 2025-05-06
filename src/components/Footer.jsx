@@ -3,11 +3,11 @@ import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="border-t">
-      <div className="p-4 mx-auto text-center flex flex-col lg:flex-row lg:justify-between gap-2">
-        <p>© All Rights Reserved 2024</p>
+    <footer className="border-t bg-gray-900 fixed bottom-0 w-full">
+      <div className="py-2 px-4 mx-auto text-center flex flex-col lg:flex-row lg:justify-between gap-1">
+        <p className="text-sm">© All Rights Reserved 2024</p>
 
-        <div className="flex items-center gap-4 justify-center text-2xl">
+        <div className="flex items-center gap-4 justify-center text-xl">
           <a href="" className="hover:text-highlight-100">
             <FaFacebook />
           </a>

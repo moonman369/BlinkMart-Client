@@ -129,7 +129,7 @@ function App() {
   return (
     <>
       <Header />
-      <main className="min-h-[80vh]">
+      <main className="min-h-[calc(100vh-8rem)] pb-12">
         <Outlet />
       </main>
       <Footer />
