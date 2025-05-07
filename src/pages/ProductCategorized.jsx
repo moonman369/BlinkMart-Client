@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { fetchProductsBySubcategory } from "../util/fetchAllProducts";
 import { axiosToastError } from "../util/axiosToastError";
 import { apiSummary } from "../config/api/apiSummary";
@@ -9,9 +9,11 @@ import { useSelector } from "react-redux";
 import { fetchSubcategoriesByCategory } from "../util/fetchAllSubcategories";
 import { IoMenu } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
+import { convertToUrlString } from "../util/convertToUrlString";
 
 const ProductCategorized = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { category, subcategory } = location.state || {};
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -93,10 +95,22 @@ const ProductCategorized = () => {
 
   useEffect(() => {
     loadProductsSubcategorywise();
-  }, [currentPage]);
+  }, [currentPage, subcategory?._id]);
 
   console.log("products", products);
   console.log("location.state", location.state);
+
+  const handleSubcategoryClick = (selectedSubcategory) => {
+    const url = `/${convertToUrlString(category.name)}-${category._id}/${convertToUrlString(selectedSubcategory.name)}-${selectedSubcategory._id}`;
+    navigate(url, {
+      state: {
+        category: category,
+        subcategory: selectedSubcategory,
+      },
+    });
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <section className="sticky top-24 lg:top-20">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-[200px,1fr] lg:grid-cols-[300px,1fr]">
@@ -133,7 +147,7 @@ const ProductCategorized = () => {
                       className={`p-3 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-800 flex items-center gap-3 ${
                         sub._id === subcategory?._id ? "bg-gray-800" : ""
                       }`}
-                      onClick={() => setIsMobileMenuOpen(false)}
+                      onClick={() => handleSubcategoryClick(sub)}
                     >
                       <img 
                         src={sub.image} 
@@ -166,6 +180,7 @@ const ProductCategorized = () => {
                   className={`p-3 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-800 flex items-center gap-3 ${
                     sub._id === subcategory?._id ? "bg-gray-800" : ""
                   }`}
+                  onClick={() => handleSubcategoryClick(sub)}
                 >
                   <img 
                     src={sub.image} 
