@@ -45,7 +45,7 @@ const ProductCard = ({ product }) => {
     // </Link>
 
     <Link
-      to={window.location.pathname}
+      to={url}
       state={{
         product: product,
         category: product?.category_id[0],

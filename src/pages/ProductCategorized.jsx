@@ -139,7 +139,9 @@ const ProductCategorized = () => {
                 <div
                   key={sub._id}
                   className={`p-3 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-800 flex items-center gap-3 ${
-                    sub._id === subcategory?._id ? "bg-green-900" : ""
+                    sub._id === subcategory?._id
+                      ? "bg-green-900 hover:bg-green-800"
+                      : ""
                   }`}
                   onClick={() => handleSubcategoryClick(sub)}
                 >
@@ -159,7 +161,7 @@ const ProductCategorized = () => {
 
         {/* products */}
         <div className="h-[calc(100vh-8rem)] overflow-y-auto ml-0 md:ml-4 scrollbar-hide">
-          <div className="shadow-green-700 shadow-md p-4 rounded-lg bg-gray-900 mt-4 mx-4 md:mx-0">
+          <div className="shadow-green-700 shadow-md p-4 rounded-lg bg-gray-900 mt-4 mx-4 md:mx-4">
             <div className="flex justify-between items-center">
               <h3 className="font-semibold text-xl">{subcategory.name}</h3>
               <button
@@ -170,7 +172,7 @@ const ProductCategorized = () => {
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-2 w-full md:grid-cols-3 lg:grid-cols-4 gap-4 p-2 my-4 max-w-[90%] mx-auto md:max-w-none md:mx-0">
+          <div className="grid grid-cols-2 w-full md:grid-cols-3 lg:grid-cols-4 gap-4 p-2 my-4 max-w-[90%] mx-auto md:max-w-none md:mx-0 pb-8">
             {loading && <LoadingSpinner />}
 
             {products.map((product, index) => (
@@ -212,7 +214,9 @@ const ProductCategorized = () => {
                   <div
                     key={sub._id}
                     className={`p-3 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-800 flex items-center gap-3 ${
-                      sub._id === subcategory?._id ? "bg-green-900" : ""
+                      sub._id === subcategory?._id
+                        ? "bg-green-900 hover:bg-green-800"
+                        : ""
                     }`}
                     onClick={() => handleSubcategoryClick(sub)}
                   >
