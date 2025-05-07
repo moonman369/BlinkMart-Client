@@ -127,7 +127,7 @@ const ProductCategorized = () => {
     <section className="sticky top-24 lg:top-20">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-[200px,1fr] lg:grid-cols-[300px,1fr]">
         {/* Desktop Subcategories Sidebar */}
-        <div className="hidden md:block h-[calc(100vh-6rem)] overflow-y-auto scrollbar-hide bg-black rounded-lg">
+        <div className="hidden md:block h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide bg-black rounded-lg">
           <div className="sticky top-0 bg-black shadow-green-700 shadow-md p-2 rounded-t-lg z-10">
             <h3 className="font-semibold text-lg">Subcategories</h3>
           </div>
@@ -158,7 +158,7 @@ const ProductCategorized = () => {
         </div>
 
         {/* products */}
-        <div className="h-[calc(100vh-6rem)] overflow-y-auto ml-0 md:ml-4">
+        <div className="h-[calc(100vh-8rem)] overflow-y-auto ml-0 md:ml-4 scrollbar-hide">
           <div className="shadow-green-700 shadow-md p-4 rounded-lg bg-gray-900 mt-4 mx-4 md:mx-0">
             <div className="flex justify-between items-center">
               <h3 className="font-semibold text-xl">{subcategory.name}</h3>
