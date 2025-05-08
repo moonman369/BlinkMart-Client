@@ -22,7 +22,7 @@ const ProductDisplay = () => {
         </div>
 
         {/* Product Details */}
-        <div className="bg-gray-800 p-6 rounded-lg">
+        <div className="bg-gray-800 p-6 rounded-lg mb-7">
           <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
 
           <div className="mb-4">

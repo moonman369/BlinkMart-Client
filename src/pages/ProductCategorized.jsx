@@ -10,6 +10,8 @@ import { fetchSubcategoriesByCategory } from "../util/fetchAllSubcategories";
 import { IoMenu } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import { convertToUrlString } from "../util/convertToUrlString";
+import { FaBoxOpen } from "react-icons/fa";
+import NoData from "../components/NoData";
 
 const ProductCategorized = () => {
   const location = useLocation();
@@ -91,10 +93,11 @@ const ProductCategorized = () => {
         productResponse.status ===
         apiSummary.endpoints.product.getProductsBySubategory.successStatus
       ) {
-        setProducts(productResponse.data.data);
+        setProducts(productResponse.data.data || []);
       }
     } catch (error) {
       console.error(error);
+      setProducts([]); // Clear products on error
       // axiosToastError(error);
     } finally {
       setLoading(false);
@@ -109,6 +112,10 @@ const ProductCategorized = () => {
   console.log("location.state", location.state);
 
   const handleSubcategoryClick = (selectedSubcategory) => {
+    // Clear current products before navigation
+    setProducts([]);
+    setCurrentPage(1);
+
     const url = `/${convertToUrlString(category.name)}-${
       category._id
     }/${convertToUrlString(selectedSubcategory.name)}-${
@@ -173,17 +180,23 @@ const ProductCategorized = () => {
             </div>
           </div>
           <div className="grid grid-cols-2 w-full md:grid-cols-3 lg:grid-cols-4 gap-4 p-2 my-4 max-w-[90%] mx-auto md:max-w-none md:mx-0 pb-8">
-            {loading && <LoadingSpinner />}
-
-            {products.map((product, index) => (
-              <ProductCard
-                key={`product-${product?._id}-${index}`}
-                product={product}
-                category={category}
-                subcategory={subcategory}
-                setCurrentPage={setCurrentPage}
-              />
-            ))}
+            {loading ? (
+              <LoadingSpinner />
+            ) : products.length > 0 ? (
+              products.map((product, index) => (
+                <ProductCard
+                  key={`product-${product?._id}-${index}`}
+                  product={product}
+                  category={category}
+                  subcategory={subcategory}
+                  setCurrentPage={setCurrentPage}
+                />
+              ))
+            ) : (
+              <div className="col-span-full">
+                <NoData message="No products found in this subcategory" />
+              </div>
+            )}
           </div>
         </div>
       </div>
