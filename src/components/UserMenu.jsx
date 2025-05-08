@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError.js";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import { isAdmin } from "../util/isAdmin.js";
+import Cookies from "js-cookie";
 
 const UserMenu = ({ isMobile, close }) => {
   const user = useSelector((state) => state.user);
@@ -24,7 +25,8 @@ const UserMenu = ({ isMobile, close }) => {
 
       if (response.status === apiSummary.endpoints.user.logout.successStatus) {
         dispatch(resetUserDetails());
-        localStorage.clear();
+        Cookies.remove("accessToken");
+        Cookies.remove("refreshToken");
         toast.success(response?.data?.message);
       }
       if (isMobile) {
