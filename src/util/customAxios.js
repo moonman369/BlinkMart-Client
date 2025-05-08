@@ -1,5 +1,6 @@
 import axios, { Axios } from "axios";
 import { apiSummary } from "../config/api/apiSummary";
+import Cookies from "js-cookie";
 
 const customAxios = axios.create({
   baseURL: apiSummary.baseUrl,
@@ -9,7 +10,7 @@ const customAxios = axios.create({
 // Sending accessToken in Auth header
 customAxios.interceptors.request.use(
   async (config) => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = Cookies.get("accessToken");
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -21,14 +22,14 @@ customAxios.interceptors.request.use(
 );
 
 //Generate new accessToken using refreshToken
-customAxios.interceptors.request.use(
+customAxios.interceptors.response.use(
   (response) => response,
   async (error) => {
     let originalRequest = error.config;
 
     if (error.response.status === 401 && !originalRequest.retry) {
       originalRequest.retry = true;
-      const refreshToken = localStorage.getItem("refreshToken");
+      const refreshToken = Cookies.get("refreshToken");
       if (refreshToken) {
         const newAccessToken = await refreshAccessToken(refreshToken);
         if (newAccessToken) {
@@ -55,7 +56,11 @@ const refreshAccessToken = async (refreshToken) => {
     });
 
     const { accessToken } = response.data.tokens;
-    localStorage.setItem("accessToken", accessToken);
+    Cookies.set("accessToken", accessToken, {
+      expires: 7,
+      secure: true,
+      sameSite: "strict",
+    });
     return accessToken;
   } catch (error) {}
 };
