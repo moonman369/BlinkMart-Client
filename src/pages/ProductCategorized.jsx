@@ -91,10 +91,11 @@ const ProductCategorized = () => {
         productResponse.status ===
         apiSummary.endpoints.product.getProductsBySubategory.successStatus
       ) {
-        setProducts(productResponse.data.data);
+        setProducts(productResponse.data.data || []);
       }
     } catch (error) {
       console.error(error);
+      setProducts([]); // Clear products on error
       // axiosToastError(error);
     } finally {
       setLoading(false);
@@ -109,6 +110,10 @@ const ProductCategorized = () => {
   console.log("location.state", location.state);
 
   const handleSubcategoryClick = (selectedSubcategory) => {
+    // Clear current products before navigation
+    setProducts([]);
+    setCurrentPage(1);
+
     const url = `/${convertToUrlString(category.name)}-${
       category._id
     }/${convertToUrlString(selectedSubcategory.name)}-${
