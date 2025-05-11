@@ -3,7 +3,7 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import toast, { Toaster } from "react-hot-toast";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { fetchUserDetails } from "./util/fetchUserDetails";
@@ -16,16 +16,75 @@ import {
   setAllSubcategories,
   setCategoryPageDetails,
   setLoadingCategory,
+  setPaginatedSubcategories,
   setProductPageDetails,
   setSubcategoryPageDetails,
 } from "./store/productSlice";
 import { all } from "axios";
 import { fetchAllSubcategories } from "./util/fetchAllSubcategories";
 import { fetchAllProducts } from "./util/fetchAllProducts";
+import customAxios from "./util/customAxios";
+import { apiSummary } from "./config/api/apiSummary";
+import Cookies from "js-cookie";
 
 function App() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const navigate = useNavigate();
+
+  const checkAndRefreshToken = async () => {
+    const accessToken = Cookies.get("accessToken");
+    const refreshToken = Cookies.get("refreshToken");
+
+    console.log("Access Token:", accessToken);
+    console.log("Refresh Token:", refreshToken);
+
+    // If both tokens are null, redirect to login
+    if (!accessToken && !refreshToken) {
+      console.log("Both tokens are missing, redirecting to login");
+      navigate("/login");
+      return false;
+    }
+
+    // If access token is null but refresh token exists, try to refresh
+    if (!accessToken && refreshToken) {
+      console.log(
+        "Access token missing but refresh token exists, attempting refresh"
+      );
+      try {
+        const response = await customAxios({
+          url: apiSummary.endpoints.user.refreshToken.path,
+          method: apiSummary.endpoints.user.refreshToken.method,
+          headers: {
+            Authorization: `Bearer ${refreshToken}`,
+          },
+        });
+
+        if (
+          response?.status ===
+          apiSummary.endpoints.user.refreshToken.successStatus
+        ) {
+          console.log("Token refresh successful");
+          // Backend will handle setting the new access token cookie
+          return true;
+        }
+      } catch (error) {
+        console.error("Token refresh error:", error);
+        // If refresh fails, clear tokens and redirect to login
+        console.log(
+          "Token refresh failed, clearing tokens and redirecting to login"
+        );
+        Cookies.remove("accessToken");
+        Cookies.remove("refreshToken");
+        navigate("/login");
+        return false;
+      }
+    }
+
+    // If access token exists, we're good
+    console.log("Access token exists, proceeding normally");
+    return true;
+  };
 
   const getUser = async () => {
     try {
@@ -66,19 +125,29 @@ function App() {
 
   const getAllSubcategories = async () => {
     try {
-      const allSubcategories = await fetchAllSubcategories({
+      // Load all subcategories for home page
+      const allSubcategoriesResponse = await fetchAllSubcategories({
+        all: true,
+      });
+      console.log("allSubcategories", allSubcategoriesResponse);
+      dispatch(setAllSubcategories(allSubcategoriesResponse?.data?.data));
+
+      // Load paginated subcategories for admin view
+      const paginatedSubcategoriesResponse = await fetchAllSubcategories({
         all: false,
         currentPage: 1,
         pageSize: 10,
       });
-      console.log("allSubcategories", allSubcategories);
-      dispatch(setAllSubcategories(allSubcategories?.data?.data));
+      console.log("paginatedSubcategories", paginatedSubcategoriesResponse);
+      dispatch(
+        setPaginatedSubcategories(paginatedSubcategoriesResponse?.data?.data)
+      );
       dispatch(
         setSubcategoryPageDetails({
-          pageSize: allSubcategories?.data?.pageSize,
-          currentPage: allSubcategories?.data?.currentPage,
-          count: allSubcategories?.data?.count,
-          totalCount: allSubcategories?.data?.totalCount,
+          pageSize: paginatedSubcategoriesResponse?.data?.pageSize,
+          currentPage: paginatedSubcategoriesResponse?.data?.currentPage,
+          count: paginatedSubcategoriesResponse?.data?.count,
+          totalCount: paginatedSubcategoriesResponse?.data?.totalCount,
         })
       );
     } catch (error) {
@@ -111,7 +180,14 @@ function App() {
   };
 
   useEffect(() => {
-    getUser();
+    const initializeApp = async () => {
+      const isTokenValid = await checkAndRefreshToken();
+      if (isTokenValid) {
+        getUser();
+      }
+    };
+
+    initializeApp();
   }, []);
 
   useEffect(() => {
@@ -121,10 +197,6 @@ function App() {
       getAllProducts();
     }
   }, [user]);
-
-  // useEffect(() => {
-  //   getAllProducts();
-  // }, []);
 
   return (
     <>
@@ -139,6 +211,8 @@ function App() {
             background: "#1f2937",
             color: "#d1d5db",
           },
+          duration: 3000,
+          dismissOnClick: true,
         }}
       />
     </>

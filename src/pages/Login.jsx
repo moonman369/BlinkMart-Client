@@ -8,7 +8,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { fetchUserDetails } from "../util/fetchUserDetails";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "../store/userSlice";
-import Cookies from "js-cookie";
 
 const Login = () => {
   const [userData, setUserData] = useState({
@@ -61,18 +60,6 @@ const Login = () => {
         console.log(userData);
         dispatch(setUserDetails(userData?.data?.data));
         toast.success("Login Successful!🎉");
-
-        // Set cookies with proper attributes
-        Cookies.set("accessToken", response.data.tokens.access, {
-          expires: 7, // 7 days
-          secure: true,
-          sameSite: "strict",
-        });
-        Cookies.set("refreshToken", response.data.tokens.refresh, {
-          expires: 30, // 30 days
-          secure: true,
-          sameSite: "strict",
-        });
 
         setUserData({
           email: "",

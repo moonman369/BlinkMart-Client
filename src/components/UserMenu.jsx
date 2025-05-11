@@ -18,6 +18,7 @@ const UserMenu = ({ isMobile, close }) => {
 
   const handleLogout = async () => {
     try {
+      console.log("yeet");
       const response = await customAxios({
         url: apiSummary.endpoints.user.logout.path,
         method: apiSummary.endpoints.user.logout.method,
@@ -27,13 +28,16 @@ const UserMenu = ({ isMobile, close }) => {
         dispatch(resetUserDetails());
         Cookies.remove("accessToken");
         Cookies.remove("refreshToken");
-        toast.success(response?.data?.message);
+        toast.success(response?.data?.message || "Logged out successfully");
+
+        handleClose();
+
+        setTimeout(() => {
+          navigate("/");
+        }, 100);
       }
-      if (isMobile) {
-        navigate(-1);
-      }
-      navigate("/");
     } catch (error) {
+      console.error("Logout error:", error);
       axiosToastError(error);
     }
   };

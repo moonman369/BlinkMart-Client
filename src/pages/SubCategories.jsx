@@ -17,14 +17,16 @@ import { fetchAllSubcategories } from "../util/fetchAllSubcategories";
 import {
   setAllSubcategories,
   setSubcategoryPageDetails,
+  setPaginatedSubcategories,
 } from "../store/productSlice";
 import PaginationBar from "../components/PaginationBar";
 
 const SubCategories = () => {
   const dispatch = useDispatch();
   const [openAddSubcategoryModal, setOpenAddSubcategoryModal] = useState(false);
-  // const [subcategories, setSubcategories] = useState([]);
-  const subcategories = useSelector((state) => state.product.allSubcategories);
+  const subcategories = useSelector(
+    (state) => state.product.paginatedSubcategories
+  );
   const subcategoryPageDetails = useSelector(
     (state) => state.product.pageDetails.subcategories
   );
@@ -114,7 +116,9 @@ const SubCategories = () => {
         apiSummary.endpoints.subcategory.getAllSubcategories.successStatus
       ) {
         console.log("Refresh Subcategories", fetchSubcategoriesResponse);
-        dispatch(setAllSubcategories(fetchSubcategoriesResponse.data.data));
+        dispatch(
+          setPaginatedSubcategories(fetchSubcategoriesResponse.data.data)
+        );
         dispatch(
           setSubcategoryPageDetails({
             pageSize: fetchSubcategoriesResponse?.data?.pageSize,
