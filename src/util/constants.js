@@ -12,3 +12,5 @@ export const IMAGE_MIMETYPE_LIST = [
 ];
 
 export const USER_ROLE_ADMIN = "ADMIN";
+export const ENV_DEV = "dev";
+export const ENV_PROD = "prod";

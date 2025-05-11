@@ -13,32 +13,8 @@ import { convertToUrlString } from "../util/convertToUrlString.js";
 const Home = () => {
   const loadingCategory = useSelector((state) => state.product.loadingCategory);
   const categories = useSelector((state) => state.product.allCategories);
-  const [subcategories, setSubcategories] = useState([]);
+  const subcategories = useSelector((state) => state.product.allSubcategories);
   const navigate = useNavigate();
-
-  const loadAllSubcategories = async () => {
-    try {
-      const fetchAllSubcategoriesResponse = await fetchAllSubcategories({
-        all: true,
-      });
-      console.log(
-        "fetchAllSubcategoriesResponse",
-        fetchAllSubcategoriesResponse
-      );
-      if (
-        fetchAllSubcategoriesResponse?.status ===
-        apiSummary.endpoints.subcategory.getAllSubcategories.successStatus
-      ) {
-        setSubcategories(fetchAllSubcategoriesResponse?.data?.data);
-      }
-    } catch (error) {
-      console.error(error);
-      axiosToastError(error);
-    }
-  };
-  useEffect(() => {
-    loadAllSubcategories();
-  }, []);
 
   const handleRedirectProductCategorizedPage = (category) => {
     const categoryId = category?._id;

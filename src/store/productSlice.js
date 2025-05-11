@@ -4,7 +4,8 @@ import { act } from "react-dom/test-utils";
 const initialState = {
   allCategories: [],
   loadingCategory: false,
-  allSubcategories: [],
+  allSubcategories: [], // For home page view
+  paginatedSubcategories: [], // For admin table view
   allProducts: [],
   pageDetails: {
     categories: {},
@@ -30,6 +31,9 @@ const productSlice = createSlice({
     setAllSubcategories: (state, action) => {
       state.allSubcategories = [...action.payload];
     },
+    setPaginatedSubcategories: (state, action) => {
+      state.paginatedSubcategories = [...action.payload];
+    },
     setSubcategoryPageDetails: (state, action) => {
       state.pageDetails.subcategories = { ...action.payload };
     },
@@ -46,6 +50,7 @@ const productSlice = createSlice({
 export const {
   setAllCategories,
   setAllSubcategories,
+  setPaginatedSubcategories,
   setLoadingCategory,
   setAllProducts,
   setCategoryPageDetails,
