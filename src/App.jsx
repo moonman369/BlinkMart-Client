@@ -139,6 +139,8 @@ function App() {
             background: "#1f2937",
             color: "#d1d5db",
           },
+          duration: 3000,
+          dismissOnClick: true,
         }}
       />
     </>
