@@ -47,9 +47,7 @@ const ProductCard = ({ product }) => {
     <Link
       to={url}
       state={{
-        product: product,
-        category: product?.category_id[0],
-        subcategory: product?.sub_category_id[0],
+        productId: product._id,
       }}
       className="border hover:border-secondary-200 p-2 lg:p-4 grid gap-0.5 lg:gap-3 max-w-32 lg:max-w-64 rounded cursor-pointer bg-gray-700"
     >

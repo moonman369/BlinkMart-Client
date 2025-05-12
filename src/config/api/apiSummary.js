@@ -128,6 +128,11 @@ export const apiSummary = {
         method: "get",
         successStatus: 200,
       },
+      getProductById: {
+        path: "api/v1/product/get-product",
+        method: "get",
+        successStatus: 200,
+      },
     },
   },
 };
