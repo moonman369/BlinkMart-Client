@@ -92,3 +92,22 @@ export const fetchProductsBySubcategory = async ({
   // console.log(productResponse);
   return productResponse;
 };
+
+export const fetchProductsById = async ({ productId }) => {
+  if (!productId) {
+    return null;
+  }
+  try {
+    const productResponse = await customAxios({
+      url: apiSummary.endpoints.product.getProductById.path,
+      method: apiSummary.endpoints.product.getProductById.method,
+      params: {
+        productId: productId,
+      },
+    });
+    return productResponse;
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    return null;
+  }
+};
