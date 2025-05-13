@@ -5,6 +5,7 @@ import customAxios from "../util/customAxios";
 import toast from "react-hot-toast";
 import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
+import useScrollLock from "../hooks/useScrollLock";
 
 const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
   const [newCategoryData, setNewCategoryData] = useState({
@@ -12,6 +13,9 @@ const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
     image: null,
   });
   const [processing, setProcessing] = useState(false);
+
+  // Lock scroll when modal is open
+  useScrollLock(true);
 
   useEffect(() => {
     setNewCategoryData((prevData) => ({

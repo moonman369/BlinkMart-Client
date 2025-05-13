@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { checkCategoriesArrayEquality } from "../util/checkCategoriesArrayEquality.js";
 import SelectionDropDown from "./SelectionDropDown.jsx";
 import { fetchAllCategories } from "../util/fetchAllCategories.js";
+import useScrollLock from "../hooks/useScrollLock";
 
 const EditSubcategoryModal = ({
   fetchSubcategories,
@@ -20,6 +21,10 @@ const EditSubcategoryModal = ({
   // const categories = useSelector((state) => state.product.allCategories);
   const [categoryBucket, setCategoryBucket] = useState([]);
   const [categories, setCategories] = useState([]);
+
+  // Lock scroll when modal is open
+  useScrollLock(true);
+
   useEffect(() => {
     const performFetchCategories = async () => {
       const fetchAllCategoriesResponse = await fetchAllCategories({
@@ -231,7 +236,7 @@ const EditSubcategoryModal = ({
             </div>
 
             <SelectionDropDown
-            title={"Category"}
+              title={"Category"}
               collection={categoryBucket}
               newCollection={editSubcategoryData?.category}
               handleAddOrRemove={handleAddOrRemove}

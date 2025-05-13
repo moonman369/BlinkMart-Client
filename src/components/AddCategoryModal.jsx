@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import { useDispatch } from "react-redux";
+import useScrollLock from "../hooks/useScrollLock";
 
 const AddCategoryModal = ({ fetchCategories, closeModal }) => {
   const [newCategoryData, setNewCategoryData] = useState({
@@ -15,6 +16,9 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
   });
   const [processing, setProcessing] = useState(false);
   const dispatch = useDispatch();
+
+  // Lock scroll when modal is open
+  useScrollLock(true);
 
   const handleOnChange = (e) => {
     e.preventDefault();
