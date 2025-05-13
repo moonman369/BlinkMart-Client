@@ -358,19 +358,25 @@ const ProductDisplay = () => {
 
             {/* Delivery Time */}
             <div className="bg-gray-700 p-4 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-3">
                 <FaTruck className="text-green-500" />
                 <span className="text-gray-400">Delivery Time</span>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-white">Estimated Delivery</span>
-                  <div className="flex items-center gap-1 text-yellow-400">
-                    <FaBolt className="text-sm" />
-                    <span className="text-sm font-medium">Superfast</span>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <div className="flex flex-col md:flex-row md:items-center gap-2">
+                  <span className="text-white text-sm md:text-base">
+                    Estimated Delivery
+                  </span>
+                  <div className="flex items-center gap-2 bg-green-500/10 px-3 py-1.5 rounded-full w-fit">
+                    <span className="text-green-500 font-medium text-sm md:text-base whitespace-nowrap">
+                      10 min
+                    </span>
                   </div>
                 </div>
-                <span className="text-green-500 font-medium">10 Minutes</span>
+                <div className="flex items-center gap-1 text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded-full w-fit">
+                  <FaBolt className="text-sm" />
+                  <span className="text-sm font-medium">Superfast</span>
+                </div>
               </div>
             </div>
 

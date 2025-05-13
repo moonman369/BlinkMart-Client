@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import SelectionDropDown from "./SelectionDropDown.jsx";
 import { fetchAllCategories } from "../util/fetchAllCategories.js";
 import { all } from "axios";
+import useScrollLock from "../hooks/useScrollLock";
 
 const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
   const [newSubcategoryData, setNewSubcategoryData] = useState({
@@ -19,6 +20,10 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
   const [processing, setProcessing] = useState(false);
   // const categories = useSelector((state) => state.product.allCategories);
   const [categories, setCategories] = useState([]);
+
+  // Lock scroll when modal is open
+  useScrollLock(true);
+
   useEffect(() => {
     const performFetchCategories = async () => {
       try {

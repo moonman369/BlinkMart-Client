@@ -4,6 +4,7 @@ import customAxios from "../util/customAxios";
 import { apiSummary } from "../config/api/apiSummary";
 import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError";
+import useScrollLock from "../hooks/useScrollLock";
 
 const DeleteSubcategoryModal = ({
   closeModal,
@@ -11,6 +12,9 @@ const DeleteSubcategoryModal = ({
   fetchSubcategories,
 }) => {
   const [processing, setProcessing] = useState(false);
+
+  // Lock scroll when modal is open
+  useScrollLock(true);
 
   const handleDelete = async () => {
     try {
