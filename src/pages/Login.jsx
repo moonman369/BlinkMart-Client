@@ -18,6 +18,7 @@ const Login = () => {
   const [isUserDataPopulated, setIsUserDataPopulated] = useState(
     Object.values(userData).every((x) => x)
   );
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -45,6 +46,7 @@ const Login = () => {
         return;
       }
 
+      setIsLoading(true);
       const response = await customAxios({
         url: apiSummary.endpoints.user.login.path,
         method: apiSummary.endpoints.user.login.method,
@@ -70,6 +72,8 @@ const Login = () => {
     } catch (error) {
       console.error(error);
       axiosToastError(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -96,6 +100,7 @@ const Login = () => {
                 className="w-full bg-transparent outline-none"
                 value={userData.email}
                 onChange={handleInputChange}
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -111,6 +116,7 @@ const Login = () => {
                 className="w-full bg-transparent outline-none"
                 value={userData.password}
                 onChange={handleInputChange}
+                disabled={isLoading}
               />
               <div onClick={toggleShowPassword} className="cursor-pointer">
                 {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
@@ -125,14 +131,21 @@ const Login = () => {
           </div>
 
           <button
-            disabled={!isUserDataPopulated}
+            disabled={!isUserDataPopulated || isLoading}
             className={`${
-              isUserDataPopulated
+              isUserDataPopulated && !isLoading
                 ? "bg-green-700 hover:bg-green-800"
                 : "bg-gray-500"
-            } text-white py-3 rounded font-semibold my-8 tracking-wider w-full`}
+            } text-white py-3 rounded font-semibold my-8 tracking-wider w-full relative`}
           >
-            Login
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                Logging in...
+              </div>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
         <div className="flex justify-center text-[12px]">
