@@ -10,6 +10,7 @@ import { axiosToastError } from "../util/axiosToastError.js";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import { isAdmin } from "../util/isAdmin.js";
 import Cookies from "js-cookie";
+import { COOKIE_CLEAR_SETTINGS } from "../util/constants.js";
 
 const UserMenu = ({ isMobile, close }) => {
   const user = useSelector((state) => state.user);
@@ -26,8 +27,8 @@ const UserMenu = ({ isMobile, close }) => {
 
       if (response.status === apiSummary.endpoints.user.logout.successStatus) {
         dispatch(resetUserDetails());
-        Cookies.remove("accessToken");
-        Cookies.remove("refreshToken");
+        Cookies.remove("accessToken", COOKIE_CLEAR_SETTINGS);
+        Cookies.remove("refreshToken", COOKIE_CLEAR_SETTINGS);
         toast.success(response?.data?.message || "Logged out successfully");
 
         handleClose();
