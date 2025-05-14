@@ -3,7 +3,7 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import toast, { Toaster } from "react-hot-toast";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { fetchUserDetails } from "./util/fetchUserDetails";
@@ -31,6 +31,7 @@ function App() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const checkAndRefreshToken = async () => {
     const accessToken = Cookies.get("accessToken");
@@ -39,10 +40,9 @@ function App() {
     console.log("Access Token:", accessToken);
     console.log("Refresh Token:", refreshToken);
 
-    // If both tokens are null, redirect to login
+    // If both tokens are null, return false to show welcome page
     if (!accessToken && !refreshToken) {
-      console.log("Both tokens are missing, redirecting to login");
-      navigate("/login");
+      console.log("Both tokens are missing, showing welcome page");
       return false;
     }
 
@@ -70,13 +70,12 @@ function App() {
         }
       } catch (error) {
         console.error("Token refresh error:", error);
-        // If refresh fails, clear tokens and redirect to login
+        // If refresh fails, clear tokens and return false to show welcome page
         console.log(
-          "Token refresh failed, clearing tokens and redirecting to login"
+          "Token refresh failed, clearing tokens and showing welcome page"
         );
         Cookies.remove("accessToken");
         Cookies.remove("refreshToken");
-        navigate("/login");
         return false;
       }
     }
@@ -102,8 +101,6 @@ function App() {
       dispatch(setLoadingCategory(true));
       const allCategories = await fetchAllCategories({
         all: true,
-        // currentPage: 1,
-        // pageSize: 10,
       });
       console.log("allCategories", allCategories);
       dispatch(setAllCategories(allCategories?.data?.data));
@@ -191,12 +188,19 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (user?._id) {
       getAllCategories();
       getAllSubcategories();
       getAllProducts();
     }
   }, [user]);
+
+  // Redirect to home if user is logged in and on welcome page
+  useEffect(() => {
+    if (user?._id && location.pathname === "/") {
+      navigate("/home");
+    }
+  }, [user, location.pathname]);
 
   return (
     <>
