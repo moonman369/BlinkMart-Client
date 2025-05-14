@@ -20,6 +20,7 @@ import AdminView from "../layouts/AdminView";
 import ProductAdmin from "../pages/ProductAdmin";
 import ProductCategorized from "../pages/ProductCategorized";
 import ProductDisplay from "../pages/ProductDisplay";
+import WelcomePage from "../components/WelcomePage";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
     children: [
       {
         path: "",
+        element: <WelcomePage />,
+      },
+      {
+        path: "home",
         element: <Home />,
       },
       {
