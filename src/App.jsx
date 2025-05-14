@@ -191,7 +191,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (user && user?.role === "ADMIN") {
+    if (user) {
       getAllCategories();
       getAllSubcategories();
       getAllProducts();

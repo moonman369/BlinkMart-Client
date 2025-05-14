@@ -28,6 +28,11 @@ const ProductDisplay = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const imageContainerRef = useRef(null);
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50;
 
