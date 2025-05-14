@@ -27,12 +27,38 @@ import customAxios from "./util/customAxios";
 import { apiSummary } from "./config/api/apiSummary";
 import Cookies from "js-cookie";
 import { COOKIE_CLEAR_SETTINGS } from "./util/constants";
+import CookieConsent from "./components/CookieConsent";
 
 function App() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
   const location = useLocation();
+  const [cookiesEnabled, setCookiesEnabled] = useState(true);
+
+  const checkCookiePermissions = () => {
+    const cookieConsent = localStorage.getItem("cookieConsent");
+    const cookiesEnabled = navigator.cookieEnabled;
+
+    if (!cookiesEnabled) {
+      toast.error(
+        "Please enable cookies in your browser settings to use this application."
+      );
+      setCookiesEnabled(false);
+      return false;
+    }
+
+    if (cookieConsent === "declined") {
+      toast.error(
+        "Cookies are required to use this application. Please accept cookies to continue."
+      );
+      setCookiesEnabled(false);
+      return false;
+    }
+
+    setCookiesEnabled(true);
+    return true;
+  };
 
   const clearAllStorage = () => {
     // Clear cookies
@@ -50,6 +76,10 @@ function App() {
   };
 
   const checkAndRefreshToken = async () => {
+    if (!checkCookiePermissions()) {
+      return false;
+    }
+
     const accessToken = Cookies.get("accessToken");
     const refreshToken = Cookies.get("refreshToken");
 
@@ -225,6 +255,7 @@ function App() {
         <Outlet />
       </main>
       <Footer />
+      <CookieConsent />
       <Toaster
         toastOptions={{
           style: {
