@@ -26,6 +26,7 @@ import { fetchAllProducts } from "./util/fetchAllProducts";
 import customAxios from "./util/customAxios";
 import { apiSummary } from "./config/api/apiSummary";
 import Cookies from "js-cookie";
+import { COOKIE_CLEAR_SETTINGS } from "./util/constants";
 
 function App() {
   const dispatch = useDispatch();
@@ -74,8 +75,8 @@ function App() {
         console.log(
           "Token refresh failed, clearing tokens and showing welcome page"
         );
-        Cookies.remove("accessToken");
-        Cookies.remove("refreshToken");
+        Cookies.remove("accessToken", COOKIE_CLEAR_SETTINGS);
+        Cookies.remove("refreshToken", COOKIE_CLEAR_SETTINGS);
         return false;
       }
     }
