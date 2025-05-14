@@ -10,27 +10,38 @@ import { axiosToastError } from "../util/axiosToastError.js";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import { isAdmin } from "../util/isAdmin.js";
 import Cookies from "js-cookie";
-import { COOKIE_CLEAR_SETTINGS } from "../util/constants.js";
+import { COOKIE_CLEAR_SETTINGS } from "../util/constants";
 
 const UserMenu = ({ isMobile, close }) => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const clearAllStorage = () => {
+    // Clear cookies
+    Cookies.remove("accessToken", COOKIE_CLEAR_SETTINGS);
+    Cookies.remove("refreshToken", COOKIE_CLEAR_SETTINGS);
+
+    // Clear localStorage
+    localStorage.clear();
+
+    // Clear sessionStorage
+    sessionStorage.clear();
+
+    // Clear Redux store user data
+    dispatch(resetUserDetails());
+  };
+
   const handleLogout = async () => {
     try {
-      console.log("yeet");
       const response = await customAxios({
         url: apiSummary.endpoints.user.logout.path,
         method: apiSummary.endpoints.user.logout.method,
       });
 
       if (response.status === apiSummary.endpoints.user.logout.successStatus) {
-        dispatch(resetUserDetails());
-        Cookies.remove("accessToken", COOKIE_CLEAR_SETTINGS);
-        Cookies.remove("refreshToken", COOKIE_CLEAR_SETTINGS);
+        clearAllStorage();
         toast.success(response?.data?.message || "Logged out successfully");
-
         handleClose();
 
         setTimeout(() => {

@@ -34,6 +34,21 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const clearAllStorage = () => {
+    // Clear cookies
+    Cookies.remove("accessToken", COOKIE_CLEAR_SETTINGS);
+    Cookies.remove("refreshToken", COOKIE_CLEAR_SETTINGS);
+
+    // Clear localStorage
+    localStorage.clear();
+
+    // Clear sessionStorage
+    sessionStorage.clear();
+
+    // Clear Redux store user data
+    dispatch(setUserDetails(null));
+  };
+
   const checkAndRefreshToken = async () => {
     const accessToken = Cookies.get("accessToken");
     const refreshToken = Cookies.get("refreshToken");
@@ -44,6 +59,7 @@ function App() {
     // If both tokens are null, return false to show welcome page
     if (!accessToken && !refreshToken) {
       console.log("Both tokens are missing, showing welcome page");
+      clearAllStorage();
       return false;
     }
 
@@ -71,12 +87,11 @@ function App() {
         }
       } catch (error) {
         console.error("Token refresh error:", error);
-        // If refresh fails, clear tokens and return false to show welcome page
+        // If refresh fails, clear all storage and return false to show welcome page
         console.log(
-          "Token refresh failed, clearing tokens and showing welcome page"
+          "Token refresh failed, clearing all storage and showing welcome page"
         );
-        Cookies.remove("accessToken", COOKIE_CLEAR_SETTINGS);
-        Cookies.remove("refreshToken", COOKIE_CLEAR_SETTINGS);
+        clearAllStorage();
         return false;
       }
     }
