@@ -5,24 +5,36 @@ const CookieConsent = () => {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
+    // Check if cookies are enabled
+    if (!navigator.cookieEnabled) {
+      setShowBanner(true);
+      return;
+    }
+
     // Check if user has already made a choice
     const cookieConsent = localStorage.getItem("cookieConsent");
-    if (!cookieConsent) {
+    if (!cookieConsent || cookieConsent === "declined") {
       setShowBanner(true);
     }
   }, []);
 
   const handleAccept = () => {
+    if (!navigator.cookieEnabled) {
+      // If cookies are disabled, keep showing the banner
+      return;
+    }
     localStorage.setItem("cookieConsent", "accepted");
     setShowBanner(false);
     // Request cookie permissions
-    if (navigator.cookieEnabled) {
-      document.cookie = "cookieConsent=true; path=/; max-age=31536000"; // 1 year
-    }
+    document.cookie = "cookieConsent=true; path=/; max-age=31536000"; // 1 year
   };
 
   const handleDecline = () => {
-    localStorage.setItem("cookieConsent", "declined");
+    if (!navigator.cookieEnabled) {
+      // If cookies are disabled, keep showing the banner
+      return;
+    }
+    // Simply hide the banner without storing the preference
     setShowBanner(false);
   };
 
@@ -35,9 +47,9 @@ const CookieConsent = () => {
           <FaCookieBite className="text-primary-200 text-2xl" />
           <div className="text-sm text-gray-300">
             <p>
-              We use cookies to enhance your browsing experience, serve
-              personalized content, and analyze our traffic. By clicking "Accept
-              All", you consent to our use of cookies.
+              {!navigator.cookieEnabled
+                ? "Please enable cookies in your browser to use this website properly."
+                : "We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. By clicking 'Accept All', you consent to our use of cookies."}
             </p>
           </div>
         </div>
