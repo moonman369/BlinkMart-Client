@@ -86,7 +86,7 @@ const SearchPage = () => {
 
   return (
     <div className="min-h-[calc(100vh-8rem)] bg-gray-800 p-4">
-      <div className="container mx-auto max-w-4xl">
+      <div className="container mx-auto max-w-4xl px-4 md:px-6">
         {showWelcome ? (
           <div className="mt-8">
             <div className="text-center mb-8">
@@ -162,7 +162,7 @@ const SearchPage = () => {
           </div>
         ) : (
           <div className="mt-8">
-            <h2 className="text-2xl font-bold text-white mb-6">
+            <h2 className="text-2xl font-bold text-white mb-6 text-center md:text-left">
               Search Results for "{searchQuery}"
             </h2>
 
@@ -170,24 +170,26 @@ const SearchPage = () => {
               <LoadingSpinner />
             ) : products.length > 0 ? (
               <>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {products.map((product, index) => (
-                    <ProductCard
-                      key={`${product._id}-${index}`}
-                      product={product}
-                    />
-                  ))}
+                <div className="flex justify-center">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full max-w-[800px]">
+                    {products.map((product, index) => (
+                      <div key={`${product._id}-${index}`} className="w-full">
+                        <ProductCard product={product} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <PaginationBar
-                  styles="mt-10"
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                  pageSize={pageDetails.pageSize}
-                  totalPages={Math.ceil(
-                    pageDetails.totalCount / pageDetails.pageSize
-                  )}
-                  reloadPage={loadSearchResults}
-                />
+                <div className="flex justify-center mt-10">
+                  <PaginationBar
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    pageSize={pageDetails.pageSize}
+                    totalPages={Math.ceil(
+                      pageDetails.totalCount / pageDetails.pageSize
+                    )}
+                    reloadPage={loadSearchResults}
+                  />
+                </div>
               </>
             ) : (
               <NoData message="No products found matching your search" />
