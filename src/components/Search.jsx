@@ -17,6 +17,7 @@ const Search = () => {
   );
   const searchQuery = useSelector((state) => state.search.searchQuery);
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
+  const searchInputRef = React.useRef(null);
 
   useEffect(() => {
     setIsSearchPage(location.pathname === "/search");
@@ -35,7 +36,6 @@ const Search = () => {
   };
 
   const handleSearchChange = (e) => {
-    console.log(e.target.value);
     setLocalSearchQuery(e.target.value);
   };
 
@@ -43,6 +43,10 @@ const Search = () => {
     if (localSearchQuery.trim()) {
       dispatch(setSearchQuery(localSearchQuery));
       dispatch(addRecentSearch(localSearchQuery));
+    }
+    // Blur the input to close mobile keyboard
+    if (searchInputRef.current) {
+      searchInputRef.current.blur();
     }
   };
 
@@ -118,10 +122,11 @@ const Search = () => {
         ) : (
           <div className="w-full h-full">
             <input
+              ref={searchInputRef}
               type="text"
               value={localSearchQuery}
               onChange={handleSearchChange}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
               placeholder="Search for groceries, snacks and more..."
               autoFocus
               className="bg-transparent w-full h-full outline-none"
