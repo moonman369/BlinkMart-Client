@@ -8,7 +8,12 @@ import ProductCard from "./ProductCard.jsx";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { useSelector } from "react-redux";
 
-const DisplayProductsByCategory = ({ id, name }) => {
+const DisplayProductsByCategory = ({
+  id,
+  name,
+  category,
+  handleRedirectToCategoryPage,
+}) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const containerRef = useRef();
@@ -53,9 +58,14 @@ const DisplayProductsByCategory = ({ id, name }) => {
     <div className="p-5">
       <div className="container mx-auto p-4 flex items-center justify-between gap-4">
         <h3 className="font-bold text-lg md:text-xl">{name}</h3>
-        <Link to="/" className="text-green-700 hover:text-secondary-200">
+        <div
+          className="text-green-700 hover:text-secondary-200 cursor-pointer"
+          onClick={() => {
+            handleRedirectToCategoryPage(category);
+          }}
+        >
           See All
-        </Link>
+        </div>
       </div>
 
       <div className="relative flex items-center justify-between">
