@@ -28,6 +28,8 @@ import { apiSummary } from "./config/api/apiSummary";
 import Cookies from "js-cookie";
 import { COOKIE_CLEAR_SETTINGS } from "./util/constants";
 import CookieConsent from "./components/CookieConsent";
+import { fetchAllCartItems } from "./util/fetchAllCartItems";
+import { addToCart } from "./store/cartSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -222,6 +224,19 @@ function App() {
     }
   };
 
+  const getAllCartItems = async () => {
+    try {
+      const response = await fetchAllCartItems();
+      // console.log("Cart Items:", response.data);
+
+      if (response.status === apiSummary.endpoints.cart.getCart.successStatus) {
+        dispatch(addToCart(response.data.data));
+      }
+    } catch (error) {
+      console.error("Fetch Cart Items Error: ", error);
+      toast.error("Error fetching cart items!");
+    }
+  };
   useEffect(() => {
     const initializeApp = async () => {
       const isTokenValid = await checkAndRefreshToken();
@@ -238,6 +253,7 @@ function App() {
       getAllCategories();
       getAllSubcategories();
       getAllProducts();
+      getAllCartItems();
     }
   }, [user]);
 

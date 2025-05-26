@@ -134,5 +134,27 @@ export const apiSummary = {
         successStatus: 200,
       },
     },
+    cart: {
+      getCart: {
+        path: "api/v1/cart/get-cart-by-user",
+        method: "get",
+        successStatus: 200,
+      },
+      addToCart: {
+        path: "api/v1/cart/add-to-cart",
+        method: "post",
+        successStatus: 200,
+      },
+      removeFromCart: {
+        path: "api/v1/cart/remove-from-cart",
+        method: "post",
+        successStatus: 200,
+      },
+      clearCart: {
+        path: "api/v1/cart/clear-cart",
+        method: "delete",
+        successStatus: 200,
+      },
+    },
   },
 };

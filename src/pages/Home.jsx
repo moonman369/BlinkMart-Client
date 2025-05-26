@@ -107,6 +107,8 @@ const Home = () => {
             key={`${category?._id}-${category.name}`}
             id={category?._id}
             name={category?.name}
+            handleRedirectToCategoryPage={handleRedirectProductCategorizedPage}
+            category={category}
           />
         );
       })}
