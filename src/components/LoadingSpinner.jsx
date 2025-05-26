@@ -1,12 +1,14 @@
 import React from "react";
 
-const LoadingSpinner = () => {
+const LoadingSpinner = ({ size }) => {
   return (
-    <div className="flex items-center justify-center p-8 mt-4 text-[30px]">
+    <div className="flex items-center justify-center text-[30px]">
       <div role="status">
         <svg
           aria-hidden="true"
-          className="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-secondary-200"
+          className={`inline w-${size ? 5 : 10} h-${
+            size ? 5 : 10
+          } text-gray-200 animate-spin dark:text-gray-600 fill-secondary-200`}
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
