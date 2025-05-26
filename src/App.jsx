@@ -227,7 +227,7 @@ function App() {
   const getAllCartItems = async () => {
     try {
       const response = await fetchAllCartItems();
-      console.log("Cart Items:", response.data);
+      // console.log("Cart Items:", response.data);
 
       if (response.status === apiSummary.endpoints.cart.getCart.successStatus) {
         dispatch(addToCart(response.data.data));

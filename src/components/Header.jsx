@@ -10,6 +10,7 @@ import { use } from "react";
 import { GoTriangleDown, GoTriangleUp } from "react-icons/go";
 import UserMenu from "./UserMenu";
 import useCloseOnOutsideClick from "../hooks/useCloseOnOutsideClick";
+import { getINRString } from "../util/getINRString";
 
 const Header = () => {
   const [isMobile] = useMobile();
@@ -19,6 +20,7 @@ const Header = () => {
     location?.pathname === "/search"
   );
   const user = useSelector((state) => state?.user);
+  const cart = useSelector((state) => state?.cart);
   const [openUserMenu, setOpenUserMenu] = useState(false);
   const userMenuRef = useRef(null);
   const accountRef = useRef(null);
@@ -26,7 +28,7 @@ const Header = () => {
   // Close menu on outside click
   useCloseOnOutsideClick([userMenuRef, accountRef], (event) => {
     // Don't close if clicking on a Link component
-    if (event.target.tagName === 'A' || event.target.closest('a')) {
+    if (event.target.tagName === "A" || event.target.closest("a")) {
       return;
     }
     setOpenUserMenu(false);
@@ -61,6 +63,7 @@ const Header = () => {
   };
 
   // console.log(isMobile);
+  console.log("Cart:", cart);
   return (
     <header className="h-28 lg:h-21 shadow-sm shadow-secondary-200 sticky top-0 bg-black text-gray-200 flex flex-col gap-2 items-center justify-center p-2 z-50">
       {!(isSearchPage && isMobile) && (
@@ -152,7 +155,16 @@ const Header = () => {
                   <TiShoppingCart size={30} />
                 </div>
                 <div className="font-semibold">
-                  <p>My Cart</p>
+                  {cart?.totalQuantity > 0 ? (
+                    <div>
+                      <p>{cart?.totalQuantity} items</p>
+                      <p className="text-xs">
+                        {getINRString(cart?.totalPrice)}
+                      </p>
+                    </div>
+                  ) : (
+                    <p>My Cart</p>
+                  )}
                 </div>
               </button>
             </div>

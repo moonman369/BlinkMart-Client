@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 // import { DisplayPriceInRupees } from "../utils/DisplayPriceInRupees";
 import { data, Link } from "react-router-dom";
 // import { valideURLConvert } from "../utils/valideURLConvert";
@@ -10,11 +10,30 @@ import { apiSummary } from "../config/api/apiSummary";
 import { getINRString } from "../util/getINRString.js";
 import { convertToUrlString } from "../util/convertToUrlString.js";
 import customAxios from "../util/customAxios.js";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../store/cartSlice.js";
 
 const ProductCard = ({ product }) => {
   const [loading, setLoading] = useState(false);
+  const [cartQuantity, setCartQuantity] = useState(0);
+  const cartItems = useSelector((state) => state.cart?.items);
+
   const url = `/product/${convertToUrlString(product?.name)}-${product._id}`;
+  const dispatch = useDispatch();
   // console.log("product", product);
+
+  useEffect(() => {
+    if (cartItems && cartItems.length > 0) {
+      const item = cartItems.find((item) => item.product._id === product._id);
+      if (item) {
+        setCartQuantity(item.quantity);
+      } else {
+        setCartQuantity(0);
+      }
+    } else {
+      setCartQuantity(0);
+    }
+  }, [cartItems]);
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
@@ -32,6 +51,7 @@ const ProductCard = ({ product }) => {
       if (
         response.status === apiSummary.endpoints.cart.addToCart.successStatus
       ) {
+        dispatch(addToCart(response?.data?.data));
         toast.success("Product added to cart successfully");
       }
     } catch (error) {
@@ -71,7 +91,10 @@ const ProductCard = ({ product }) => {
         <div className="bg-gray-600 rounded w-16 text-secondary-200 font-bold p-1 lg:p-2 text-xs">
           {getINRString(product.price)}
         </div>
-        <div className="bg-green-600 px-2 py-0.5 lg:px-4 lg:py-1 text-white rounded hover:bg-green-700 text-xs" onClick={handleAddToCart}>
+        <div
+          className="bg-green-600 px-2 py-0.5 lg:px-4 lg:py-1 text-white rounded hover:bg-green-700 text-xs"
+          onClick={handleAddToCart}
+        >
           <button>Add</button>
         </div>
       </div>
