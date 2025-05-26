@@ -12,6 +12,7 @@ import { convertToUrlString } from "../util/convertToUrlString.js";
 import customAxios from "../util/customAxios.js";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/cartSlice.js";
+import AddToCartButton from "./AddToCartButton.jsx";
 
 const ProductCard = ({ product }) => {
   const [loading, setLoading] = useState(false);
@@ -68,7 +69,7 @@ const ProductCard = ({ product }) => {
       state={{
         productId: product._id,
       }}
-      className="border hover:border-secondary-200 p-2 lg:p-4 grid gap-0.5 lg:gap-3 max-w-32 lg:max-w-64 rounded cursor-pointer bg-gray-700"
+      className="border hover:border-secondary-200 p-2 lg:p-4 grid gap-0.5 lg:gap-3 max-w-44 lg:max-w-72 rounded cursor-pointer bg-gray-700"
     >
       <div className="min-h-20 max-h-28 rounded">
         <img
@@ -91,11 +92,17 @@ const ProductCard = ({ product }) => {
         <div className="bg-gray-600 rounded w-16 text-secondary-200 font-bold p-1 lg:p-2 text-xs">
           {getINRString(product.price)}
         </div>
-        <div
-          className="bg-green-600 px-2 py-0.5 lg:px-4 lg:py-1 text-white rounded hover:bg-green-700 text-xs"
-          onClick={handleAddToCart}
-        >
-          <button>Add</button>
+        <div>
+          {product.stock > 0 ? (
+            <AddToCartButton product={product} />
+          ) : (
+            <button
+              className="bg-gray-600 px-2 py-0.5 lg:px-4 lg:py-1 text-white rounded cursor-not-allowed text-xs"
+              disabled
+            >
+              Out of Stock
+            </button>
+          )}
         </div>
       </div>
     </Link>
