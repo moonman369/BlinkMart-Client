@@ -94,16 +94,31 @@ const Header = () => {
           </div>
 
           {/* login and cart */}
-          <div>
+          <div className="">
             {/* mobile */}
-            <button
-              className={`${
-                user?._id ? "text-secondary-200" : "text-primary-200"
-              } lg:hidden`}
-              onClick={handleMobileUserMenu}
-            >
-              <FaRegCircleUser size={26} />
-            </button>
+            <div className="flex items-center gap-4 lg:hidden">
+              <Link
+                to="/cart"
+                className="flex items-center gap-1 bg-green-600 hover:bg-green-700 px-2 py-1.5 rounded text-white"
+              >
+                <div className="animate-bounce">
+                  <TiShoppingCart size={24} />
+                </div>
+                {cart?.totalQuantity > 0 && (
+                  <span className="text-sm font-semibold">
+                    {cart.totalQuantity}
+                  </span>
+                )}
+              </Link>
+              <button
+                className={`${
+                  user?._id ? "text-secondary-200" : "text-primary-200"
+                } lg:hidden`}
+                onClick={handleMobileUserMenu}
+              >
+                <FaRegCircleUser size={26} />
+              </button>
+            </div>
 
             {/* desktop */}
             <div className="hidden lg:flex items-center gap-10">
