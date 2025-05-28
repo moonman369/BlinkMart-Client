@@ -36,33 +36,6 @@ const ProductCard = ({ product }) => {
     }
   }, [cartItems]);
 
-  const handleAddToCart = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    try {
-      setLoading(true);
-      const response = await customAxios.post(
-        apiSummary.endpoints.cart.addToCart.path,
-        {
-          productId: product._id,
-          quantity: 1,
-        }
-      );
-      if (
-        response.status === apiSummary.endpoints.cart.addToCart.successStatus
-      ) {
-        dispatch(addToCart(response?.data?.data));
-        toast.success("Product added to cart successfully");
-      }
-    } catch (error) {
-      console.error("Error adding product to cart:", error);
-      axiosToastError(error);
-      toast.error("Failed to add product to cart");
-    } finally {
-      setLoading(false);
-    }
-  };
   return (
     <Link
       to={url}

@@ -42,7 +42,7 @@ const AddToCartButton = ({ product }) => {
   return (
     <div>
       <button
-        className="bg-green-600 px-2 py-0.5 lg:px-4 lg:py-1 text-white rounded hover:bg-green-700 text-xs"
+        className="bg-green-600 px-2 py-1 lg:px-4 lg:py-1 text-white rounded hover:bg-green-700 text-sm"
         onClick={handleAddToCart}
         disabled={loading}
       >
