@@ -2,12 +2,12 @@ import React from "react";
 
 const LoadingSpinner = ({ size }) => {
   return (
-    <div className="flex items-center justify-center text-[30px]">
+    <div className="flex items-center justify-center text-[10px]">
       <div role="status">
         <svg
           aria-hidden="true"
-          className={`inline w-${size ? 5 : 10} h-${
-            size ? 5 : 10
+          className={`inline w-${size ? 6 : 10} h-${
+            size ? 6 : 10
           } text-gray-200 animate-spin dark:text-gray-600 fill-secondary-200`}
           viewBox="0 0 100 101"
           fill="none"

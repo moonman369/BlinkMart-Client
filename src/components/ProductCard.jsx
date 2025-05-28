@@ -13,10 +13,11 @@ import customAxios from "../util/customAxios.js";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/cartSlice.js";
 import AddToCartButton from "./AddToCartButton.jsx";
+import { FaMinus, FaPlus } from "react-icons/fa6";
 
 const ProductCard = ({ product }) => {
   const [loading, setLoading] = useState(false);
-  const [cartQuantity, setCartQuantity] = useState(0);
+  const [cartItem, setCartItem] = useState({});
   const cartItems = useSelector((state) => state.cart?.items);
 
   const url = `/product/${convertToUrlString(product?.name)}-${product._id}`;
@@ -27,42 +28,15 @@ const ProductCard = ({ product }) => {
     if (cartItems && cartItems.length > 0) {
       const item = cartItems.find((item) => item.product._id === product._id);
       if (item) {
-        setCartQuantity(item.quantity);
+        setCartItem(item);
       } else {
-        setCartQuantity(0);
+        setCartItem({});
       }
     } else {
-      setCartQuantity(0);
+      setCartItem({});
     }
   }, [cartItems]);
 
-  const handleAddToCart = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    try {
-      setLoading(true);
-      const response = await customAxios.post(
-        apiSummary.endpoints.cart.addToCart.path,
-        {
-          productId: product._id,
-          quantity: 1,
-        }
-      );
-      if (
-        response.status === apiSummary.endpoints.cart.addToCart.successStatus
-      ) {
-        dispatch(addToCart(response?.data?.data));
-        toast.success("Product added to cart successfully");
-      }
-    } catch (error) {
-      console.error("Error adding product to cart:", error);
-      axiosToastError(error);
-      toast.error("Failed to add product to cart");
-    } finally {
-      setLoading(false);
-    }
-  };
   return (
     <Link
       to={url}
@@ -94,7 +68,7 @@ const ProductCard = ({ product }) => {
         </div>
         <div>
           {product.stock > 0 ? (
-            <AddToCartButton product={product} />
+            <AddToCartButton product={product} cartItem={cartItem} />
           ) : (
             <button
               className="bg-gray-600 px-2 py-0.5 lg:px-4 lg:py-1 text-white rounded cursor-not-allowed text-xs"
