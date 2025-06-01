@@ -7,8 +7,9 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "../store/cartSlice";
 import LoadingSpinner from "./LoadingSpinner";
 import { FaMinus, FaPlus } from "react-icons/fa6";
+import { FaShoppingCart } from "react-icons/fa";
 
-const AddToCartButton = ({ product, cartItem }) => {
+const AddToCartButton = ({ product, cartItem, productDisplayPage }) => {
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
@@ -79,7 +80,9 @@ const AddToCartButton = ({ product, cartItem }) => {
         <div className="flex w-full h-full">
           <button
             onClick={decreaseQty}
-            className="bg-green-600 hover:bg-green-700 text-white flex-1 w-full p-1 rounded flex items-center justify-center"
+            className={`bg-green-600 hover:bg-green-700 text-white flex-1 w-full ${
+              productDisplayPage ? "p-3" : "p-1"
+            } rounded flex items-center justify-center`}
           >
             <FaMinus />
           </button>
@@ -88,7 +91,13 @@ const AddToCartButton = ({ product, cartItem }) => {
             {loading ? (
               <LoadingSpinner size={"5"} />
             ) : (
-              <p className="flex-1 w-full px-1 flex items-center justify-center font-semibold">
+              <p
+                className={`flex-1 w-full ${
+                  productDisplayPage ? "px-2 py-3" : "px-1"
+                } flex items-center justify-center ${
+                  productDisplayPage ? "font-bold" : "font-semibold"
+                }`}
+              >
                 {cartItem?.quantity}
               </p>
             )}
@@ -96,11 +105,22 @@ const AddToCartButton = ({ product, cartItem }) => {
 
           <button
             onClick={increaseQty}
-            className="bg-green-600 hover:bg-green-700 text-white flex-1 w-full p-1 rounded flex items-center justify-center"
+            className={`bg-green-600 hover:bg-green-700 text-white flex-1 w-full ${
+              productDisplayPage ? "p-3" : "p-1"
+            } rounded flex items-center justify-center`}
           >
             <FaPlus />
           </button>
         </div>
+      ) : productDisplayPage ? (
+        <button
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+          onClick={handleAddToCart}
+          disabled={loading}
+        >
+          <FaShoppingCart />
+          Add to Cart
+        </button>
       ) : (
         <button
           className="bg-green-600 px-2 py-1 lg:px-4 lg:py-1 text-white rounded hover:bg-green-700 text-sm"

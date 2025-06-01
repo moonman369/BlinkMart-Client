@@ -15,6 +15,8 @@ import {
   FaBolt,
 } from "react-icons/fa";
 import { FaIndianRupeeSign } from "react-icons/fa6";
+import AddToCartButton from "../components/AddToCartButton";
+import { useSelector } from "react-redux";
 
 const ProductDisplay = () => {
   const location = useLocation();
@@ -26,7 +28,26 @@ const ProductDisplay = () => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [cartItem, setCartItem] = useState({});
+  const cartItems = useSelector((state) => state.cart?.items);
   const imageContainerRef = useRef(null);
+
+  useEffect(() => {
+    loadProduct();
+  }, []);
+
+  useEffect(() => {
+    if (cartItems && cartItems.length > 0 && product) {
+      const item = cartItems.find((item) => item.product._id === product._id);
+      if (item) {
+        setCartItem(item);
+      } else {
+        setCartItem({});
+      }
+    } else {
+      setCartItem({});
+    }
+  }, [cartItems, product]);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -97,10 +118,6 @@ const ProductDisplay = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    loadProduct();
-  }, []);
 
   const handlePreviousImage = () => {
     setCurrentImageIndex((prevIndex) =>
@@ -427,10 +444,15 @@ const ProductDisplay = () => {
             )}
 
             {/* Add to Cart Button */}
-            <button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+            <AddToCartButton
+              product={product}
+              cartItem={cartItem}
+              productDisplayPage={true}
+            />
+            {/* <button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
               <FaShoppingCart />
               Add to Cart
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
