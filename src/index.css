@@ -14,4 +14,14 @@ body {
   font-style: normal; */
   @apply bg-gray-800;
   @apply text-gray-300 scroll-smooth;
+  @layer utilities {
+    .scrollbar-hide {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none; /* Chrome, Safari and Opera */
+    }
+  }
 }

@@ -21,6 +21,7 @@ import ProductAdmin from "../pages/ProductAdmin";
 import ProductCategorized from "../pages/ProductCategorized";
 import ProductDisplay from "../pages/ProductDisplay";
 import WelcomePage from "../components/WelcomePage";
+import CartPage from "../pages/CartPage";
 
 const router = createBrowserRouter([
   {
@@ -125,6 +126,10 @@ const router = createBrowserRouter([
       {
         path: "product/:productId",
         element: <ProductDisplay />,
+      },
+      {
+        path: "cart",
+        element: <CartPage />,
       },
     ],
   },

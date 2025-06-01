@@ -9,8 +9,10 @@ import { apiSummary } from "../config/api/apiSummary";
 import DisplayProductsByCategory from "../components/DisplayProductsByCategory";
 import { axiosToastError } from "../util/axiosToastError.js";
 import { convertToUrlString } from "../util/convertToUrlString.js";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Home = () => {
+  const [loading, setLoading] = useState(true);
   const loadingCategory = useSelector((state) => state.product.loadingCategory);
   const categories = useSelector((state) => state.product.allCategories);
   const subcategories = useSelector((state) => state.product.allSubcategories);
@@ -46,6 +48,34 @@ const Home = () => {
       },
     });
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        await Promise.all([
+          fetchAllCategories({ all: true }),
+          fetchAllSubcategories({ all: true }),
+          // other fetch calls
+        ]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        axiosToastError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <section>

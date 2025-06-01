@@ -165,7 +165,10 @@ const Header = () => {
                   Login
                 </button>
               )}
-              <button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-3 py-3 rounded text-white">
+              <button
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-3 py-3 rounded text-white"
+                onClick={() => navigate("/cart")}
+              >
                 <div className="animate-bounce">
                   <TiShoppingCart size={30} />
                 </div>
