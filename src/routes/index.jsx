@@ -22,6 +22,7 @@ import ProductCategorized from "../pages/ProductCategorized";
 import ProductDisplay from "../pages/ProductDisplay";
 import WelcomePage from "../components/WelcomePage";
 import CartPage from "../pages/CartPage";
+import Checkout from "../pages/Checkout";
 
 const router = createBrowserRouter([
   {
@@ -130,6 +131,10 @@ const router = createBrowserRouter([
       {
         path: "cart",
         element: <CartPage />,
+      },
+      {
+        path: "checkout",
+        element: <Checkout />,
       },
     ],
   },

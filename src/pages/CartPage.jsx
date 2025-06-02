@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TiShoppingCart } from "react-icons/ti";
 import { FaTrash } from "react-icons/fa";
 import AddToCartButton from "../components/AddToCartButton";
@@ -10,10 +10,13 @@ import { apiSummary } from "../config/api/apiSummary";
 import { addToCart, clearCart } from "../store/cartSlice";
 import toast from "react-hot-toast";
 import ClearCartModal from "../components/ClearCartModal";
+import { use } from "react";
 
 const CartPage = () => {
   const cart = useSelector((state) => state.cart);
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [showClearCartModal, setShowClearCartModal] = useState(false);
 
   const handleClearCart = async () => {
@@ -23,13 +26,28 @@ const CartPage = () => {
         method: apiSummary.endpoints.cart.clearCart.method,
       });
 
-      if (response.status === apiSummary.endpoints.cart.clearCart.successStatus) {
+      if (
+        response.status === apiSummary.endpoints.cart.clearCart.successStatus
+      ) {
         dispatch(clearCart());
         toast.success("Cart cleared successfully!");
         setShowClearCartModal(false);
       }
     } catch (error) {
       toast.error("Failed to clear cart");
+    }
+  };
+
+  const redirectToCheckout = () => {
+    if (user && user?._id) {
+      navigate("/checkout", {
+        state: {
+          from: "cart",
+          user: user,
+          cartItems: cart.items,
+          totalAmount: cart.totalPrice + 40, // Assuming 40 is the delivery fee
+        },
+      });
     }
   };
 
@@ -94,7 +112,10 @@ const CartPage = () => {
                           {getINRString(item.product.price)}
                         </p>
                         <div className="w-28 lg:w-32">
-                          <AddToCartButton product={item.product} cartItem={item} />
+                          <AddToCartButton
+                            product={item.product}
+                            cartItem={item}
+                          />
                         </div>
                       </div>
                     </div>
@@ -146,8 +167,10 @@ const CartPage = () => {
               </div>
 
               <div className="space-y-2 lg:space-y-3">
-                <button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 lg:py-4 px-4 rounded-lg">
-                  <span className="text-sm lg:text-base">Proceed to Checkout</span>
+                <button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 lg:py-4 px-4 rounded-lg" onClick={redirectToCheckout}>
+                  <span className="text-sm lg:text-base">
+                    Proceed to Checkout
+                  </span>
                 </button>
                 <p className="text-center text-[10px] lg:text-xs text-gray-500">
                   Prices are inclusive of all taxes
