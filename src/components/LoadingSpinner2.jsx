@@ -1,13 +1,13 @@
 import React from "react";
 
-const LoadingSpinner = ({ size }) => {
+const LoadingSpinner2 = ({ size }) => {
   return (
     <div className="flex flex-col items-center justify-center gap-3 text-[10px]">
       <div role="status">
         <svg
           aria-hidden="true"
-          className={`inline w-${size ? size : 10} h-${
-            size ? size : 10
+          className={`inline w-${size ? 6 : 10} h-${
+            size ? 6 : 10
           } text-gray-200 animate-spin dark:text-gray-600 fill-secondary-200`}
           viewBox="0 0 100 101"
           fill="none"
@@ -24,13 +24,8 @@ const LoadingSpinner = ({ size }) => {
         </svg>
         <span className="sr-only">Loading...</span>
       </div>
-
-      {/* Pulsing Loading Text */}
-      <p className="text-sm md:text-base font-medium text-secondary-200 animate-pulse">
-        Loading...
-      </p>
     </div>
   );
 };
 
-export default LoadingSpinner;
+export default LoadingSpinner2;
