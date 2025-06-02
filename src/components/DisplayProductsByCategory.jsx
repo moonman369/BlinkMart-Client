@@ -53,7 +53,7 @@ const DisplayProductsByCategory = ({
     containerRef.current.scrollLeft -= 200;
   };
 
-  const loadingCardCount = new Array(6).fill(null);
+  const loadingCardCount = new Array(10).fill(null);
   return products.length > 0 ? (
     <div className="p-5">
       <div className="container mx-auto p-4 flex items-center justify-between gap-4">
