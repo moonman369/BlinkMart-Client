@@ -5,9 +5,9 @@ import { axiosToastError } from "../util/axiosToastError";
 import customAxios from "../util/customAxios";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../store/cartSlice";
-import LoadingSpinner from "./LoadingSpinner";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { FaShoppingCart } from "react-icons/fa";
+import LoadingSpinner2 from "./LoadingSpinner2";
 
 const AddToCartButton = ({ product, cartItem, productDisplayPage }) => {
   const [loading, setLoading] = useState(false);
@@ -89,7 +89,7 @@ const AddToCartButton = ({ product, cartItem, productDisplayPage }) => {
 
           <div>
             {loading ? (
-              <LoadingSpinner size={"5"} />
+              <LoadingSpinner2 size={"5"} />
             ) : (
               <p
                 className={`flex-1 w-full ${
@@ -127,7 +127,7 @@ const AddToCartButton = ({ product, cartItem, productDisplayPage }) => {
           onClick={handleAddToCart}
           disabled={loading}
         >
-          {loading ? <LoadingSpinner size={"5"} /> : "Add"}
+          {loading ? <LoadingSpinner2 size={"5"} /> : "Add"}
         </button>
       )}
     </div>

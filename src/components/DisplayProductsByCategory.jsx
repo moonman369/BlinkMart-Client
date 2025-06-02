@@ -54,7 +54,7 @@ const DisplayProductsByCategory = ({
   };
 
   const loadingCardCount = new Array(6).fill(null);
-  return (
+  return products.length > 0 ? (
     <div className="p-5">
       <div className="container mx-auto p-4 flex items-center justify-between gap-4">
         <h3 className="font-bold text-lg md:text-xl">{name}</h3>
@@ -97,6 +97,21 @@ const DisplayProductsByCategory = ({
             <FaAngleRight />
           </button>
         </div>
+      </div>
+    </div>
+  ) : (
+    <div className="p-5">
+      <div className="container mx-auto p-4 flex items-center justify-between gap-4">
+        <h3 className="font-bold text-lg md:text-xl">{name}</h3>
+      </div>
+      <div className="flex items-center justify-center h-64">
+        {loading ? (
+          <CardLoading />
+        ) : (
+          <p className="text-gray-500">
+            No products available in this category
+          </p>
+        )}
       </div>
     </div>
   );

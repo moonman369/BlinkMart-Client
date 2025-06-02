@@ -18,7 +18,7 @@ const ProductCategorized = () => {
   const navigate = useNavigate();
   const { category, subcategory } = location.state || {};
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [categorySubcategories, setCategorySubcategories] = useState([]);
   const [loadingSubcategories, setLoadingSubcategories] = useState(false);
@@ -129,6 +129,14 @@ const ProductCategorized = () => {
     });
     setIsMobileMenuOpen(false);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
+        <LoadingSpinner size="8" />
+      </div>
+    );
+  }
 
   return (
     <section className="sticky top-24 lg:top-20">
