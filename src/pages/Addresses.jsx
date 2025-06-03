@@ -23,7 +23,8 @@ const Addresses = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    addressLine: "",
+    addressLine1: "",
+    addressLine2: "",
     city: "",
     state: "",
     pincode: "",
@@ -70,7 +71,7 @@ const Addresses = () => {
 
     if (
       !formData.name ||
-      !formData.addressLine ||
+      !formData.addressLine1 ||
       !formData.city ||
       !formData.state ||
       !formData.pincode
@@ -125,7 +126,8 @@ const Addresses = () => {
   const handleEdit = (address) => {
     setFormData({
       name: address.name,
-      addressLine: address.addressLine,
+      addressLine1: address.addressLine1 || "",
+      addressLine2: address.addressLine2 || "",
       city: address.city,
       state: address.state,
       pincode: address.pincode,
@@ -161,7 +163,8 @@ const Addresses = () => {
   const resetForm = () => {
     setFormData({
       name: "",
-      addressLine: "",
+      addressLine1: "",
+      addressLine2: "",
       city: "",
       state: "",
       pincode: "",
@@ -221,7 +224,8 @@ const Addresses = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-300">
-                  Address Name*
+                  Address Name*{" "}
+                  <span className="text-xs text-gray-500">(Home, Office, etc.)</span>
                 </label>
                 <input
                   type="text"
@@ -230,18 +234,35 @@ const Addresses = () => {
                   value={formData.name}
                   onChange={handleChange}
                   className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-gray-200 focus:outline-none focus:border-secondary-200"
+                  required
                 />
               </div>
 
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium mb-1 text-gray-300">
-                  Full Address*
+                  Address Line 1*
                 </label>
                 <input
                   type="text"
-                  name="addressLine"
+                  name="addressLine1"
                   placeholder="Street address, House no."
-                  value={formData.addressLine}
+                  value={formData.addressLine1}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-gray-200 focus:outline-none focus:border-secondary-200"
+                  required
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1 text-gray-300">
+                  Address Line 2{" "}
+                  <span className="text-xs text-gray-500">(Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  name="addressLine2"
+                  placeholder="Apartment, Floor, Landmark, etc. (Optional)"
+                  value={formData.addressLine2}
                   onChange={handleChange}
                   className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-gray-200 focus:outline-none focus:border-secondary-200"
                 />
@@ -258,6 +279,7 @@ const Addresses = () => {
                   value={formData.city}
                   onChange={handleChange}
                   className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-gray-200 focus:outline-none focus:border-secondary-200"
+                  required
                 />
               </div>
 
@@ -272,6 +294,7 @@ const Addresses = () => {
                   value={formData.state}
                   onChange={handleChange}
                   className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-gray-200 focus:outline-none focus:border-secondary-200"
+                  required
                 />
               </div>
 
@@ -286,6 +309,7 @@ const Addresses = () => {
                   value={formData.pincode}
                   onChange={handleChange}
                   className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-gray-200 focus:outline-none focus:border-secondary-200"
+                  required
                 />
               </div>
 
@@ -361,7 +385,8 @@ const Addresses = () => {
                       )}
                     </div>
                     <div className="text-sm text-gray-400 mt-1 space-y-1">
-                      <p>{address.addressLine}</p>
+                      <p>{address.addressLine1}</p>
+                      {address.addressLine2 && <p>{address.addressLine2}</p>}
                       <p>
                         {address.city}, {address.state}
                       </p>
