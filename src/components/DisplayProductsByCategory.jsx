@@ -53,7 +53,7 @@ const DisplayProductsByCategory = ({
     containerRef.current.scrollLeft -= 200;
   };
 
-  const loadingCardCount = new Array(10).fill(null);
+  const loadingCardCount = new Array(10).fill({});
   return products.length > 0 ? (
     <div className="p-5">
       <div className="container mx-auto p-4 flex items-center justify-between gap-4">
@@ -106,7 +106,9 @@ const DisplayProductsByCategory = ({
       </div>
       <div className="flex items-center justify-center h-64">
         {loading ? (
-          <CardLoading />
+          loadingCardCount.map((_, i) => {
+            return <CardLoading key={`Prod-Loading-${i}`} />;
+          })
         ) : (
           <p className="text-gray-500">
             No products available in this category
