@@ -23,11 +23,13 @@ const Addresses = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
+    addressType: "Home", // Default value
     addressLine1: "",
     addressLine2: "",
     city: "",
     state: "",
     pincode: "",
+    mobile: "",
     isDefault: false,
   });
   const [editMode, setEditMode] = useState(false);
@@ -74,7 +76,8 @@ const Addresses = () => {
       !formData.addressLine1 ||
       !formData.city ||
       !formData.state ||
-      !formData.pincode
+      !formData.pincode ||
+      !formData.mobile
     ) {
       toast.error("Please fill all required fields");
       return;
@@ -126,11 +129,13 @@ const Addresses = () => {
   const handleEdit = (address) => {
     setFormData({
       name: address.name,
+      addressType: address.addressType || "Home", // Default to Home if not set
       addressLine1: address.addressLine1 || "",
       addressLine2: address.addressLine2 || "",
       city: address.city,
       state: address.state,
       pincode: address.pincode,
+      mobile: address.mobile || "",
       isDefault: address.isDefault,
     });
     setCurrentId(address._id);
@@ -163,11 +168,13 @@ const Addresses = () => {
   const resetForm = () => {
     setFormData({
       name: "",
+      addressType: "Home",
       addressLine1: "",
       addressLine2: "",
       city: "",
       state: "",
       pincode: "",
+      mobile: "",
       isDefault: false,
     });
   };
@@ -224,8 +231,7 @@ const Addresses = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-300">
-                  Address Name*{" "}
-                  <span className="text-xs text-gray-500">(Home, Office, etc.)</span>
+                  Address Name*
                 </label>
                 <input
                   type="text"
@@ -236,6 +242,23 @@ const Addresses = () => {
                   className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-gray-200 focus:outline-none focus:border-secondary-200"
                   required
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-300">
+                  Address Type*
+                </label>
+                <select
+                  name="addressType"
+                  value={formData.addressType}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-gray-200 focus:outline-none focus:border-secondary-200 appearance-none"
+                  required
+                >
+                  <option value="Home">Home</option>
+                  <option value="Work">Work</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
 
               <div className="md:col-span-2">
@@ -313,6 +336,23 @@ const Addresses = () => {
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-300">
+                  Mobile Number*
+                </label>
+                <input
+                  type="tel"
+                  name="mobile"
+                  placeholder="10-digit mobile number"
+                  value={formData.mobile}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-gray-200 focus:outline-none focus:border-secondary-200"
+                  required
+                  pattern="[0-9]{10}"
+                  title="Please enter a valid 10-digit mobile number"
+                />
+              </div>
+
               <div className="flex items-center h-full pt-4">
                 <label className="flex items-center cursor-pointer">
                   <input
@@ -367,9 +407,12 @@ const Addresses = () => {
               <div className="flex justify-between items-start">
                 <div className="flex items-start gap-3">
                   <div className="p-2 rounded-full bg-gray-800 text-primary-200">
-                    {address.name.toLowerCase().includes("home") ? (
+                    {address.addressType === "Home" ||
+                    address.name.toLowerCase().includes("home") ? (
                       <FaHome size={16} />
-                    ) : address.name.toLowerCase().includes("office") ? (
+                    ) : address.addressType === "Work" ||
+                      address.name.toLowerCase().includes("work") ||
+                      address.name.toLowerCase().includes("office") ? (
                       <FaBuilding size={16} />
                     ) : (
                       <MdLocationOn size={16} />
@@ -391,6 +434,7 @@ const Addresses = () => {
                         {address.city}, {address.state}
                       </p>
                       <p>PIN: {address.pincode}</p>
+                      <p>Mobile: {address.mobile}</p>
                     </div>
                   </div>
                 </div>
