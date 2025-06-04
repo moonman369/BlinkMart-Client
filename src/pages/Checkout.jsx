@@ -14,8 +14,11 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { cartItems, totalAmount } = location.state || {};
   const user = useSelector((state) => state.user);
+
+  // Get addresses from Redux store instead of using local state
+  const addresses = useSelector((state) => state.addresses.addresses) || [];
+
   const [loading, setLoading] = useState(false);
-  const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("card");
 
@@ -26,42 +29,12 @@ const Checkout = () => {
       return;
     }
 
-    // Fetch addresses
-    const fetchAddresses = async () => {
-      try {
-        setLoading(true);
-        // Mock data for now - replace with actual API call
-        const mockAddresses = [
-          {
-            id: 1,
-            name: "Home",
-            address: "123 Main Street",
-            city: "Mumbai",
-            state: "Maharashtra",
-            pincode: "400001",
-            isDefault: true,
-          },
-          {
-            id: 2,
-            name: "Office",
-            address: "456 Work Avenue",
-            city: "Bengaluru",
-            state: "Karnataka",
-            pincode: "560001",
-            isDefault: false,
-          },
-        ];
-        setAddresses(mockAddresses);
-        setSelectedAddress(mockAddresses.find(addr => addr.isDefault) || mockAddresses[0]);
-      } catch (error) {
-        console.error("Error fetching addresses:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAddresses();
-  }, [cartItems, navigate]);
+    // Select default address if available, otherwise select first address
+    if (addresses.length > 0) {
+      const defaultAddress = addresses.find((addr) => addr.is_default);
+      setSelectedAddress(defaultAddress || addresses[0]);
+    }
+  }, [cartItems, navigate, addresses]);
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
@@ -72,19 +45,19 @@ const Checkout = () => {
     setLoading(true);
     try {
       // Simulate order processing delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       // In a real app, make API call to create order
-      
+
       toast.success("Order placed successfully!");
-      navigate("/order-confirmation", { 
-        state: { 
+      navigate("/order-confirmation", {
+        state: {
           orderId: "ORD" + Math.floor(100000 + Math.random() * 900000),
           address: selectedAddress,
           paymentMethod,
           cartItems,
-          totalAmount
-        } 
+          totalAmount,
+        },
       });
     } catch (error) {
       toast.error("Failed to place order. Please try again.");
@@ -105,7 +78,7 @@ const Checkout = () => {
   return (
     <div className="container mx-auto px-2 lg:px-4 py-4 lg:py-8 min-h-[calc(100vh-8rem)]">
       <div className="flex items-center gap-2 mb-6">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-1 text-gray-400 hover:text-gray-300"
         >
@@ -123,40 +96,64 @@ const Checkout = () => {
             <h2 className="text-lg font-bold mb-4 pb-2 border-b border-gray-800">
               Delivery Address
             </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {addresses.map((address) => (
-                <div 
-                  key={address.id}
-                  className={`p-4 border rounded-lg cursor-pointer ${
-                    selectedAddress?.id === address.id 
-                      ? "border-primary-200 bg-gray-800/60" 
-                      : "border-gray-700 hover:border-gray-600"
-                  }`}
-                  onClick={() => setSelectedAddress(address)}
+
+            {addresses.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {addresses.map((address) => (
+                  <div
+                    key={address._id}
+                    className={`p-4 border rounded-lg cursor-pointer ${
+                      selectedAddress?._id === address._id
+                        ? "border-primary-200 bg-gray-800/60"
+                        : "border-gray-700 hover:border-gray-600"
+                    }`}
+                    onClick={() => setSelectedAddress(address)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-semibold">
+                        {address.address_name || address.addressName}
+                      </h3>
+                      {(address.is_default || address.isDefault) && (
+                        <span className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded">
+                          Default
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-400 mt-1 space-y-1">
+                      <p>{address.address_line_1 || address.addressLine1}</p>
+                      {(address.address_line_2 || address.addressLine2) && (
+                        <p>{address.address_line_2 || address.addressLine2}</p>
+                      )}
+                      <p>
+                        {address.city}, {address.state} -{" "}
+                        {address.pincode || address.postalCode}
+                      </p>
+                      <p>Phone: {address.mobile}</p>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  className="border border-dashed border-gray-600 rounded-lg p-4 flex flex-col items-center justify-center text-gray-400 hover:text-gray-300 hover:border-gray-500"
+                  onClick={() => navigate("/dashboard/addresses")}
                 >
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-semibold">{address.name}</h3>
-                    {address.isDefault && (
-                      <span className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded">Default</span>
-                    )}
-                  </div>
-                  <div className="text-sm text-gray-400 mt-1 space-y-1">
-                    <p>{address.address}</p>
-                    <p>{address.city}, {address.state}</p>
-                    <p>PIN: {address.pincode}</p>
-                  </div>
-                </div>
-              ))}
-              
-              <button 
-                className="border border-dashed border-gray-600 rounded-lg p-4 flex flex-col items-center justify-center text-gray-400 hover:text-gray-300 hover:border-gray-500"
-                onClick={() => navigate("/dashboard/addresses")}
-              >
-                <span className="text-2xl mb-1">+</span>
-                <span>Add New Address</span>
-              </button>
-            </div>
+                  <span className="text-2xl mb-1">+</span>
+                  <span>Add New Address</span>
+                </button>
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <p className="text-gray-400 mb-4">
+                  You don't have any saved addresses yet.
+                </p>
+                <button
+                  className="px-4 py-2 bg-secondary-200 hover:bg-opacity-90 text-white rounded-md"
+                  onClick={() => navigate("/dashboard/addresses")}
+                >
+                  Add a New Address
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Payment Methods */}
@@ -164,73 +161,81 @@ const Checkout = () => {
             <h2 className="text-lg font-bold mb-4 pb-2 border-b border-gray-800">
               Payment Method
             </h2>
-            
+
             <div className="space-y-3">
-              <div 
+              <div
                 className={`p-4 border rounded-lg cursor-pointer flex items-center gap-3 ${
-                  paymentMethod === 'card' 
-                    ? "border-primary-200 bg-gray-800/60" 
+                  paymentMethod === "card"
+                    ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod('card')}
+                onClick={() => setPaymentMethod("card")}
               >
                 <div className="p-2 rounded-full bg-blue-900/20">
                   <FaCreditCard className="text-blue-500" size={20} />
                 </div>
                 <div>
                   <h3 className="font-semibold">Credit/Debit Card</h3>
-                  <p className="text-xs text-gray-400">Pay securely with your card</p>
+                  <p className="text-xs text-gray-400">
+                    Pay securely with your card
+                  </p>
                 </div>
               </div>
-              
-              <div 
+
+              <div
                 className={`p-4 border rounded-lg cursor-pointer flex items-center gap-3 ${
-                  paymentMethod === 'upi' 
-                    ? "border-primary-200 bg-gray-800/60" 
+                  paymentMethod === "upi"
+                    ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod('upi')}
+                onClick={() => setPaymentMethod("upi")}
               >
                 <div className="p-2 rounded-full bg-green-900/20">
                   <FaWallet className="text-green-500" size={20} />
                 </div>
                 <div>
                   <h3 className="font-semibold">UPI</h3>
-                  <p className="text-xs text-gray-400">Pay with UPI apps like GPay, PhonePe, Paytm</p>
+                  <p className="text-xs text-gray-400">
+                    Pay with UPI apps like GPay, PhonePe, Paytm
+                  </p>
                 </div>
               </div>
-              
-              <div 
+
+              <div
                 className={`p-4 border rounded-lg cursor-pointer flex items-center gap-3 ${
-                  paymentMethod === 'netbanking' 
-                    ? "border-primary-200 bg-gray-800/60" 
+                  paymentMethod === "netbanking"
+                    ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod('netbanking')}
+                onClick={() => setPaymentMethod("netbanking")}
               >
                 <div className="p-2 rounded-full bg-purple-900/20">
                   <MdPayment className="text-purple-500" size={20} />
                 </div>
                 <div>
                   <h3 className="font-semibold">Net Banking</h3>
-                  <p className="text-xs text-gray-400">Pay using your bank account</p>
+                  <p className="text-xs text-gray-400">
+                    Pay using your bank account
+                  </p>
                 </div>
               </div>
-              
-              <div 
+
+              <div
                 className={`p-4 border rounded-lg cursor-pointer flex items-center gap-3 ${
-                  paymentMethod === 'cod' 
-                    ? "border-primary-200 bg-gray-800/60" 
+                  paymentMethod === "cod"
+                    ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod('cod')}
+                onClick={() => setPaymentMethod("cod")}
               >
                 <div className="p-2 rounded-full bg-amber-900/20">
                   <FaMoneyBill className="text-amber-500" size={20} />
                 </div>
                 <div>
                   <h3 className="font-semibold">Cash on Delivery</h3>
-                  <p className="text-xs text-gray-400">Pay when your order is delivered</p>
+                  <p className="text-xs text-gray-400">
+                    Pay when your order is delivered
+                  </p>
                 </div>
               </div>
             </div>
@@ -265,8 +270,12 @@ const Checkout = () => {
                       {item.product.name}
                     </h4>
                     <div className="flex justify-between text-xs text-gray-400">
-                      <span>{item.quantity} × {getINRString(item.product.price)}</span>
-                      <span>{getINRString(item.quantity * item.product.price)}</span>
+                      <span>
+                        {item.quantity} × {getINRString(item.product.price)}
+                      </span>
+                      <span>
+                        {getINRString(item.quantity * item.product.price)}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -280,9 +289,11 @@ const Checkout = () => {
                   <span className="w-2 h-2 rounded-full bg-gray-500"></span>
                   Subtotal
                 </span>
-                <span className="font-semibold">{getINRString(totalAmount)}</span>
+                <span className="font-semibold">
+                  {getINRString(totalAmount)}
+                </span>
               </div>
-              
+
               <div className="flex justify-between text-gray-300 bg-gray-800/40 p-3 rounded-lg">
                 <span className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-gray-500"></span>
@@ -290,7 +301,7 @@ const Checkout = () => {
                 </span>
                 <span className="font-semibold">{getINRString(50)}</span>
               </div>
-              
+
               <div className="flex justify-between text-gray-300 bg-gray-800/40 p-3 rounded-lg">
                 <span className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-gray-500"></span>
@@ -307,9 +318,14 @@ const Checkout = () => {
             </div>
 
             {/* Place Order Button */}
-            <button 
+            <button
               onClick={handlePlaceOrder}
-              className="w-full mt-4 py-3 rounded-lg bg-secondary-200 hover:bg-opacity-90 text-white font-semibold transition-all flex items-center justify-center gap-2 shadow-md"
+              disabled={!selectedAddress}
+              className={`w-full mt-4 py-3 rounded-lg ${
+                !selectedAddress
+                  ? "bg-gray-700 cursor-not-allowed"
+                  : "bg-secondary-200 hover:bg-opacity-90"
+              } text-white font-semibold transition-all flex items-center justify-center gap-2 shadow-md`}
             >
               {loading ? (
                 <LoadingSpinner size="4" color="white" />
@@ -320,6 +336,12 @@ const Checkout = () => {
                 </>
               )}
             </button>
+
+            {!selectedAddress && (
+              <p className="text-xs text-red-400 mt-2 text-center">
+                Please select a delivery address
+              </p>
+            )}
           </div>
         </div>
       </div>
