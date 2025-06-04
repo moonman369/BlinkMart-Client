@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux"; // Add dispatch
 import {
   FaArrowLeft,
   FaPlus,
@@ -14,21 +14,30 @@ import toast from "react-hot-toast";
 import customAxios from "../util/customAxios";
 import { apiSummary } from "../config/api/apiSummary";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { axiosToastError } from "../util/axiosToastError";
+import { fetchAllAddresses } from "../util/fetchAllAddresses";
+import { setAddresses } from "../store/addressSlice"; // Import setAddresses action
 
 const Addresses = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch(); // Add dispatch hook
   const user = useSelector((state) => state.user);
-  const [addresses, setAddresses] = useState([]);
+
+  // Get addresses from Redux store instead of local state
+  const addresses = useSelector((state) => state.addresses.addresses) || [];
+  console.log("Addresses:", addresses);
+
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    addressType: "Home", // Default value
+    addressName: "",
+    addressType: "Home",
     addressLine1: "",
     addressLine2: "",
     city: "",
     state: "",
-    pincode: "",
+    postalCode: "",
+    country: "India",
     mobile: "",
     isDefault: false,
   });
@@ -37,20 +46,19 @@ const Addresses = () => {
 
   useEffect(() => {
     fetchAddresses();
-  }, []);
+  }, [dispatch]); // Add dispatch to dependency array
 
   const fetchAddresses = async () => {
     try {
       setLoading(true);
-      const response = await customAxios({
-        url: apiSummary.endpoints.address.getAll.path,
-        method: apiSummary.endpoints.address.getAll.method,
-      });
+      const response = await fetchAllAddresses();
 
       if (
-        response.status === apiSummary.endpoints.address.getAll.successStatus
+        response.status ===
+        apiSummary.endpoints.address.getAllAddresses.successStatus
       ) {
-        setAddresses(response.data.addresses || []);
+        // Dispatch to Redux store instead of setting local state
+        dispatch(setAddresses(response.data.data || []));
       }
     } catch (error) {
       console.error("Error fetching addresses:", error);
@@ -71,12 +79,14 @@ const Addresses = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validation remains the same
     if (
-      !formData.name ||
+      !formData.addressName ||
       !formData.addressLine1 ||
       !formData.city ||
       !formData.state ||
-      !formData.pincode ||
+      !formData.postalCode ||
+      !formData.country ||
       !formData.mobile
     ) {
       toast.error("Please fill all required fields");
@@ -87,12 +97,12 @@ const Addresses = () => {
       setLoading(true);
 
       const endpoint = editMode
-        ? `${apiSummary.endpoints.address.update.path}/${currentId}`
-        : apiSummary.endpoints.address.add.path;
+        ? `${apiSummary.endpoints.address.updateAddress.path}/${currentId}`
+        : apiSummary.endpoints.address.addAddress.path;
 
       const method = editMode
-        ? apiSummary.endpoints.address.update.method
-        : apiSummary.endpoints.address.add.method;
+        ? apiSummary.endpoints.address.updateAddress.method
+        : apiSummary.endpoints.address.addAddress.method;
 
       const response = await customAxios({
         url: endpoint,
@@ -103,8 +113,8 @@ const Addresses = () => {
       if (
         response.status ===
         (editMode
-          ? apiSummary.endpoints.address.update.successStatus
-          : apiSummary.endpoints.address.add.successStatus)
+          ? apiSummary.endpoints.address.updateAddress.successStatus
+          : apiSummary.endpoints.address.addAddress.successStatus)
       ) {
         toast.success(
           editMode
@@ -114,7 +124,7 @@ const Addresses = () => {
         setShowAddForm(false);
         setEditMode(false);
         resetForm();
-        fetchAddresses();
+        fetchAddresses(); // This will now update the Redux store
       }
     } catch (error) {
       console.error("Error saving address:", error);
@@ -127,16 +137,18 @@ const Addresses = () => {
   };
 
   const handleEdit = (address) => {
+    // Update handleEdit function
     setFormData({
-      name: address.name,
-      addressType: address.addressType || "Home", // Default to Home if not set
-      addressLine1: address.addressLine1 || "",
-      addressLine2: address.addressLine2 || "",
-      city: address.city,
-      state: address.state,
-      pincode: address.pincode,
+      addressName: address.addressName || address.address_name || "",
+      addressType: address.addressType || address.address_type || "Home",
+      addressLine1: address.addressLine1 || address.address_line_1 || "",
+      addressLine2: address.addressLine2 || address.address_line_2 || "",
+      city: address.city || "",
+      state: address.state || "",
+      postalCode: address.postalCode || address.pincode || "",
+      country: address.country || "India",
       mobile: address.mobile || "",
-      isDefault: address.isDefault,
+      isDefault: address.isDefault || address.is_default || false,
     });
     setCurrentId(address._id);
     setEditMode(true);
@@ -147,33 +159,36 @@ const Addresses = () => {
     try {
       setLoading(true);
       const response = await customAxios({
-        url: `${apiSummary.endpoints.address.delete.path}/${id}`,
-        method: apiSummary.endpoints.address.delete.method,
+        url: `${apiSummary.endpoints.address.deleteAddress.path}/${id}`,
+        method: apiSummary.endpoints.address.deleteAddress.method,
       });
 
       if (
-        response.status === apiSummary.endpoints.address.delete.successStatus
+        response.status ===
+        apiSummary.endpoints.address.deleteAddress.successStatus
       ) {
         toast.success("Address deleted successfully");
-        fetchAddresses();
+        fetchAddresses(); // This will now update the Redux store
       }
     } catch (error) {
       console.error("Error deleting address:", error);
-      toast.error("Failed to delete address");
+      axiosToastError(error);
     } finally {
       setLoading(false);
     }
   };
 
   const resetForm = () => {
+    // Update resetForm function
     setFormData({
-      name: "",
+      addressName: "",
       addressType: "Home",
       addressLine1: "",
       addressLine2: "",
       city: "",
       state: "",
-      pincode: "",
+      postalCode: "",
+      country: "India",
       mobile: "",
       isDefault: false,
     });
@@ -235,9 +250,9 @@ const Addresses = () => {
                 </label>
                 <input
                   type="text"
-                  name="name"
+                  name="addressName"
                   placeholder="Home, Office, etc."
-                  value={formData.name}
+                  value={formData.addressName}
                   onChange={handleChange}
                   className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-gray-200 focus:outline-none focus:border-secondary-200"
                   required
@@ -327,9 +342,9 @@ const Addresses = () => {
                 </label>
                 <input
                   type="text"
-                  name="pincode"
+                  name="postalCode"
                   placeholder="PIN Code"
-                  value={formData.pincode}
+                  value={formData.postalCode}
                   onChange={handleChange}
                   className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-gray-200 focus:outline-none focus:border-secondary-200"
                   required
@@ -402,56 +417,109 @@ const Addresses = () => {
           addresses.map((address) => (
             <div
               key={address._id}
-              className="p-4 bg-gray-900/50 border border-gray-700 rounded-lg"
+              className="p-4 bg-gray-900/50 border border-gray-700 hover:border-gray-600 rounded-lg shadow-sm transition-all duration-200"
             >
               <div className="flex justify-between items-start">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-full bg-gray-800 text-primary-200">
-                    {address.addressType === "Home" ||
-                    address.name.toLowerCase().includes("home") ? (
-                      <FaHome size={16} />
-                    ) : address.addressType === "Work" ||
-                      address.name.toLowerCase().includes("work") ||
-                      address.name.toLowerCase().includes("office") ? (
-                      <FaBuilding size={16} />
+                  {/* Icon based on addressType with distinct colors */}
+                  <div
+                    className={`p-2 rounded-full ${
+                      address.address_type === "Home"
+                        ? "bg-blue-900/20"
+                        : address.address_type === "Work"
+                        ? "bg-amber-900/20"
+                        : "bg-purple-900/20"
+                    }`}
+                  >
+                    {address.address_type === "Home" ? (
+                      <FaHome size={16} className="text-blue-400" />
+                    ) : address.address_type === "Work" ? (
+                      <FaBuilding size={16} className="text-amber-400" />
                     ) : (
-                      <MdLocationOn size={16} />
+                      <MdLocationOn size={16} className="text-purple-400" />
                     )}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{address.name}</h3>
-                      {address.isDefault && (
-                        <span className="text-xs bg-gray-800 text-gray-300 px-2 py-0.5 rounded">
+
+                  {/* Address content with more emphasis on name and location */}
+                  <div className="flex-grow min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* Address name with larger text */}
+                      <h3 className="font-semibold text-base">
+                        {address.address_name || "Unnamed Address"}
+                      </h3>
+                      <div className="flex items-center gap-1">
+                        <span
+                          className={`inline-block w-2 h-2 rounded-full ${
+                            address.address_type === "Home"
+                              ? "bg-blue-500"
+                              : address.address_type === "Work"
+                              ? "bg-amber-500"
+                              : "bg-purple-500"
+                          }`}
+                        ></span>
+                        <span className="text-xs text-gray-400">
+                          {address.address_type}
+                        </span>
+                      </div>
+                      {address.is_default && (
+                        <span className="text-xs bg-gray-800 text-gray-300 px-2 py-0.5 rounded-full">
                           Default
                         </span>
                       )}
                     </div>
-                    <div className="text-sm text-gray-400 mt-1 space-y-1">
-                      <p>{address.addressLine1}</p>
-                      {address.addressLine2 && <p>{address.addressLine2}</p>}
-                      <p>
-                        {address.city}, {address.state}
-                      </p>
-                      <p>PIN: {address.pincode}</p>
-                      <p>Mobile: {address.mobile}</p>
+
+                    {/* Address details with enhanced location display */}
+                    <div className="text-sm text-gray-400 mt-2 space-y-1">
+                      <div className="line-clamp-1">
+                        {address.address_line_1}
+                      </div>
+                      {address.address_line_1 && (
+                        <div className="line-clamp-1">
+                          {address.address_line_2}
+                        </div>
+                      )}
+                      {/* Highlighted location info */}
+                      <div className="font-medium text-gray-300 mt-1">
+                        {address.city}, {address.state} - {address.pincode}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Phone: {address.mobile}
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
+
+                {/* Action buttons with hover effects - Edit button now yellow */}
+                <div className="flex gap-2 ml-2">
                   <button
                     onClick={() => handleEdit(address)}
-                    className="p-1.5 text-blue-400 hover:text-blue-300 bg-gray-800/50 rounded-md"
+                    className="p-1.5 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/30 bg-gray-800/50 rounded-md transition-colors"
+                    title="Edit address"
                   >
-                    <FaEdit size={16} />
+                    <FaEdit size={14} />
                   </button>
                   <button
                     onClick={() => handleDelete(address._id)}
-                    className="p-1.5 text-red-400 hover:text-red-300 bg-gray-800/50 rounded-md"
+                    className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-900/30 bg-gray-800/50 rounded-md transition-colors"
+                    title="Delete address"
                   >
-                    <FaTrash size={16} />
+                    <FaTrash size={14} />
                   </button>
                 </div>
+              </div>
+
+              {/* Quick action buttons */}
+              <div className="flex justify-end mt-3 pt-2 border-t border-gray-800">
+                <button
+                  onClick={() =>
+                    navigate("/checkout", {
+                      state: { selectedAddressId: address._id },
+                    })
+                  }
+                  className="text-xs text-secondary-200 hover:text-secondary-100 bg-transparent"
+                >
+                  Use for checkout
+                </button>
               </div>
             </div>
           ))

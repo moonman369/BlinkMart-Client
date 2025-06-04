@@ -156,5 +156,32 @@ export const apiSummary = {
         successStatus: 200,
       },
     },
+    address: {
+      getAllAddresses: {
+        path: "api/v1/address/get-all-addresses",
+        method: "get",
+        successStatus: 200,
+      },
+      addAddress: {
+        path: "api/v1/address/add-address",
+        method: "post",
+        successStatus: 201,
+      },
+      updateAddress: {
+        path: "api/v1/address/update-address",
+        method: "put",
+        successStatus: 200,
+      },
+      deleteAddress: {
+        path: "api/v1/address/delete-address",
+        method: "delete",
+        successStatus: 200,
+      },
+      setDefaultAddress: {
+        path: "api/v1/address/set-default",
+        method: "put",
+        successStatus: 200,
+      },
+    },
   },
 };

@@ -30,6 +30,7 @@ import { COOKIE_CLEAR_SETTINGS } from "./util/constants";
 import CookieConsent from "./components/CookieConsent";
 import { fetchAllCartItems } from "./util/fetchAllCartItems";
 import { addToCart } from "./store/cartSlice";
+import { setAddresses } from "./store/addressSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -237,6 +238,28 @@ function App() {
       toast.error("Error fetching cart items!");
     }
   };
+
+  const getAllAddresses = async () => {
+    try {
+      const response = await customAxios({
+        url: apiSummary.endpoints.address.getAllAddresses.path,
+        method: apiSummary.endpoints.address.getAllAddresses.method,
+      });
+
+      if (
+        response.status ===
+        apiSummary.endpoints.address.getAllAddresses.successStatus
+      ) {
+        // Handle the response data as needed
+        console.log("Addresses fetched successfully:", response.data.data);
+        dispatch(setAddresses(response.data.data));
+      }
+    } catch (error) {
+      console.error("Fetch Addresses Error: ", error);
+      toast.error("Error fetching addresses!");
+    }
+  };
+
   useEffect(() => {
     const initializeApp = async () => {
       const isTokenValid = await checkAndRefreshToken();
@@ -254,6 +277,7 @@ function App() {
       getAllSubcategories();
       getAllProducts();
       getAllCartItems();
+      getAllAddresses();
     }
   }, [user]);
 
