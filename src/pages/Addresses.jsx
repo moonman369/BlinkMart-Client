@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, NavLink } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux"; // Add dispatch
-import {
-  FaArrowLeft,
-  FaPlus,
-  FaHome,
-  FaBuilding,
-  FaTrash,
-  FaEdit,
-} from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { FaArrowLeft, FaPlus } from "react-icons/fa";
 import { MdLocationOn } from "react-icons/md";
 import toast from "react-hot-toast";
 import customAxios from "../util/customAxios";
@@ -16,16 +9,16 @@ import { apiSummary } from "../config/api/apiSummary";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { axiosToastError } from "../util/axiosToastError";
 import { fetchAllAddresses } from "../util/fetchAllAddresses";
-import { setAddresses } from "../store/addressSlice"; // Import setAddresses action
+import { setAddresses } from "../store/addressSlice";
+import AddressCard from "../components/AddressCard"; // Import the AddressCard component
 
 const Addresses = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // Add dispatch hook
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
 
-  // Get addresses from Redux store instead of local state
+  // Get addresses from Redux store
   const addresses = useSelector((state) => state.addresses.addresses) || [];
-  console.log("Addresses:", addresses);
 
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -36,7 +29,7 @@ const Addresses = () => {
     addressLine2: "",
     city: "",
     state: "",
-    postalCode: "",
+    pincode: "", // Changed from postalCode
     country: "India",
     mobile: "",
     isDefault: false,
@@ -46,7 +39,7 @@ const Addresses = () => {
 
   useEffect(() => {
     fetchAddresses();
-  }, [dispatch]); // Add dispatch to dependency array
+  }, [dispatch]);
 
   const fetchAddresses = async () => {
     try {
@@ -57,7 +50,6 @@ const Addresses = () => {
         response.status ===
         apiSummary.endpoints.address.getAllAddresses.successStatus
       ) {
-        // Dispatch to Redux store instead of setting local state
         dispatch(setAddresses(response.data.data || []));
       }
     } catch (error) {
@@ -79,13 +71,12 @@ const Addresses = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation remains the same
     if (
       !formData.addressName ||
       !formData.addressLine1 ||
       !formData.city ||
       !formData.state ||
-      !formData.postalCode ||
+      !formData.pincode || // Changed from postalCode
       !formData.country ||
       !formData.mobile
     ) {
@@ -124,7 +115,7 @@ const Addresses = () => {
         setShowAddForm(false);
         setEditMode(false);
         resetForm();
-        fetchAddresses(); // This will now update the Redux store
+        fetchAddresses();
       }
     } catch (error) {
       console.error("Error saving address:", error);
@@ -137,7 +128,6 @@ const Addresses = () => {
   };
 
   const handleEdit = (address) => {
-    // Update handleEdit function
     setFormData({
       addressName: address.addressName || address.address_name || "",
       addressType: address.addressType || address.address_type || "Home",
@@ -145,7 +135,7 @@ const Addresses = () => {
       addressLine2: address.addressLine2 || address.address_line_2 || "",
       city: address.city || "",
       state: address.state || "",
-      postalCode: address.postalCode || address.pincode || "",
+      pincode: address.pincode || address.postalCode || "", // Update field name but keep backward compatibility
       country: address.country || "India",
       mobile: address.mobile || "",
       isDefault: address.isDefault || address.is_default || false,
@@ -168,7 +158,7 @@ const Addresses = () => {
         apiSummary.endpoints.address.deleteAddress.successStatus
       ) {
         toast.success("Address deleted successfully");
-        fetchAddresses(); // This will now update the Redux store
+        fetchAddresses();
       }
     } catch (error) {
       console.error("Error deleting address:", error);
@@ -179,7 +169,6 @@ const Addresses = () => {
   };
 
   const resetForm = () => {
-    // Update resetForm function
     setFormData({
       addressName: "",
       addressType: "Home",
@@ -187,7 +176,7 @@ const Addresses = () => {
       addressLine2: "",
       city: "",
       state: "",
-      postalCode: "",
+      pincode: "", // Changed from postalCode
       country: "India",
       mobile: "",
       isDefault: false,
@@ -236,6 +225,7 @@ const Addresses = () => {
         </button>
       </div>
 
+      {/* Form section - unchanged */}
       {showAddForm && (
         <div className="bg-gray-900/50 p-4 lg:p-6 rounded-lg mb-6 border border-gray-800">
           <h2 className="text-lg font-bold mb-4 pb-2 border-b border-gray-800">
@@ -243,6 +233,7 @@ const Addresses = () => {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Form fields remain the same */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-300">
@@ -342,9 +333,9 @@ const Addresses = () => {
                 </label>
                 <input
                   type="text"
-                  name="postalCode"
+                  name="pincode"
                   placeholder="PIN Code"
-                  value={formData.postalCode}
+                  value={formData.pincode}
                   onChange={handleChange}
                   className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-gray-200 focus:outline-none focus:border-secondary-200"
                   required
@@ -412,116 +403,16 @@ const Addresses = () => {
         </div>
       )}
 
+      {/* Using AddressCard component */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {addresses.length > 0 ? (
           addresses.map((address) => (
-            <div
+            <AddressCard
               key={address._id}
-              className="p-4 bg-gray-900/50 border border-gray-700 hover:border-gray-600 rounded-lg shadow-sm transition-all duration-200"
-            >
-              <div className="flex justify-between items-start">
-                <div className="flex items-start gap-3">
-                  {/* Icon based on addressType with distinct colors */}
-                  <div
-                    className={`p-2 rounded-full ${
-                      address.address_type === "Home"
-                        ? "bg-blue-900/20"
-                        : address.address_type === "Work"
-                        ? "bg-amber-900/20"
-                        : "bg-purple-900/20"
-                    }`}
-                  >
-                    {address.address_type === "Home" ? (
-                      <FaHome size={16} className="text-blue-400" />
-                    ) : address.address_type === "Work" ? (
-                      <FaBuilding size={16} className="text-amber-400" />
-                    ) : (
-                      <MdLocationOn size={16} className="text-purple-400" />
-                    )}
-                  </div>
-
-                  {/* Address content with more emphasis on name and location */}
-                  <div className="flex-grow min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {/* Address name with larger text */}
-                      <h3 className="font-semibold text-base">
-                        {address.address_name || "Unnamed Address"}
-                      </h3>
-                      <div className="flex items-center gap-1">
-                        <span
-                          className={`inline-block w-2 h-2 rounded-full ${
-                            address.address_type === "Home"
-                              ? "bg-blue-500"
-                              : address.address_type === "Work"
-                              ? "bg-amber-500"
-                              : "bg-purple-500"
-                          }`}
-                        ></span>
-                        <span className="text-xs text-gray-400">
-                          {address.address_type}
-                        </span>
-                      </div>
-                      {address.is_default && (
-                        <span className="text-xs bg-gray-800 text-gray-300 px-2 py-0.5 rounded-full">
-                          Default
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Address details with enhanced location display */}
-                    <div className="text-sm text-gray-400 mt-2 space-y-1">
-                      <div className="line-clamp-1">
-                        {address.address_line_1}
-                      </div>
-                      {address.address_line_1 && (
-                        <div className="line-clamp-1">
-                          {address.address_line_2}
-                        </div>
-                      )}
-                      {/* Highlighted location info */}
-                      <div className="font-medium text-gray-300 mt-1">
-                        {address.city}, {address.state} - {address.pincode}
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        Phone: {address.mobile}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action buttons with hover effects - Edit button now yellow */}
-                <div className="flex gap-2 ml-2">
-                  <button
-                    onClick={() => handleEdit(address)}
-                    className="p-1.5 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/30 bg-gray-800/50 rounded-md transition-colors"
-                    title="Edit address"
-                  >
-                    <FaEdit size={14} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(address._id)}
-                    className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-900/30 bg-gray-800/50 rounded-md transition-colors"
-                    title="Delete address"
-                  >
-                    <FaTrash size={14} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Quick action buttons */}
-              <div className="flex justify-end mt-3 pt-2 border-t border-gray-800">
-                <button
-                  onClick={() =>
-                    navigate("/checkout", {
-                      state: { selectedAddressId: address._id },
-                    })
-                  }
-                  className="text-xs text-secondary-200 hover:text-secondary-100 bg-transparent"
-                >
-                  Use for checkout
-                </button>
-              </div>
-            </div>
+              address={address}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           ))
         ) : (
           <div className="col-span-full p-8 bg-gray-900/50 border border-gray-700 rounded-lg flex flex-col items-center justify-center">
