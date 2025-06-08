@@ -25,7 +25,7 @@ const ClearCartModal = ({ isOpen, onClose, onConfirm }) => {
     <section className="fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
       <div className="bg-gray-700 max-w-sm lg:max-w-[40%] w-full p-4 rounded-md">
         <div className="flex items-center justify-between">
-          <h1 className="font-semibold text-[22px]">Clear Cart</h1>
+          <h1 className="font-semibold text-[22px] text-red-500">Clear Cart</h1>
           <button
             className="w-fit block ml-auto text-red-600"
             onClick={onClose}
@@ -35,9 +35,7 @@ const ClearCartModal = ({ isOpen, onClose, onConfirm }) => {
         </div>
         <div className="flex-col items-center justify-center pt-4">
           <p className="my-4 flex items-center justify-center text-[16px] ml-3">
-            Are you sure you want to{" "}
-            <b className="text-red-400">&nbsp;clear all items&nbsp;</b> from
-            your cart?
+            Are you sure you want to permanently delete this category?
           </p>
           <div className="flex items-center justify-center gap-6">
             <button

@@ -48,11 +48,9 @@ const DeleteCategoryModal = ({ closeModal, category, fetchCategories }) => {
             <IoClose size={25} />
           </button>
         </div>
-        <div className="flex-col items-center justify-center pt-4">
-          <p className="my-4 flex items-center justify-center text-[16px] ml-3">
-            Are you sure you want to{" "}
-            <b className="text-red-400">&nbsp;permanently delete&nbsp;</b> this
-            category?
+        <div className="items-center justify-center pt-4">
+          <p className="my-4 flex items-center justify-center text-[16px] ml-3 text-red-500">
+            Are you sure you want to permanently delete this category?
           </p>
           <div className="flex items-center justify-center gap-6">
             <button
