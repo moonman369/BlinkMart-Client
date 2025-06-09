@@ -97,7 +97,9 @@ const OrderConfirmation = () => {
                     </h3>
                     <div className="flex justify-between mt-1 text-sm text-gray-400">
                       <span>Qty: {item.quantity}</span>
-                      <span>{getINRString(item.quantity * item.product.price)}</span>
+                      <span>
+                        {getINRString(item.quantity * item.product.price)}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -239,7 +241,7 @@ const OrderConfirmation = () => {
             </button>
 
             <button
-              onClick={() => navigate("/dashboard/orders")}
+              onClick={() => navigate("/dashboard/my-orders")}
               className="w-full py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-semibold"
             >
               View All Orders

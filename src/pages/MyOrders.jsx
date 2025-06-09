@@ -73,7 +73,12 @@ const MyOrders = () => {
         apiSummary.endpoints.order.getAllOrders.successStatus
       ) {
         console.log(response);
-        setOrders(response.data.data || []);
+        // Sort orders by date (most recent first)
+        const sortedOrders = [...(response.data.data || [])].sort((a, b) => {
+          // Convert string dates to Date objects and compare
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+        setOrders(sortedOrders);
       } else {
         throw new Error("Failed to fetch orders");
       }
@@ -86,13 +91,34 @@ const MyOrders = () => {
     }
   };
 
+  // Update the formatDate function
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+    const orderDate = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - orderDate);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+    const diffMinutes = Math.floor(diffTime / (1000 * 60));
+
+    // Format the date normally
+    const formattedDate = orderDate.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
+
+    // Add relative time info
+    if (diffMinutes < 60) {
+      return `${formattedDate} (${diffMinutes} min ago)`;
+    } else if (diffHours < 24) {
+      return `${formattedDate} (${diffHours} hrs ago)`;
+    } else if (diffDays === 1) {
+      return `${formattedDate} (yesterday)`;
+    } else if (diffDays < 7) {
+      return `${formattedDate} (${diffDays} days ago)`;
+    }
+
+    return formattedDate;
   };
 
   if (loading) {
@@ -168,98 +194,113 @@ const MyOrders = () => {
       </div>
 
       <div className="space-y-4">
-        {orders.map((order) => (
-          <div
-            key={order._id}
-            className="bg-gray-900/50 rounded-lg border border-gray-800 overflow-hidden"
-          >
-            {/* Order header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between bg-gray-800/50 px-4 py-3">
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400">Order ID:</span>
-                  <span className="text-sm font-mono font-medium">
-                    {order.order_id}
-                  </span>
+        {orders.map((order, index) => {
+          // Check if order is from the last 24 hours
+          const isRecentOrder =
+            new Date() - new Date(order.createdAt) < 24 * 60 * 60 * 1000;
+
+          return (
+            <div
+              key={order._id}
+              className={`bg-gray-900/50 rounded-lg border ${
+                isRecentOrder
+                  ? "border-secondary-200/30"
+                  : "border-gray-800"
+              } overflow-hidden`}
+            >
+              {/* Order header */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between bg-gray-800/50 px-4 py-3">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400">Order ID:</span>
+                    <span className="text-sm font-mono font-medium">
+                      {order.order_id}
+                    </span>
+                    {isRecentOrder && (
+                      <span className="text-xs bg-secondary-200/20 text-secondary-200 px-2 py-0.5 rounded-full">
+                        New
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400">Placed on:</span>
+                    <span className="text-sm">{formatDate(order.createdAt)}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400">Placed on:</span>
-                  <span className="text-sm">{formatDate(order.createdAt)}</span>
+
+                <div className="flex items-center gap-2 mt-2 md:mt-0">
+                  <OrderStatusBadge status={order.status || "Processing"} />
+                  <Link
+                    to={`/dashboard/my-orders/${order.order_id}`} // Fix path to match route definition
+                    state={{ orderData: order }} // Pass the entire order object as state
+                    className="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded text-gray-200"
+                  >
+                    View Details
+                  </Link>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 mt-2 md:mt-0">
-                <OrderStatusBadge status={order.status || "Processing"} />
-                <Link
-                  to={`/dashboard/orders/${order.order_id}`}
-                  state={{ orderData: order }} // Pass the entire order object as state
-                  className="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded text-gray-200"
-                >
-                  View Details
-                </Link>
-              </div>
-            </div>
-
-            {/* Order items */}
-            <div className="p-4">
-              <div className="space-y-4">
-                {order.products.slice(0, 2).map((item) => (
-                  <div key={item._id} className="flex gap-3 items-center">
-                    <div className="bg-gray-800 p-1.5 rounded w-12 h-12 shrink-0">
-                      <img
-                        src={item?.product_id?.image?.[0] || "placeholder.jpg"}
-                        alt={item?.product_id?.name}
-                        className="w-full h-full object-cover rounded"
-                      />
-                    </div>
-                    <div className="flex-grow min-w-0">
-                      <h4 className="text-sm font-medium text-gray-300 truncate">
-                        {item.product?.name}
-                      </h4>
-                      <div className="flex justify-between text-xs text-gray-400 mt-1">
-                        <span>Qty: {item?.quantity}</span>
-                        <span>{getINRString(item?.product_id.price)}</span>
+              {/* Order items */}
+              <div className="p-4">
+                <div className="space-y-4">
+                  {order.products.slice(0, 2).map((item) => (
+                    <div key={item._id} className="flex gap-3 items-center">
+                      <div className="bg-gray-800 p-1.5 rounded w-12 h-12 shrink-0">
+                        <img
+                          src={item?.product_id?.image?.[0] || "placeholder.jpg"}
+                          alt={item?.product_id?.name}
+                          className="w-full h-full object-cover rounded"
+                        />
+                      </div>
+                      <div className="flex-grow min-w-0">
+                        <h4 className="text-sm font-medium text-gray-300 truncate">
+                          {item.product?.name}
+                        </h4>
+                        <div className="flex justify-between text-xs text-gray-400 mt-1">
+                          <span>Qty: {item?.quantity}</span>
+                          <span>{getINRString(item?.product_id.price)}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
 
-                {order.products.length > 2 && (
-                  <div className="text-xs text-gray-400 mt-2">
-                    + {order.products.length - 2} more{" "}
-                    {order.products.length - 2 === 1 ? "item" : "items"}
-                  </div>
-                )}
-              </div>
-
-              {/* Order footer */}
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mt-4 pt-4 border-t border-gray-800">
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs text-gray-400">Payment:</span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="text-sm">{order.payment_method}</span>
-                    <span
-                      className={`text-xs px-1.5 py-0.5 rounded ${
-                        order.payment_method === "COD"
-                          ? "bg-amber-400/20 text-amber-400"
-                          : "bg-green-400/20 text-green-400"
-                      }`}
-                    >
-                      {order.payment_method === "COD" ? "Pending" : "Paid"}
-                    </span>
-                  </span>
+                  {order.products.length > 2 && (
+                    <div className="text-xs text-gray-400 mt-2">
+                      + {order.products.length - 2} more{" "}
+                      {order.products.length - 2 === 1 ? "item" : "items"}
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex flex-col items-end mt-2 md:mt-0">
-                  <span className="text-xs text-gray-400">Order Total:</span>
-                  <span className="text-lg font-semibold">
-                    {getINRString(order?.total_amount)}
-                  </span>
+                {/* Order footer */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mt-4 pt-4 border-t border-gray-800">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-gray-400">Payment:</span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="text-sm">{order.payment_method}</span>
+                      <span
+                        className={`text-xs px-1.5 py-0.5 rounded ${
+                          order.payment_method === "COD"
+                            ? "bg-amber-400/20 text-amber-400"
+                            : "bg-green-400/20 text-green-400"
+                        }`}
+                      >
+                        {order.payment_method === "COD" ? "Pending" : "Paid"}
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col items-end mt-2 md:mt-0">
+                    <span className="text-xs text-gray-400">Order Total:</span>
+                    <span className="text-lg font-semibold">
+                      {getINRString(order?.total_amount)}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
