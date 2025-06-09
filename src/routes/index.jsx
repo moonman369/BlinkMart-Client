@@ -23,6 +23,8 @@ import ProductDisplay from "../pages/ProductDisplay";
 import WelcomePage from "../components/WelcomePage";
 import CartPage from "../pages/CartPage";
 import Checkout from "../pages/Checkout";
+import OrderConfirmation from "../pages/OrderConfirmation";
+import OrderDetails from "../pages/OrderDetails";
 
 const router = createBrowserRouter([
   {
@@ -76,6 +78,10 @@ const router = createBrowserRouter([
           {
             path: "my-orders",
             element: <MyOrders />,
+          },
+          {
+            path: "orders/:orderId",
+            element: <OrderDetails />,
           },
           {
             path: "addresses",
@@ -135,6 +141,10 @@ const router = createBrowserRouter([
       {
         path: "checkout",
         element: <Checkout />,
+      },
+      {
+        path: "order-confirmation",
+        element: <OrderConfirmation />,
       },
     ],
   },

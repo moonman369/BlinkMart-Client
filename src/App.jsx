@@ -86,8 +86,8 @@ function App() {
     const accessToken = Cookies.get("accessToken");
     const refreshToken = Cookies.get("refreshToken");
 
-    console.log("Access Token:", accessToken);
-    console.log("Refresh Token:", refreshToken);
+    // console.log("Access Token:", accessToken);
+    // console.log("Refresh Token:", refreshToken);
 
     // If both tokens are null, return false to show welcome page
     if (!accessToken && !refreshToken) {
@@ -137,7 +137,7 @@ function App() {
   const getUser = async () => {
     try {
       const userData = await fetchUserDetails();
-      console.log("user", userData);
+      // console.log("user", userData);
       dispatch(setUserDetails(userData?.data?.data));
     } catch (error) {
       console.error("Fetch User Error: ", error);
@@ -151,7 +151,7 @@ function App() {
       const allCategories = await fetchAllCategories({
         all: true,
       });
-      console.log("allCategories", allCategories);
+      // console.log("allCategories", allCategories);
       dispatch(setAllCategories(allCategories?.data?.data));
       dispatch(
         setCategoryPageDetails({
@@ -175,7 +175,7 @@ function App() {
       const allSubcategoriesResponse = await fetchAllSubcategories({
         all: true,
       });
-      console.log("allSubcategories", allSubcategoriesResponse);
+      // console.log("allSubcategories", allSubcategoriesResponse);
       dispatch(setAllSubcategories(allSubcategoriesResponse?.data?.data));
 
       // Load paginated subcategories for admin view
@@ -184,7 +184,7 @@ function App() {
         currentPage: 1,
         pageSize: 10,
       });
-      console.log("paginatedSubcategories", paginatedSubcategoriesResponse);
+      // console.log("paginatedSubcategories", paginatedSubcategoriesResponse);
       dispatch(
         setPaginatedSubcategories(paginatedSubcategoriesResponse?.data?.data)
       );
@@ -209,7 +209,7 @@ function App() {
         currentPage: 1,
         pageSize: 12,
       });
-      console.log("allProducts", allProducts);
+      // console.log("allProducts", allProducts);
       dispatch(setAllProducts(allProducts?.data?.data));
       dispatch(
         setProductPageDetails({
@@ -251,7 +251,7 @@ function App() {
         apiSummary.endpoints.address.getAllAddresses.successStatus
       ) {
         // Handle the response data as needed
-        console.log("Addresses fetched successfully:", response.data.data);
+        // console.log("Addresses fetched successfully:", response.data.data);
         dispatch(setAddresses(response.data.data));
       }
     } catch (error) {
