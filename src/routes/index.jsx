@@ -80,7 +80,7 @@ const router = createBrowserRouter([
             element: <MyOrders />,
           },
           {
-            path: "orders/:orderId",
+            path: "my-orders/:orderId",
             element: <OrderDetails />,
           },
           {
