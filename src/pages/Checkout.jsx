@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux"; // Add useDispatch
 import { TiShoppingCart } from "react-icons/ti";
 import { FaArrowLeft, FaCreditCard, FaWallet, FaPlus } from "react-icons/fa";
 import { MdPayment } from "react-icons/md";
@@ -8,11 +8,16 @@ import { FaMoneyBill } from "react-icons/fa6";
 import { getINRString } from "../util/getINRString";
 import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
-import AddressCard from "../components/AddressCard"; // Import AddressCard component
+import AddressCard from "../components/AddressCard";
+import { createCodOrder } from "../util/orderMethods";
+import { apiSummary } from "../config/api/apiSummary";
+import { clearCart } from "../store/cartSlice"; // Import clearCart action
+import customAxios from "../util/customAxios";
 
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch(); // Add dispatch hook
   const { cartItems, totalAmount } = location.state || {};
 
   // Get addresses from Redux store
@@ -20,7 +25,7 @@ const Checkout = () => {
 
   const [loading, setLoading] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [paymentMethod, setPaymentMethod] = useState("COD"); // Set default to COD
 
   useEffect(() => {
     // Redirect if no cart items
@@ -40,6 +45,71 @@ const Checkout = () => {
     setSelectedAddress(address);
   };
 
+  const handlePlaceCodOrder = async () => {
+    if (!selectedAddress) {
+      toast.error("Please select a delivery address");
+      return;
+    }
+    setLoading(true);
+    try {
+      const orderPayload = {
+        deliveryAddressId: selectedAddress._id,
+        paymentMethod: "COD",
+        products: cartItems.map((item) => ({
+          productId: item.product._id,
+          quantity: item.quantity,
+        })),
+        subtotalAmount: totalAmount,
+        totalAmount: totalAmount + 50 + 18, // Including shipping and tax
+      };
+
+      const response = await createCodOrder(orderPayload);
+
+      if (
+        response.status ===
+        apiSummary.endpoints.order.createCodOrder.successStatus
+      ) {
+        // Clear the cart after successful order
+        await performClearCart();
+        console.log(response);
+        toast.success("Order placed successfully!");
+        navigate("/order-confirmation", {
+          state: {
+            orderId: response?.data?.data?.order_id,
+            address: selectedAddress,
+            paymentMethod: "COD",
+            cartItems,
+            totalAmount: totalAmount + 50 + 18, // Including shipping and tax
+          },
+        });
+      }
+    } catch (error) {
+      toast.error("Failed to place order. Please try again.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const performClearCart = async () => {
+    try {
+      const response = await customAxios({
+        url: apiSummary.endpoints.cart.clearCart.path,
+        method: apiSummary.endpoints.cart.clearCart.method,
+      });
+
+      if (
+        response.status === apiSummary.endpoints.cart.clearCart.successStatus
+      ) {
+        dispatch(clearCart());
+      }
+    } catch (error) {
+      console.error("Failed to clear cart:", error);
+      toast.error("Failed to clear cart");
+    }
+  };
+
+  // handlePlaceOrder function for non-COD payments should also clear the cart on success
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
       toast.error("Please select a delivery address");
@@ -52,6 +122,10 @@ const Checkout = () => {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // In a real app, make API call to create order
+      // When that's implemented, you would clear the cart after successful API response
+
+      // Clear the cart after successful order (even for simulated orders)
+      dispatch(clearCart());
 
       toast.success("Order placed successfully!");
       navigate("/order-confirmation", {
@@ -60,7 +134,7 @@ const Checkout = () => {
           address: selectedAddress,
           paymentMethod,
           cartItems,
-          totalAmount,
+          totalAmount: totalAmount + 50 + 18, // Including shipping and tax
         },
       });
     } catch (error) {
@@ -147,11 +221,11 @@ const Checkout = () => {
             <div className="space-y-3">
               <div
                 className={`p-4 border rounded-lg cursor-pointer flex items-center gap-3 ${
-                  paymentMethod === "card"
+                  paymentMethod === "Card"
                     ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod("card")}
+                onClick={() => setPaymentMethod("Card")}
               >
                 <div className="p-2 rounded-full bg-blue-900/20">
                   <FaCreditCard className="text-blue-500" size={20} />
@@ -166,11 +240,11 @@ const Checkout = () => {
 
               <div
                 className={`p-4 border rounded-lg cursor-pointer flex items-center gap-3 ${
-                  paymentMethod === "upi"
+                  paymentMethod === "UPI"
                     ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod("upi")}
+                onClick={() => setPaymentMethod("UPI")}
               >
                 <div className="p-2 rounded-full bg-green-900/20">
                   <FaWallet className="text-green-500" size={20} />
@@ -185,11 +259,11 @@ const Checkout = () => {
 
               <div
                 className={`p-4 border rounded-lg cursor-pointer flex items-center gap-3 ${
-                  paymentMethod === "netbanking"
+                  paymentMethod === "Net Banking"
                     ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod("netbanking")}
+                onClick={() => setPaymentMethod("Net Banking")}
               >
                 <div className="p-2 rounded-full bg-purple-900/20">
                   <MdPayment className="text-purple-500" size={20} />
@@ -204,11 +278,11 @@ const Checkout = () => {
 
               <div
                 className={`p-4 border rounded-lg cursor-pointer flex items-center gap-3 ${
-                  paymentMethod === "cod"
+                  paymentMethod === "COD"
                     ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod("cod")}
+                onClick={() => setPaymentMethod("COD")}
               >
                 <div className="p-2 rounded-full bg-amber-900/20">
                   <FaMoneyBill className="text-amber-500" size={20} />
@@ -301,7 +375,9 @@ const Checkout = () => {
 
             {/* Place Order Button */}
             <button
-              onClick={handlePlaceOrder}
+              onClick={
+                paymentMethod === "COD" ? handlePlaceCodOrder : handlePlaceOrder
+              }
               disabled={!selectedAddress}
               className={`w-full mt-4 py-3 rounded-lg ${
                 !selectedAddress

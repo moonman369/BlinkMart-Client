@@ -183,5 +183,22 @@ export const apiSummary = {
         successStatus: 200,
       },
     },
+    order: {
+      getAllOrders: {
+        path: "api/v1/order/get-order-details",
+        method: "get",
+        successStatus: 200,
+      },
+      createCodOrder: {
+        path: "api/v1/order/create-cod-order",
+        method: "post",
+        successStatus: 201,
+      },
+      createOnlineOrder: {
+        path: "api/v1/order/create-online-order",
+        method: "post",
+        successStatus: 201,
+      },
+    },
   },
 };
