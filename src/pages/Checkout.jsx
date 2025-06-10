@@ -9,10 +9,12 @@ import { getINRString } from "../util/getINRString";
 import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
 import AddressCard from "../components/AddressCard";
-import { createCodOrder } from "../util/orderMethods";
+import { createCodOrder, createOnlineOrder } from "../util/orderMethods";
 import { apiSummary } from "../config/api/apiSummary";
 import { clearCart } from "../store/cartSlice"; // Import clearCart action
 import customAxios from "../util/customAxios";
+import { loadRazorpayScript } from "../util/razorPay";
+import { paymentMethodsToRzpMap } from "../util/constants";
 
 const Checkout = () => {
   const location = useLocation();
@@ -22,6 +24,8 @@ const Checkout = () => {
 
   // Get addresses from Redux store
   const addresses = useSelector((state) => state.addresses.addresses) || [];
+  const user = useSelector((state) => state.user) || {};
+  const RAZORPAY_KEY_ID = import.meta.env["VITE_APP_RAZORPAY_KEY_ID"];
 
   const [loading, setLoading] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -91,6 +95,45 @@ const Checkout = () => {
     }
   };
 
+  const handlePlaceOnlineOrder = async () => {
+    if (!selectedAddress) {
+      toast.error("Please select a delivery address");
+      return;
+    }
+    setLoading(true);
+    try {
+      const orderPayload = {
+        deliveryAddressId: selectedAddress._id,
+        paymentMethod: paymentMethod, // Changed from "COD" to "Online"
+        products: cartItems.map((item) => ({
+          productId: item.product._id,
+          quantity: item.quantity,
+        })),
+        subtotalAmount: totalAmount,
+        totalAmount: totalAmount + 50 + 18, // Including shipping and tax
+      };
+
+      // Call the createOnlineOrder method instead of createCodOrder
+      const response = await createOnlineOrder(orderPayload);
+
+      if (
+        response.status ===
+        apiSummary.endpoints.order.createOnlineOrder.successStatus
+      ) {
+        // Get the payment URL from the response
+        const { razorpayOrderId, amount } =
+          response?.data?.data?.paymentDetails;
+        console.log("Online", response);
+        handlePayment(paymentMethod, razorpayOrderId, amount);
+      }
+    } catch (error) {
+      toast.error("Failed to process online payment. Please try again.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const performClearCart = async () => {
     try {
       const response = await customAxios({
@@ -109,39 +152,103 @@ const Checkout = () => {
     }
   };
 
-  // handlePlaceOrder function for non-COD payments should also clear the cart on success
-  const handlePlaceOrder = async () => {
-    if (!selectedAddress) {
-      toast.error("Please select a delivery address");
+  const handlePayment = async (paymentMethod, orderId, totalAmount) => {
+    const res = await loadRazorpayScript();
+
+    if (!res) {
+      toast.error("Razorpay SDK failed to load. Please try again later.");
       return;
     }
 
-    setLoading(true);
+    const methodOptions = {
+      card: { card: true, upi: false, netbanking: false },
+      upi: { card: false, upi: true, netbanking: false },
+      netbanking: { card: false, upi: false, netbanking: true },
+    };
+
+    console.log(RAZORPAY_KEY_ID);
+    const options = {
+      key: RAZORPAY_KEY_ID, // Replace with your Razorpay Test Key ID
+      amount: totalAmount, // Already in paise
+      currency: "INR",
+      name: "My Store",
+      description: "Order Payment",
+      order_id: orderId, // 👈 From backend
+      handler: async function (response) {
+        // ✅ This function is called when payment is successful
+        alert("Payment successful!");
+        console.log("Payment ID:", response.razorpay_payment_id);
+        console.log("Order ID:", response.razorpay_order_id);
+        console.log("Signature:", response.razorpay_signature);
+
+        // 🔐 (Optional) Call backend to verify signature
+        // axios.post("/api/verify-payment", response);
+        await handlePaymentSuccess(response);
+      },
+      prefill: {
+        name: user?.username || "John Doe",
+        email: user?.email || "john@example.com",
+        contact: user?.mobile || "9876543210",
+      },
+      notes: {
+        address: "BlinkMart",
+      },
+      theme: {
+        color: "#3399cc",
+      },
+      method: methodOptions[paymentMethodsToRzpMap[paymentMethod]],
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+  // Example frontend code
+  const handlePaymentSuccess = async (response) => {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+      response;
+
     try {
-      // Simulate order processing delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // In a real app, make API call to create order
-      // When that's implemented, you would clear the cart after successful API response
-
-      // Clear the cart after successful order (even for simulated orders)
-      dispatch(clearCart());
-
-      toast.success("Order placed successfully!");
-      navigate("/order-confirmation", {
-        state: {
-          orderId: "ORD" + Math.floor(100000 + Math.random() * 900000),
-          address: selectedAddress,
-          paymentMethod,
-          cartItems,
-          totalAmount: totalAmount + 50 + 18, // Including shipping and tax
-        },
+      const result = await customAxios.post("/api/v1/order/verify-payment", {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+        orderId: yourOrderId, // If needed
       });
+
+      if (result.data.success) {
+        // Show success message
+        // Redirect to order confirmation page
+      }
     } catch (error) {
-      toast.error("Failed to place order. Please try again.");
-      console.error(error);
-    } finally {
-      setLoading(false);
+      // Handle error
+    }
+  };
+
+  const handlePaymentMethodChange = (method) => {
+    // Update the selected payment method
+    setPaymentMethod(method);
+
+    // Additional logic based on payment method if needed
+    switch (method) {
+      case "COD":
+        // Maybe show a message about COD
+        console.log("Selected Cash on Delivery");
+        break;
+      case "Card":
+        // Maybe prepare card form or validation
+        console.log("Selected Card payment");
+        break;
+      case "UPI":
+        // Maybe prepare UPI form or validation
+        console.log("Selected UPI payment");
+        break;
+      case "Net Banking":
+        // Maybe prepare bank selection options
+        console.log("Selected Net Banking");
+        break;
+      default:
+        console.log("Unknown payment method");
     }
   };
 
@@ -225,7 +332,7 @@ const Checkout = () => {
                     ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod("Card")}
+                onClick={() => handlePaymentMethodChange("Card")}
               >
                 <div className="p-2 rounded-full bg-blue-900/20">
                   <FaCreditCard className="text-blue-500" size={20} />
@@ -244,7 +351,7 @@ const Checkout = () => {
                     ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod("UPI")}
+                onClick={() => handlePaymentMethodChange("UPI")}
               >
                 <div className="p-2 rounded-full bg-green-900/20">
                   <FaWallet className="text-green-500" size={20} />
@@ -263,7 +370,7 @@ const Checkout = () => {
                     ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod("Net Banking")}
+                onClick={() => handlePaymentMethodChange("Net Banking")}
               >
                 <div className="p-2 rounded-full bg-purple-900/20">
                   <MdPayment className="text-purple-500" size={20} />
@@ -282,7 +389,7 @@ const Checkout = () => {
                     ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod("COD")}
+                onClick={() => handlePaymentMethodChange("COD")}
               >
                 <div className="p-2 rounded-full bg-amber-900/20">
                   <FaMoneyBill className="text-amber-500" size={20} />
@@ -376,7 +483,9 @@ const Checkout = () => {
             {/* Place Order Button */}
             <button
               onClick={
-                paymentMethod === "COD" ? handlePlaceCodOrder : handlePlaceOrder
+                paymentMethod === "COD"
+                  ? handlePlaceCodOrder
+                  : handlePlaceOnlineOrder
               }
               disabled={!selectedAddress}
               className={`w-full mt-4 py-3 rounded-lg ${

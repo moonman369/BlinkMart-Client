@@ -18,3 +18,9 @@ export const COOKIE_CLEAR_SETTINGS = {
   path: "/",
   domain: import.meta.env.COOKIE_DOMAIN ?? ".*",
 };
+
+export const paymentMethodsToRzpMap = {
+  UPI: "upi",
+  Card: "card",
+  "Net Banking": "netbanking",
+};
