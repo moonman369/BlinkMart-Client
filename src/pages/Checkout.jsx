@@ -9,10 +9,12 @@ import { getINRString } from "../util/getINRString";
 import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
 import AddressCard from "../components/AddressCard";
-import { createCodOrder } from "../util/orderMethods";
+import { createCodOrder, createOnlineOrder } from "../util/orderMethods";
 import { apiSummary } from "../config/api/apiSummary";
 import { clearCart } from "../store/cartSlice"; // Import clearCart action
 import customAxios from "../util/customAxios";
+import { loadRazorpayScript } from "../util/razorPay";
+import { paymentMethodsToRzpMap } from "../util/constants";
 
 const Checkout = () => {
   const location = useLocation();
@@ -22,6 +24,8 @@ const Checkout = () => {
 
   // Get addresses from Redux store
   const addresses = useSelector((state) => state.addresses.addresses) || [];
+  const user = useSelector((state) => state.user) || {};
+  const RAZORPAY_KEY_ID = import.meta.env["VITE_APP_RAZORPAY_KEY_ID"];
 
   const [loading, setLoading] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -91,6 +95,45 @@ const Checkout = () => {
     }
   };
 
+  const handlePlaceOnlineOrder = async () => {
+    if (!selectedAddress) {
+      toast.error("Please select a delivery address");
+      return;
+    }
+    setLoading(true);
+    try {
+      const orderPayload = {
+        deliveryAddressId: selectedAddress._id,
+        paymentMethod: paymentMethod, // Changed from "COD" to "Online"
+        products: cartItems.map((item) => ({
+          productId: item.product._id,
+          quantity: item.quantity,
+        })),
+        subtotalAmount: totalAmount,
+        totalAmount: totalAmount + 50 + 18, // Including shipping and tax
+      };
+
+      // Call the createOnlineOrder method instead of createCodOrder
+      const response = await createOnlineOrder(orderPayload);
+
+      if (
+        response.status ===
+        apiSummary.endpoints.order.createOnlineOrder.successStatus
+      ) {
+        // Get the payment URL from the response
+        const { razorpayOrderId, amount } =
+          response?.data?.data?.paymentDetails;
+        console.log("Online", response);
+        handlePayment(paymentMethod, razorpayOrderId, amount);
+      }
+    } catch (error) {
+      toast.error("Failed to process online payment. Please try again.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const performClearCart = async () => {
     try {
       const response = await customAxios({
@@ -109,39 +152,194 @@ const Checkout = () => {
     }
   };
 
-  // handlePlaceOrder function for non-COD payments should also clear the cart on success
-  const handlePlaceOrder = async () => {
-    if (!selectedAddress) {
-      toast.error("Please select a delivery address");
+  const handlePayment = async (paymentMethod, orderId, totalAmount) => {
+    const res = await loadRazorpayScript();
+
+    if (!res) {
+      toast.error("Razorpay SDK failed to load. Please try again later.");
       return;
     }
 
-    setLoading(true);
+    // Get the correct RAZORPAY_KEY_ID
+    const RAZORPAY_KEY_ID = import.meta.env.VITE_APP_RAZORPAY_KEY_ID;
+
+    if (!RAZORPAY_KEY_ID) {
+      console.error("Razorpay key not found in environment variables");
+      toast.error("Payment configuration error. Please contact support.");
+      return;
+    }
+
+    // Base options for all payment methods
+    const options = {
+      key: RAZORPAY_KEY_ID,
+      amount: totalAmount,
+      currency: "INR",
+      name: "BlinkMart",
+      description: "Order Payment",
+      order_id: orderId,
+      handler: async function (response) {
+        toast.success("Payment successful!");
+        console.log("Payment ID:", response.razorpay_payment_id);
+        console.log("Order ID:", response.razorpay_order_id);
+        console.log("Signature:", response.razorpay_signature);
+        await handlePaymentSuccess(response);
+      },
+      prefill: {
+        name: user?.username || "John Doe",
+        email: user?.email || "john@example.com",
+        contact: user?.mobile || "9876543210",
+      },
+      notes: {
+        address: "BlinkMart",
+        order_id: orderId,
+      },
+      theme: {
+        color: "#00b050",
+      },
+      modal: {
+        ondismiss: function() {
+          console.log("Payment cancelled by user");
+          toast.error("Payment cancelled");
+        }
+      }
+    };
+
+    // Map payment method to Razorpay's method names
+    const paymentMethodMap = {
+      "Card": "card",
+      "UPI": "upi",
+      "Net Banking": "netbanking"
+    };
+
+    // Apply the mapped method if it's not COD
+    if (paymentMethod !== "COD" && paymentMethodMap[paymentMethod]) {
+      options.method = paymentMethodMap[paymentMethod];
+      
+      // This is the key part: Configure specific payment method settings and hide others
+      // These settings control which payment blocks are shown/hidden in the Razorpay modal
+      options.config = {
+        display: {
+          blocks: {},
+          sequence: [],
+          preferences: {
+            show_default_blocks: false
+          }
+        }
+      };
+      
+      // Only add the selected payment method block
+      switch(paymentMethod) {
+        case "Card":
+          options.config.display.blocks.card = {
+            name: "Pay with Card",
+            instruments: [{ method: "card" }]
+          };
+          options.config.display.sequence = ["block.card"];
+          break;
+        
+        case "UPI":
+          options.config.display.blocks.upi = {
+            name: "Pay using UPI",
+            instruments: [{
+              method: "upi",
+              flow: "all",
+              apps: ["google_pay", "phonepe", "paytm", "amazon_pay", "bhim"]
+            }]
+          };
+          options.config.display.sequence = ["block.upi"];
+          break;
+        
+        case "Net Banking":
+          options.config.display.blocks.netbanking = {
+            name: "Pay via Net Banking",
+            instruments: [{ method: "netbanking" }]
+          };
+          options.config.display.sequence = ["block.netbanking"];
+          break;
+      }
+    }
+
+    const rzp = new window.Razorpay(options);
+
+    // Event handler for payment failure
+    rzp.on("payment.failed", function (response) {
+      console.error("Payment failed:", response.error);
+      toast.error(`Payment failed: ${response.error.description}`);
+    });
+
+    rzp.open();
+  };
+
+  // Example frontend code
+  const handlePaymentSuccess = async (response) => {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+      response;
+
     try {
-      // Simulate order processing delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // In a real app, make API call to create order
-      // When that's implemented, you would clear the cart after successful API response
-
-      // Clear the cart after successful order (even for simulated orders)
-      dispatch(clearCart());
-
-      toast.success("Order placed successfully!");
-      navigate("/order-confirmation", {
-        state: {
-          orderId: "ORD" + Math.floor(100000 + Math.random() * 900000),
-          address: selectedAddress,
-          paymentMethod,
-          cartItems,
-          totalAmount: totalAmount + 50 + 18, // Including shipping and tax
-        },
+      setLoading(true);
+      const result = await customAxios.post("/api/v1/order/verify-payment", {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
       });
+
+      if (result.data.success) {
+        // Clear the cart
+        await performClearCart();
+
+        // Show success message
+        toast.success("Payment verified successfully!");
+
+        // Redirect to order confirmation page
+        navigate("/order-confirmation", {
+          state: {
+            orderId: result.data.data.order_id, // Get order ID from the response
+            address: selectedAddress,
+            paymentMethod: paymentMethod,
+            cartItems,
+            totalAmount: totalAmount + 50 + 18, // Including shipping and tax
+            paymentId: razorpay_payment_id,
+            orderReference: razorpay_order_id,
+          },
+        });
+      } else {
+        throw new Error("Payment verification failed");
+      }
     } catch (error) {
-      toast.error("Failed to place order. Please try again.");
-      console.error(error);
+      console.error("Payment verification error:", error);
+      toast.error("Payment verification failed. Please contact support.");
+
+      // Navigate to orders page so they can see their order status
+      navigate("/dashboard/my-orders");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePaymentMethodChange = (method) => {
+    // Update the selected payment method
+    setPaymentMethod(method);
+
+    // Additional logic based on payment method if needed
+    switch (method) {
+      case "COD":
+        // Maybe show a message about COD
+        console.log("Selected Cash on Delivery");
+        break;
+      case "Card":
+        // Maybe prepare card form or validation
+        console.log("Selected Card payment");
+        break;
+      case "UPI":
+        // Maybe prepare UPI form or validation
+        console.log("Selected UPI payment");
+        break;
+      case "Net Banking":
+        // Maybe prepare bank selection options
+        console.log("Selected Net Banking");
+        break;
+      default:
+        console.log("Unknown payment method");
     }
   };
 
@@ -225,7 +423,7 @@ const Checkout = () => {
                     ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod("Card")}
+                onClick={() => handlePaymentMethodChange("Card")}
               >
                 <div className="p-2 rounded-full bg-blue-900/20">
                   <FaCreditCard className="text-blue-500" size={20} />
@@ -244,7 +442,7 @@ const Checkout = () => {
                     ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod("UPI")}
+                onClick={() => handlePaymentMethodChange("UPI")}
               >
                 <div className="p-2 rounded-full bg-green-900/20">
                   <FaWallet className="text-green-500" size={20} />
@@ -263,7 +461,7 @@ const Checkout = () => {
                     ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod("Net Banking")}
+                onClick={() => handlePaymentMethodChange("Net Banking")}
               >
                 <div className="p-2 rounded-full bg-purple-900/20">
                   <MdPayment className="text-purple-500" size={20} />
@@ -282,7 +480,7 @@ const Checkout = () => {
                     ? "border-primary-200 bg-gray-800/60"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
-                onClick={() => setPaymentMethod("COD")}
+                onClick={() => handlePaymentMethodChange("COD")}
               >
                 <div className="p-2 rounded-full bg-amber-900/20">
                   <FaMoneyBill className="text-amber-500" size={20} />
@@ -376,7 +574,9 @@ const Checkout = () => {
             {/* Place Order Button */}
             <button
               onClick={
-                paymentMethod === "COD" ? handlePlaceCodOrder : handlePlaceOrder
+                paymentMethod === "COD"
+                  ? handlePlaceCodOrder
+                  : handlePlaceOnlineOrder
               }
               disabled={!selectedAddress}
               className={`w-full mt-4 py-3 rounded-lg ${

@@ -199,6 +199,11 @@ export const apiSummary = {
         method: "post",
         successStatus: 201,
       },
+      verifyPayment: {
+        path: "api/v1/order/verify-payment",
+        method: "post",
+        successStatus: 200,
+      },
     },
   },
 };

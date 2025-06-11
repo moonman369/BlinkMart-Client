@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, Link, useNavigate, useLocation } from "react-router-dom"; // Add useLocation
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { 
   FaArrowLeft, 
   FaMapMarkerAlt, 
@@ -11,24 +11,17 @@ import { MdPayment } from "react-icons/md";
 import { TiShoppingCart } from "react-icons/ti";
 import { BsClockHistory } from "react-icons/bs";
 import { getINRString } from "../util/getINRString";
-// Remove this import since we won't need it
-// import { getOrderById } from "../util/orderMethods";
 import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
-// import { apiSummary } from "../config/api/apiSummary"; // Not needed anymore
 
 const OrderDetails = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  const location = useLocation(); // Get location object to access state
+  const location = useLocation();
   
-  // Get the order from location state, or null if not provided
   const [order, setOrder] = useState(location.state?.orderData || null);
-  const [loading, setLoading] = useState(false); // Set to false by default
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // We don't need the useEffect and fetchOrderDetails function anymore
-  // since we're getting the data from navigation state
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -42,7 +35,6 @@ const OrderDetails = () => {
     });
   };
 
-  // If no order data was passed in location state
   if (!order) {
     return (
       <div className="min-h-[calc(100vh-8rem)] flex flex-col items-center justify-center text-center px-4">
@@ -87,7 +79,7 @@ const OrderDetails = () => {
           </div>
           <div className="flex flex-col gap-1 mt-2 md:mt-0">
             <span className="text-xs text-gray-400">Payment Method</span>
-            <span className="font-medium">{order.payment_method}</span>
+            <span className="font-medium">{order.payment_mode}</span>
           </div>
           <div className="flex flex-col gap-1 mt-2 md:mt-0">
             <span className="text-xs text-gray-400">Total Amount</span>
@@ -104,11 +96,24 @@ const OrderDetails = () => {
             {order.status === "Processing" && <BsClockHistory size={18} />}
             {!order.status && <BsClockHistory size={18} />}
             
-            <div>
+            <div className="flex-grow">
               <p className="font-medium">Status: {order.status || "Processing"}</p>
               <p className="text-xs text-gray-400">
                 Last Updated: {formatDate(order.updatedAt)}
               </p>
+            </div>
+
+            {/* Payment Status Badge */}
+            <div 
+              className={`px-3 py-1.5 rounded-full text-sm ${
+                order.payment_status === "Completed" 
+                  ? "bg-green-900/30 text-green-500" 
+                  : order.payment_status === "Failed"
+                  ? "bg-red-900/30 text-red-500"
+                  : "bg-yellow-900/30 text-yellow-500"
+              }`}
+            >
+              Payment: {order.payment_status}
             </div>
           </div>
         </div>
@@ -165,7 +170,7 @@ const OrderDetails = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Items Total</span>
-                  <span>{getINRString(order.subtotal_amount)}</span>
+                  <span>{getINRString(order.sub_total_amount)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Shipping Fee</span>
@@ -201,7 +206,7 @@ const OrderDetails = () => {
               </p>
               <p className="text-sm text-gray-400">
                 {order.delivery_address?.address_line_1}
-                {order.delivery_address?.address_line_2 && `, ${order.delivery_address.address_line_2}`}
+                {order.delivery_address?.address_line_2 && `, ${order.delivery_address?.address_line_2}`}
               </p>
               <p className="text-sm text-gray-400">
                 {order.delivery_address?.city}, {order.delivery_address?.state}, {order.delivery_address?.pincode}
@@ -224,20 +229,27 @@ const OrderDetails = () => {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-400">Payment Method</span>
-                <span className="font-medium">{order.payment_method}</span>
+                <span className="font-medium">{order.payment_mode}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Payment Status</span>
                 <span className={`font-medium ${
-                  order.payment_method === "COD" ? "text-yellow-400" : "text-green-500"
+                  order.payment_status === "Pending" ? "text-yellow-400" : 
+                  order.payment_status === "Completed" ? "text-green-500" : "text-red-500"
                 }`}>
-                  {order.payment_method === "COD" ? "Pending" : "Paid"}
+                  {order.payment_status}
                 </span>
               </div>
-              {order.payment_id && (
+              {order.razorpay_order_id && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Order Reference</span>
+                  <span className="font-mono text-xs">{order.razorpay_order_id.substring(0, 15)}...</span>
+                </div>
+              )}
+              {order.razorpay_payment_id && (
                 <div className="flex justify-between">
                   <span className="text-gray-400">Transaction ID</span>
-                  <span className="font-mono text-xs">{order.payment_id}</span>
+                  <span className="font-mono text-xs">{order.razorpay_payment_id.substring(0, 15)}...</span>
                 </div>
               )}
             </div>
@@ -251,6 +263,16 @@ const OrderDetails = () => {
             <button onClick={() => navigate("/dashboard/my-orders")} className="w-full py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium">
               Back to My Orders
             </button>
+            {order.invoice_receipt && (
+              <a 
+                href={order.invoice_receipt}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 bg-transparent border border-gray-700 hover:bg-gray-800 text-gray-300 rounded-lg font-medium flex items-center justify-center gap-2"
+              >
+                <span>Download Invoice</span>
+              </a>
+            )}
             <button 
               onClick={() => window.print()}
               className="w-full py-2.5 bg-transparent border border-gray-700 hover:bg-gray-800 text-gray-300 rounded-lg font-medium flex items-center justify-center gap-2"
