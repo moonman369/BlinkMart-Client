@@ -8,7 +8,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
 import { apiSummary } from "../config/api/apiSummary";
 
-const OrderStatusBadge = ({ status }) => {
+const OrderStatusBadge = ({ status, paymentStatus }) => {
   const getStatusDetails = () => {
     switch (status) {
       case "Processing":
@@ -72,7 +72,6 @@ const MyOrders = () => {
         response.status ===
         apiSummary.endpoints.order.getAllOrders.successStatus
       ) {
-        console.log(response);
         // Sort orders by date (most recent first)
         const sortedOrders = [...(response.data.data || [])].sort((a, b) => {
           // Convert string dates to Date objects and compare
@@ -150,16 +149,6 @@ const MyOrders = () => {
   if (orders.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8 min-h-[calc(100vh-8rem)]">
-        <div className="flex items-center mb-6">
-          <Link
-            to="/dashboard"
-            className="flex items-center gap-2 text-gray-400 hover:text-gray-300"
-          >
-            <FaArrowLeft size={14} />
-            <span>Back to Dashboard</span>
-          </Link>
-        </div>
-
         <div className="flex flex-col items-center justify-center text-center h-[60vh]">
           <FaBoxOpen size={60} className="text-gray-600 mb-4" />
           <h2 className="text-xl font-semibold mb-2">No Orders Yet</h2>
@@ -229,7 +218,10 @@ const MyOrders = () => {
                 </div>
 
                 <div className="flex items-center gap-2 mt-2 md:mt-0">
-                  <OrderStatusBadge status={order.status || "Processing"} />
+                  <OrderStatusBadge
+                    status={order.status || "Processing"}
+                    paymentStatus={order.payment_status}
+                  />
                   <Link
                     to={`/dashboard/my-orders/${order.order_id}`} // Fix path to match route definition
                     state={{ orderData: order }} // Pass the entire order object as state
@@ -254,11 +246,11 @@ const MyOrders = () => {
                       </div>
                       <div className="flex-grow min-w-0">
                         <h4 className="text-sm font-medium text-gray-300 truncate">
-                          {item.product?.name}
+                          {item.product_id?.name}
                         </h4>
                         <div className="flex justify-between text-xs text-gray-400 mt-1">
                           <span>Qty: {item?.quantity}</span>
-                          <span>{getINRString(item?.product_id.price)}</span>
+                          <span>{getINRString(item?.product_id?.price)}</span>
                         </div>
                       </div>
                     </div>
@@ -277,15 +269,17 @@ const MyOrders = () => {
                   <div className="flex flex-col gap-1">
                     <span className="text-xs text-gray-400">Payment:</span>
                     <span className="flex items-center gap-1.5">
-                      <span className="text-sm">{order.payment_method}</span>
+                      <span className="text-sm">{order.payment_mode}</span>
                       <span
                         className={`text-xs px-1.5 py-0.5 rounded ${
-                          order.payment_method === "COD"
+                          order.payment_status === "Pending"
                             ? "bg-amber-400/20 text-amber-400"
-                            : "bg-green-400/20 text-green-400"
+                            : order.payment_status === "Completed"
+                            ? "bg-green-400/20 text-green-400"
+                            : "bg-red-400/20 text-red-400"
                         }`}
                       >
-                        {order.payment_method === "COD" ? "Pending" : "Paid"}
+                        {order.payment_status}
                       </span>
                     </span>
                   </div>

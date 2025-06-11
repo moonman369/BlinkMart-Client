@@ -160,29 +160,28 @@ const Checkout = () => {
       return;
     }
 
-    const methodOptions = {
-      card: { card: true, upi: false, netbanking: false },
-      upi: { card: false, upi: true, netbanking: false },
-      netbanking: { card: false, upi: false, netbanking: true },
-    };
+    // Get the correct RAZORPAY_KEY_ID
+    const RAZORPAY_KEY_ID = import.meta.env.VITE_APP_RAZORPAY_KEY_ID;
 
-    console.log(RAZORPAY_KEY_ID);
+    if (!RAZORPAY_KEY_ID) {
+      console.error("Razorpay key not found in environment variables");
+      toast.error("Payment configuration error. Please contact support.");
+      return;
+    }
+
+    // Base options for all payment methods
     const options = {
-      key: RAZORPAY_KEY_ID, // Replace with your Razorpay Test Key ID
-      amount: totalAmount, // Already in paise
+      key: RAZORPAY_KEY_ID,
+      amount: totalAmount,
       currency: "INR",
-      name: "My Store",
+      name: "BlinkMart",
       description: "Order Payment",
-      order_id: orderId, // 👈 From backend
+      order_id: orderId,
       handler: async function (response) {
-        // ✅ This function is called when payment is successful
-        alert("Payment successful!");
+        toast.success("Payment successful!");
         console.log("Payment ID:", response.razorpay_payment_id);
         console.log("Order ID:", response.razorpay_order_id);
         console.log("Signature:", response.razorpay_signature);
-
-        // 🔐 (Optional) Call backend to verify signature
-        // axios.post("/api/verify-payment", response);
         await handlePaymentSuccess(response);
       },
       prefill: {
@@ -192,14 +191,82 @@ const Checkout = () => {
       },
       notes: {
         address: "BlinkMart",
+        order_id: orderId,
       },
       theme: {
-        color: "#3399cc",
+        color: "#00b050",
       },
-      method: methodOptions[paymentMethodsToRzpMap[paymentMethod]],
+      modal: {
+        ondismiss: function() {
+          console.log("Payment cancelled by user");
+          toast.error("Payment cancelled");
+        }
+      }
     };
 
+    // Map payment method to Razorpay's method names
+    const paymentMethodMap = {
+      "Card": "card",
+      "UPI": "upi",
+      "Net Banking": "netbanking"
+    };
+
+    // Apply the mapped method if it's not COD
+    if (paymentMethod !== "COD" && paymentMethodMap[paymentMethod]) {
+      options.method = paymentMethodMap[paymentMethod];
+      
+      // This is the key part: Configure specific payment method settings and hide others
+      // These settings control which payment blocks are shown/hidden in the Razorpay modal
+      options.config = {
+        display: {
+          blocks: {},
+          sequence: [],
+          preferences: {
+            show_default_blocks: false
+          }
+        }
+      };
+      
+      // Only add the selected payment method block
+      switch(paymentMethod) {
+        case "Card":
+          options.config.display.blocks.card = {
+            name: "Pay with Card",
+            instruments: [{ method: "card" }]
+          };
+          options.config.display.sequence = ["block.card"];
+          break;
+        
+        case "UPI":
+          options.config.display.blocks.upi = {
+            name: "Pay using UPI",
+            instruments: [{
+              method: "upi",
+              flow: "all",
+              apps: ["google_pay", "phonepe", "paytm", "amazon_pay", "bhim"]
+            }]
+          };
+          options.config.display.sequence = ["block.upi"];
+          break;
+        
+        case "Net Banking":
+          options.config.display.blocks.netbanking = {
+            name: "Pay via Net Banking",
+            instruments: [{ method: "netbanking" }]
+          };
+          options.config.display.sequence = ["block.netbanking"];
+          break;
+      }
+    }
+
     const rzp = new window.Razorpay(options);
+
+    // Event handler for payment failure
+    rzp.on("payment.failed", function (response) {
+      console.error("Payment failed:", response.error);
+      toast.error(`Payment failed: ${response.error.description}`);
+    });
+
     rzp.open();
   };
 
@@ -209,19 +276,43 @@ const Checkout = () => {
       response;
 
     try {
+      setLoading(true);
       const result = await customAxios.post("/api/v1/order/verify-payment", {
         razorpay_order_id,
         razorpay_payment_id,
         razorpay_signature,
-        orderId: yourOrderId, // If needed
       });
 
       if (result.data.success) {
+        // Clear the cart
+        await performClearCart();
+
         // Show success message
+        toast.success("Payment verified successfully!");
+
         // Redirect to order confirmation page
+        navigate("/order-confirmation", {
+          state: {
+            orderId: result.data.data.order_id, // Get order ID from the response
+            address: selectedAddress,
+            paymentMethod: paymentMethod,
+            cartItems,
+            totalAmount: totalAmount + 50 + 18, // Including shipping and tax
+            paymentId: razorpay_payment_id,
+            orderReference: razorpay_order_id,
+          },
+        });
+      } else {
+        throw new Error("Payment verification failed");
       }
     } catch (error) {
-      // Handle error
+      console.error("Payment verification error:", error);
+      toast.error("Payment verification failed. Please contact support.");
+
+      // Navigate to orders page so they can see their order status
+      navigate("/dashboard/my-orders");
+    } finally {
+      setLoading(false);
     }
   };
 
