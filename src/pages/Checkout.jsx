@@ -124,12 +124,19 @@ const Checkout = () => {
         // Get the payment URL from the response
         const { razorpayOrderId, amount } =
           response?.data?.data?.paymentDetails;
-        console.log("Online", response);
+        console.log("Online order created:", response.data.data);
+
+        // Store the order_id in localStorage to handle potential payment failures
+        localStorage.setItem("pendingOrderId", response.data.data.order_id);
+
+        // Initialize payment
         handlePayment(paymentMethod, razorpayOrderId, amount);
+      } else {
+        throw new Error("Failed to create order");
       }
     } catch (error) {
+      console.error("Error creating online order:", error);
       showToast.error("Failed to process online payment. Please try again.");
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -201,7 +208,13 @@ const Checkout = () => {
         ondismiss: function () {
           console.log("Payment cancelled by user");
           showToast.error("Payment cancelled");
+
+          // Handle the payment cancellation
+          handlePaymentCancelled(orderId);
         },
+        escape: false, // Prevent closing with ESC key
+        animation: true, // Enable animations
+        handleBackButton: true, // Handle back button press on mobile
       },
     };
 
@@ -263,14 +276,88 @@ const Checkout = () => {
     }
 
     const rzp = new window.Razorpay(options);
+    console.log(rzp);
+
+    rzp.open();
 
     // Event handler for payment failure
     rzp.on("payment.failed", function (response) {
+      rzp.close();
       console.error("Payment failed:", response.error);
       showToast.error(`Payment failed: ${response.error.description}`);
-    });
 
-    rzp.open();
+      handlePaymentFailed(orderId, response.error);
+
+      // Close the Razorpay modal
+      rzp.close();
+    });
+  };
+
+  // Add these new handlers for payment cancellation and failure
+  const handlePaymentCancelled = async (orderId) => {
+    try {
+      setLoading(true);
+
+      // Call API to update the order status as cancelled
+      const response = await customAxios.post("/api/v1/order/cancel-payment", {
+        order_id: orderId,
+        reason: "Payment cancelled by user",
+      });
+
+      if (response.data.success) {
+        // Redirect to orders page
+        navigate("/dashboard/my-orders");
+      } else {
+        throw new Error("Could not update order status");
+      }
+    } catch (error) {
+      console.error("Error handling payment cancellation:", error);
+      // Still navigate to orders so user can see their order
+      navigate("/dashboard/my-orders");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePaymentFailed = async (orderId, error) => {
+    try {
+      setLoading(true);
+
+      // Call API to update the order status as payment failed
+      const response = await customAxios.post(
+        apiSummary.endpoints.order.paymentFailed.path,
+        {
+          razorpay_order_id: orderId,
+          cancel_reason: "Payment failed",
+          error_code: error.code,
+          error_description: error.description,
+          error_source: error.source,
+          error_step: error.step,
+          error_reason: error.reason,
+        }
+      );
+
+      if (
+        response.status ===
+        apiSummary.endpoints.order.paymentFailed.successStatus
+      ) {
+        // Provide user with options
+        showToast.error(
+          "Payment failed. You can try again from your orders page."
+        );
+
+        // After a slight delay, navigate to orders
+        setTimeout(() => {
+          navigate("/dashboard/my-orders");
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Error handling payment failure:", error);
+      // Still navigate to orders so user can see their order
+      navigate("/dashboard/my-orders");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Example frontend code
@@ -289,6 +376,9 @@ const Checkout = () => {
       if (result.data.success) {
         // Clear the cart
         await performClearCart();
+
+        // Clear the pending order ID from localStorage
+        localStorage.removeItem("pendingOrderId");
 
         // Show success message
         showToast.success("Payment verified successfully!");
