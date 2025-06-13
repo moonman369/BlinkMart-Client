@@ -12,6 +12,7 @@ import { axiosToastError } from "../util/axiosToastError";
 import toast from "react-hot-toast";
 import customAxios from "../util/customAxios";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { showToast } from "../config/toastConfig";
 
 const UploadProduct = () => {
   const [productData, setProductData] = useState({
@@ -143,7 +144,7 @@ const UploadProduct = () => {
         !productData.subcategories.length ||
         !productData.image.length
       ) {
-        toast.error(
+        showToast.error(
           "Missing one or more required fields: [name, image, categories, subcategories, unit, stock, price, description]"
         );
         setProcessing(false);
@@ -189,7 +190,7 @@ const UploadProduct = () => {
         response.status ===
         apiSummary.endpoints.product.addProduct.successStatus
       ) {
-        toast.success(response.data.message);
+        showToast.success(response.data.message);
         setProductData({
           name: "",
           image: [],

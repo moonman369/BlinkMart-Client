@@ -5,6 +5,7 @@ import { apiSummary } from "../config/api/apiSummary";
 import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError";
 import useScrollLock from "../hooks/useScrollLock";
+import { showToast } from "../config/toastConfig";
 
 const DeleteSubcategoryModal = ({
   closeModal,
@@ -28,7 +29,7 @@ const DeleteSubcategoryModal = ({
         deleteResponse.status ===
         apiSummary.endpoints.subcategory.deleteSubcategory.successStatus
       ) {
-        toast.success("Successfully deleted subcategory! ✅");
+        showToast.success("Successfully deleted subcategory! ✅");
         fetchSubcategories();
         closeModal();
       }

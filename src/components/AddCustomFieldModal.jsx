@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { IoClose } from "react-icons/io5";
+import { showToast } from "../config/toastConfig";
 
 const AddCustomFieldModal = ({ closeModal, customFields, setCustomFields }) => {
   const [newField, setNewField] = useState("");
@@ -14,11 +15,11 @@ const AddCustomFieldModal = ({ closeModal, customFields, setCustomFields }) => {
     try {
       setProcessing(true);
       if (!newField) {
-        toast.error("Field Name is required!");
+        showToast.error("Field Name is required!");
         return;
       }
       if (Object.keys(customFields).includes(newField)) {
-        toast.error("Field already added!");
+        showToast.error("Field already added!");
         return;
       }
       console.log("newField", newField);
@@ -31,11 +32,11 @@ const AddCustomFieldModal = ({ closeModal, customFields, setCustomFields }) => {
           },
         };
       });
-      toast.success("Custom Field added successfully!");
+      showToast.success("Custom Field added successfully!");
       closeModal();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to add custom field!");
+      showToast.error("Failed to add custom field!");
     } finally {
       setProcessing(false);
     }

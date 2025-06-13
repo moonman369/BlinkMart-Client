@@ -5,6 +5,7 @@ import { apiSummary } from "../config/api/apiSummary";
 import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError";
 import useScrollLock from "../hooks/useScrollLock";
+import { showToast } from "../config/toastConfig";
 
 const DeleteProductModal = ({ closeModal, product, fetchProducts }) => {
   const [processing, setProcessing] = useState(false);
@@ -24,7 +25,7 @@ const DeleteProductModal = ({ closeModal, product, fetchProducts }) => {
         deleteResponse.status ===
         apiSummary.endpoints.product.deleteProduct.successStatus
       ) {
-        toast.success("Successfully deleted product! ✅");
+        showToast.success("Successfully deleted product! ✅");
         fetchProducts();
         closeModal();
       }

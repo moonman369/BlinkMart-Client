@@ -31,6 +31,7 @@ import CookieConsent from "./components/CookieConsent";
 import { fetchAllCartItems } from "./util/fetchAllCartItems";
 import { addToCart } from "./store/cartSlice";
 import { setAddresses } from "./store/addressSlice";
+import { CustomToaster } from "./config/toastConfig";
 
 function App() {
   const dispatch = useDispatch();
@@ -44,7 +45,7 @@ function App() {
     const cookiesEnabled = navigator.cookieEnabled;
 
     if (!cookiesEnabled) {
-      toast.error(
+      showToast.error(
         "Please enable cookies in your browser settings to use this application."
       );
       setCookiesEnabled(false);
@@ -52,7 +53,7 @@ function App() {
     }
 
     if (cookieConsent === "declined") {
-      toast.error(
+      showToast.error(
         "Cookies are required to use this application. Please accept cookies to continue."
       );
       setCookiesEnabled(false);
@@ -141,7 +142,7 @@ function App() {
       dispatch(setUserDetails(userData?.data?.data));
     } catch (error) {
       console.error("Fetch User Error: ", error);
-      toast.error("Error fetching user details!");
+      showToast.error("Error fetching user details!");
     }
   };
 
@@ -163,7 +164,7 @@ function App() {
       );
     } catch (error) {
       console.error("Fetch Categories Error: ", error);
-      toast.error("Error fetching categories!");
+      showToast.error("Error fetching categories!");
     } finally {
       dispatch(setLoadingCategory(false));
     }
@@ -198,7 +199,7 @@ function App() {
       );
     } catch (error) {
       console.error("Fetch Subcategories Error: ", error);
-      toast.error("Error fetching subcategories!");
+      showToast.error("Error fetching subcategories!");
     }
   };
 
@@ -221,7 +222,7 @@ function App() {
       );
     } catch (error) {
       console.error("Fetch Products Error: ", error);
-      toast.error("Error fetching products!");
+      showToast.error("Error fetching products!");
     }
   };
 
@@ -235,7 +236,7 @@ function App() {
       }
     } catch (error) {
       console.error("Fetch Cart Items Error: ", error);
-      toast.error("Error fetching cart items!");
+      showToast.error("Error fetching cart items!");
     }
   };
 
@@ -256,7 +257,7 @@ function App() {
       }
     } catch (error) {
       console.error("Fetch Addresses Error: ", error);
-      toast.error("Error fetching addresses!");
+      showToast.error("Error fetching addresses!");
     }
   };
 
@@ -289,24 +290,15 @@ function App() {
   }, [user, location.pathname]);
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-900 text-gray-100">
       <Header />
       <main className="min-h-[calc(100vh-8rem)] pb-2">
         <Outlet />
       </main>
       <Footer />
       <CookieConsent />
-      <Toaster
-        toastOptions={{
-          style: {
-            background: "#1f2937",
-            color: "#d1d5db",
-          },
-          duration: 3000,
-          dismissOnClick: true,
-        }}
-      />
-    </>
+      <CustomToaster />
+    </div>
   );
 }
 

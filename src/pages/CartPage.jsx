@@ -11,6 +11,7 @@ import { addToCart, clearCart } from "../store/cartSlice";
 import toast from "react-hot-toast";
 import ClearCartModal from "../components/ClearCartModal";
 import { use } from "react";
+import { showToast } from "../config/toastConfig";
 
 const CartPage = () => {
   const cart = useSelector((state) => state.cart);
@@ -30,11 +31,11 @@ const CartPage = () => {
         response.status === apiSummary.endpoints.cart.clearCart.successStatus
       ) {
         dispatch(clearCart());
-        toast.success("Cart cleared successfully!");
+        showToast.success("Cart cleared successfully!");
         setShowClearCartModal(false);
       }
     } catch (error) {
-      toast.error("Failed to clear cart");
+      showToast.error("Failed to clear cart");
     }
   };
 
@@ -167,7 +168,10 @@ const CartPage = () => {
               </div>
 
               <div className="space-y-2 lg:space-y-3">
-                <button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 lg:py-4 px-4 rounded-lg" onClick={redirectToCheckout}>
+                <button
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 lg:py-4 px-4 rounded-lg"
+                  onClick={redirectToCheckout}
+                >
                   <span className="text-sm lg:text-base">
                     Proceed to Checkout
                   </span>

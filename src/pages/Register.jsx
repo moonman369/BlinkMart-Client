@@ -5,6 +5,7 @@ import customAxios from "../util/customAxios";
 import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import { Link, useNavigate } from "react-router-dom";
+import { showToast } from "../config/toastConfig";
 
 const Register = () => {
   const [userData, setUserData] = useState({
@@ -51,11 +52,11 @@ const Register = () => {
     try {
       e.preventDefault();
       if (!isUserDataPopulated) {
-        toast.error("Fill in all the user details and try again!");
+        showToast.error("Fill in all the user details and try again!");
         return;
       }
       if (!passwordsMatch) {
-        toast.error("Password and Confirm Password don't match!");
+        showToast.error("Password and Confirm Password don't match!");
         return;
       }
 
@@ -73,7 +74,7 @@ const Register = () => {
       if (
         response?.status === apiSummary.endpoints.user.register.successStatus
       ) {
-        toast.success("User has been created successfully!🎉");
+        showToast.success("User has been created successfully!🎉");
       }
       navigate("/login");
     } catch (error) {

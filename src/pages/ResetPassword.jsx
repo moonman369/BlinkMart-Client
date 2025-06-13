@@ -5,6 +5,7 @@ import customAxios from "../util/customAxios";
 import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { showToast } from "../config/toastConfig";
 
 const ResetPassword = () => {
   const [userData, setUserData] = useState({
@@ -56,7 +57,7 @@ const ResetPassword = () => {
     try {
       e.preventDefault();
       if (!isUserDataPopulated) {
-        toast.error("Fill in all the user details and try again!");
+        showToast.error("Fill in all the user details and try again!");
         return;
       }
 
@@ -75,7 +76,7 @@ const ResetPassword = () => {
         response?.status ===
         apiSummary.endpoints.user.resetPassword.successStatus
       ) {
-        toast.success("Your Password has been successfully reset!🎉");
+        showToast.success("Your Password has been successfully reset!🎉");
       }
       navigate("/login");
     } catch (error) {

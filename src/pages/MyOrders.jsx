@@ -7,6 +7,7 @@ import { getAllOrders } from "../util/orderMethods";
 import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
 import { apiSummary } from "../config/api/apiSummary";
+import { showToast } from "../config/toastConfig";
 
 const OrderStatusBadge = ({ status, paymentStatus }) => {
   const getStatusDetails = () => {
@@ -84,7 +85,7 @@ const MyOrders = () => {
     } catch (error) {
       console.error("Error fetching orders:", error);
       setError("Failed to load your orders. Please try again later.");
-      toast.error("Failed to load orders");
+      showToast.error("Failed to load orders");
     } finally {
       setLoading(false);
     }
@@ -192,9 +193,7 @@ const MyOrders = () => {
             <div
               key={order._id}
               className={`bg-gray-900/50 rounded-lg border ${
-                isRecentOrder
-                  ? "border-secondary-200/30"
-                  : "border-gray-800"
+                isRecentOrder ? "border-secondary-200/30" : "border-gray-800"
               } overflow-hidden`}
             >
               {/* Order header */}
@@ -213,7 +212,9 @@ const MyOrders = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-400">Placed on:</span>
-                    <span className="text-sm">{formatDate(order.createdAt)}</span>
+                    <span className="text-sm">
+                      {formatDate(order.createdAt)}
+                    </span>
                   </div>
                 </div>
 
@@ -239,7 +240,9 @@ const MyOrders = () => {
                     <div key={item._id} className="flex gap-3 items-center">
                       <div className="bg-gray-800 p-1.5 rounded w-12 h-12 shrink-0">
                         <img
-                          src={item?.product_id?.image?.[0] || "placeholder.jpg"}
+                          src={
+                            item?.product_id?.image?.[0] || "placeholder.jpg"
+                          }
                           alt={item?.product_id?.name}
                           className="w-full h-full object-cover rounded"
                         />

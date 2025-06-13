@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError";
 import { fetchUserDetails } from "../util/fetchUserDetails";
 import { setUserDetails } from "../store/userSlice";
+import { showToast } from "../config/toastConfig";
 
 const Profile = () => {
   const user = useSelector((state) => state.user);
@@ -64,7 +65,7 @@ const Profile = () => {
           setUserDataUpdated(false);
           const freshUserData = await fetchUserDetails();
           dispatch(setUserDetails(freshUserData?.data?.data));
-          toast.success(response?.data?.message);
+          showToast.success(response?.data?.message);
         }
       }
     } catch (error) {

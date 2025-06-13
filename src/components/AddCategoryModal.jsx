@@ -8,6 +8,7 @@ import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import { useDispatch } from "react-redux";
 import useScrollLock from "../hooks/useScrollLock";
+import { showToast } from "../config/toastConfig";
 
 const AddCategoryModal = ({ fetchCategories, closeModal }) => {
   const [newCategoryData, setNewCategoryData] = useState({
@@ -31,7 +32,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
     try {
       setProcessing(true);
       if (!newCategoryData.name) {
-        toast.error("Category Name is required!");
+        showToast.error("Category Name is required!");
         return;
       }
       const formData = new FormData();
@@ -49,7 +50,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
       ) {
         fetchCategories();
         // dispatch(setAllCategories(response.data.data));
-        toast.success(response.data.message);
+        showToast.success(response.data.message);
         closeModal();
       }
     } catch (error) {
@@ -70,7 +71,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
           image: file,
         }));
       } else {
-        toast.error(
+        showToast.error(
           `Invalid file format! Choose a format from this list: ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/heif', 'image/heic']`
         );
       }

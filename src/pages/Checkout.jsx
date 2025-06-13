@@ -15,6 +15,7 @@ import { clearCart } from "../store/cartSlice"; // Import clearCart action
 import customAxios from "../util/customAxios";
 import { loadRazorpayScript } from "../util/razorPay";
 import { paymentMethodsToRzpMap } from "../util/constants";
+import { showToast } from "../config/toastConfig";
 
 const Checkout = () => {
   const location = useLocation();
@@ -51,7 +52,7 @@ const Checkout = () => {
 
   const handlePlaceCodOrder = async () => {
     if (!selectedAddress) {
-      toast.error("Please select a delivery address");
+      showToast.error("Please select a delivery address");
       return;
     }
     setLoading(true);
@@ -76,7 +77,7 @@ const Checkout = () => {
         // Clear the cart after successful order
         await performClearCart();
         console.log(response);
-        toast.success("Order placed successfully!");
+        showToast.success("Order placed successfully!");
         navigate("/order-confirmation", {
           state: {
             orderId: response?.data?.data?.order_id,
@@ -88,7 +89,7 @@ const Checkout = () => {
         });
       }
     } catch (error) {
-      toast.error("Failed to place order. Please try again.");
+      showToast.error("Failed to place order. Please try again.");
       console.error(error);
     } finally {
       setLoading(false);
@@ -97,7 +98,7 @@ const Checkout = () => {
 
   const handlePlaceOnlineOrder = async () => {
     if (!selectedAddress) {
-      toast.error("Please select a delivery address");
+      showToast.error("Please select a delivery address");
       return;
     }
     setLoading(true);
@@ -127,7 +128,7 @@ const Checkout = () => {
         handlePayment(paymentMethod, razorpayOrderId, amount);
       }
     } catch (error) {
-      toast.error("Failed to process online payment. Please try again.");
+      showToast.error("Failed to process online payment. Please try again.");
       console.error(error);
     } finally {
       setLoading(false);
@@ -148,7 +149,7 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error("Failed to clear cart:", error);
-      toast.error("Failed to clear cart");
+      showToast.error("Failed to clear cart");
     }
   };
 
@@ -156,7 +157,7 @@ const Checkout = () => {
     const res = await loadRazorpayScript();
 
     if (!res) {
-      toast.error("Razorpay SDK failed to load. Please try again later.");
+      showToast.error("Razorpay SDK failed to load. Please try again later.");
       return;
     }
 
@@ -165,7 +166,7 @@ const Checkout = () => {
 
     if (!RAZORPAY_KEY_ID) {
       console.error("Razorpay key not found in environment variables");
-      toast.error("Payment configuration error. Please contact support.");
+      showToast.error("Payment configuration error. Please contact support.");
       return;
     }
 
@@ -178,7 +179,7 @@ const Checkout = () => {
       description: "Order Payment",
       order_id: orderId,
       handler: async function (response) {
-        toast.success("Payment successful!");
+        showToast.success("Payment successful!");
         console.log("Payment ID:", response.razorpay_payment_id);
         console.log("Order ID:", response.razorpay_order_id);
         console.log("Signature:", response.razorpay_signature);
@@ -197,24 +198,24 @@ const Checkout = () => {
         color: "#00b050",
       },
       modal: {
-        ondismiss: function() {
+        ondismiss: function () {
           console.log("Payment cancelled by user");
-          toast.error("Payment cancelled");
-        }
-      }
+          showToast.error("Payment cancelled");
+        },
+      },
     };
 
     // Map payment method to Razorpay's method names
     const paymentMethodMap = {
-      "Card": "card",
-      "UPI": "upi",
-      "Net Banking": "netbanking"
+      Card: "card",
+      UPI: "upi",
+      "Net Banking": "netbanking",
     };
 
     // Apply the mapped method if it's not COD
     if (paymentMethod !== "COD" && paymentMethodMap[paymentMethod]) {
       options.method = paymentMethodMap[paymentMethod];
-      
+
       // This is the key part: Configure specific payment method settings and hide others
       // These settings control which payment blocks are shown/hidden in the Razorpay modal
       options.config = {
@@ -222,37 +223,39 @@ const Checkout = () => {
           blocks: {},
           sequence: [],
           preferences: {
-            show_default_blocks: false
-          }
-        }
+            show_default_blocks: false,
+          },
+        },
       };
-      
+
       // Only add the selected payment method block
-      switch(paymentMethod) {
+      switch (paymentMethod) {
         case "Card":
           options.config.display.blocks.card = {
             name: "Pay with Card",
-            instruments: [{ method: "card" }]
+            instruments: [{ method: "card" }],
           };
           options.config.display.sequence = ["block.card"];
           break;
-        
+
         case "UPI":
           options.config.display.blocks.upi = {
             name: "Pay using UPI",
-            instruments: [{
-              method: "upi",
-              flow: "all",
-              apps: ["google_pay", "phonepe", "paytm", "amazon_pay", "bhim"]
-            }]
+            instruments: [
+              {
+                method: "upi",
+                flow: "all",
+                apps: ["google_pay", "phonepe", "paytm", "amazon_pay", "bhim"],
+              },
+            ],
           };
           options.config.display.sequence = ["block.upi"];
           break;
-        
+
         case "Net Banking":
           options.config.display.blocks.netbanking = {
             name: "Pay via Net Banking",
-            instruments: [{ method: "netbanking" }]
+            instruments: [{ method: "netbanking" }],
           };
           options.config.display.sequence = ["block.netbanking"];
           break;
@@ -264,7 +267,7 @@ const Checkout = () => {
     // Event handler for payment failure
     rzp.on("payment.failed", function (response) {
       console.error("Payment failed:", response.error);
-      toast.error(`Payment failed: ${response.error.description}`);
+      showToast.error(`Payment failed: ${response.error.description}`);
     });
 
     rzp.open();
@@ -288,7 +291,7 @@ const Checkout = () => {
         await performClearCart();
 
         // Show success message
-        toast.success("Payment verified successfully!");
+        showToast.success("Payment verified successfully!");
 
         // Redirect to order confirmation page
         navigate("/order-confirmation", {
@@ -307,7 +310,7 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error("Payment verification error:", error);
-      toast.error("Payment verification failed. Please contact support.");
+      showToast.error("Payment verification failed. Please contact support.");
 
       // Navigate to orders page so they can see their order status
       navigate("/dashboard/my-orders");
