@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux"; // Add useDispatch
 import { TiShoppingCart } from "react-icons/ti";
@@ -31,6 +31,7 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("COD"); // Set default to COD
+  const paymentAttemptedRef = useRef(false);
 
   useEffect(() => {
     // Redirect if no cart items
@@ -80,11 +81,12 @@ const Checkout = () => {
         showToast.success("Order placed successfully!");
         navigate("/order-confirmation", {
           state: {
-            orderId: response?.data?.data?.order_id,
+            orderId: response.data.data.order_id,
             address: selectedAddress,
             paymentMethod: "COD",
             cartItems,
             totalAmount: totalAmount + 50 + 18, // Including shipping and tax
+            paymentStatus: "COD", // <-- Pass this for COD
           },
         });
       }
@@ -124,13 +126,14 @@ const Checkout = () => {
         // Get the payment URL from the response
         const { razorpayOrderId, amount } =
           response?.data?.data?.paymentDetails;
+        const { order_id } = response?.data?.data?.order;
         console.log("Online order created:", response.data.data);
 
         // Store the order_id in localStorage to handle potential payment failures
         localStorage.setItem("pendingOrderId", response.data.data.order_id);
 
         // Initialize payment
-        handlePayment(paymentMethod, razorpayOrderId, amount);
+        handlePayment(paymentMethod, order_id, razorpayOrderId, amount);
       } else {
         throw new Error("Failed to create order");
       }
@@ -160,7 +163,12 @@ const Checkout = () => {
     }
   };
 
-  const handlePayment = async (paymentMethod, orderId, totalAmount) => {
+  const handlePayment = async (
+    paymentMethod,
+    order_id,
+    razorpay_order_id,
+    totalAmount
+  ) => {
     const res = await loadRazorpayScript();
 
     if (!res) {
@@ -184,7 +192,7 @@ const Checkout = () => {
       currency: "INR",
       name: "BlinkMart",
       description: "Order Payment",
-      order_id: orderId,
+      order_id: razorpay_order_id,
       handler: async function (response) {
         showToast.success("Payment successful!");
         console.log("Payment ID:", response.razorpay_payment_id);
@@ -195,22 +203,27 @@ const Checkout = () => {
       prefill: {
         name: user?.username || "John Doe",
         email: user?.email || "john@example.com",
-        contact: user?.mobile || "9876543210",
+        contact: user?.mobile || "0000000000",
       },
       notes: {
         address: "BlinkMart",
-        order_id: orderId,
+        order_id: razorpay_order_id,
       },
       theme: {
         color: "#00b050",
       },
+      retry: {
+        enabled: false,
+      },
       modal: {
         ondismiss: function () {
-          console.log("Payment cancelled by user");
-          showToast.error("Payment cancelled");
-
-          // Handle the payment cancellation
-          handlePaymentCancelled(orderId);
+          setTimeout(() => {
+            console.log(paymentAttemptedRef.current);
+            if (paymentAttemptedRef.current === false) {
+              showToast.error("Payment cancelled by user");
+              handlePaymentCancelled(order_id, razorpay_order_id);
+            }
+          }, 1000); // Delay to allow any pending actions to complete
         },
         escape: false, // Prevent closing with ESC key
         animation: true, // Enable animations
@@ -276,39 +289,49 @@ const Checkout = () => {
     }
 
     const rzp = new window.Razorpay(options);
-    console.log(rzp);
-
-    rzp.open();
 
     // Event handler for payment failure
     rzp.on("payment.failed", function (response) {
-      rzp.close();
+      console.log(paymentAttemptedRef.current);
       console.error("Payment failed:", response.error);
       showToast.error(`Payment failed: ${response.error.description}`);
-
-      handlePaymentFailed(orderId, response.error);
-
-      // Close the Razorpay modal
-      rzp.close();
+      handlePaymentFailed(order_id, razorpay_order_id, response.error);
     });
+    rzp.open();
   };
 
   // Add these new handlers for payment cancellation and failure
-  const handlePaymentCancelled = async (orderId) => {
+  const handlePaymentCancelled = async (order_id, razorpay_order_id) => {
     try {
       setLoading(true);
 
       // Call API to update the order status as cancelled
-      const response = await customAxios.post("/api/v1/order/cancel-payment", {
-        order_id: orderId,
-        reason: "Payment cancelled by user",
-      });
+      const response = await customAxios.post(
+        apiSummary.endpoints.order.paymentCancelled.path,
+        {
+          razorpay_order_id: razorpay_order_id,
+          reason: "Payment cancelled by user",
+        }
+      );
 
-      if (response.data.success) {
+      if (
+        response.status ===
+        apiSummary.endpoints.order.paymentCancelled.successStatus
+      ) {
+        console.log(response);
         // Redirect to orders page
-        navigate("/dashboard/my-orders");
-      } else {
-        throw new Error("Could not update order status");
+        navigate("/order-confirmation", {
+          state: {
+            orderId: order_id, // Get order ID from the response
+            address: selectedAddress,
+            paymentMethod: paymentMethod,
+            cartItems,
+            totalAmount: totalAmount + 50 + 18, // Including shipping and tax
+            orderReference: razorpay_order_id, // Pass the order reference
+            paymentId: null, // No payment ID since it was cancelled
+            paymentStatus: "Cancelled", // <-- Added
+          },
+        });
       }
     } catch (error) {
       console.error("Error handling payment cancellation:", error);
@@ -319,15 +342,15 @@ const Checkout = () => {
     }
   };
 
-  const handlePaymentFailed = async (orderId, error) => {
+  const handlePaymentFailed = async (order_id, razorpay_order_id, error) => {
     try {
       setLoading(true);
-
+      paymentAttemptedRef.current = true; // Set payment attempted to true
       // Call API to update the order status as payment failed
       const response = await customAxios.post(
         apiSummary.endpoints.order.paymentFailed.path,
         {
-          razorpay_order_id: orderId,
+          razorpay_order_id: razorpay_order_id,
           cancel_reason: "Payment failed",
           error_code: error.code,
           error_description: error.description,
@@ -347,9 +370,18 @@ const Checkout = () => {
         );
 
         // After a slight delay, navigate to orders
-        setTimeout(() => {
-          navigate("/dashboard/my-orders");
-        }, 2000);
+        navigate("/order-confirmation", {
+          state: {
+            orderId: order_id,
+            address: selectedAddress,
+            paymentMethod: paymentMethod,
+            cartItems,
+            totalAmount: totalAmount + 50 + 18,
+            orderReference: razorpay_order_id,
+            paymentId: null,
+            paymentStatus: "Failed", // <-- Added
+          },
+        });
       }
     } catch (error) {
       console.error("Error handling payment failure:", error);
@@ -367,6 +399,7 @@ const Checkout = () => {
 
     try {
       setLoading(true);
+      paymentAttemptedRef.current = true; // Set payment attempted to true
       const result = await customAxios.post("/api/v1/order/verify-payment", {
         razorpay_order_id,
         razorpay_payment_id,
@@ -386,13 +419,14 @@ const Checkout = () => {
         // Redirect to order confirmation page
         navigate("/order-confirmation", {
           state: {
-            orderId: result.data.data.order_id, // Get order ID from the response
+            orderId: result.data.data.order_id,
             address: selectedAddress,
             paymentMethod: paymentMethod,
             cartItems,
-            totalAmount: totalAmount + 50 + 18, // Including shipping and tax
+            totalAmount: totalAmount + 50 + 18,
             paymentId: razorpay_payment_id,
             orderReference: razorpay_order_id,
+            paymentStatus: "Completed", // <-- Added
           },
         });
       } else {
