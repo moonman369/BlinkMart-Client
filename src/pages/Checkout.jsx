@@ -289,6 +289,7 @@ const Checkout = () => {
     }
 
     const rzp = new window.Razorpay(options);
+    rzp.open();
 
     // Event handler for payment failure
     rzp.on("payment.failed", function (response) {
@@ -297,7 +298,7 @@ const Checkout = () => {
       showToast.error(`Payment failed: ${response.error.description}`);
       handlePaymentFailed(order_id, razorpay_order_id, response.error);
     });
-    rzp.open();
+    rzp.close();
   };
 
   // Add these new handlers for payment cancellation and failure
