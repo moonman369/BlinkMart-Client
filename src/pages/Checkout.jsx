@@ -30,7 +30,7 @@ const Checkout = () => {
 
   const [loading, setLoading] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState("COD"); // Set default to COD
+  const [paymentMethod, setPaymentMethod] = useState(""); // Set default to COD
   const paymentAttemptedRef = useRef(false);
 
   useEffect(() => {
@@ -54,6 +54,10 @@ const Checkout = () => {
   const handlePlaceCodOrder = async () => {
     if (!selectedAddress) {
       showToast.error("Please select a delivery address");
+      return;
+    }
+    if (!paymentMethod) {
+      showToast.error("Please select a payment method");
       return;
     }
     setLoading(true);
@@ -101,6 +105,10 @@ const Checkout = () => {
   const handlePlaceOnlineOrder = async () => {
     if (!selectedAddress) {
       showToast.error("Please select a delivery address");
+      return;
+    }
+    if (!paymentMethod) {
+      showToast.error("Please select a payment method");
       return;
     }
     setLoading(true);

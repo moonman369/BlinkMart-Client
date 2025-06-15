@@ -25,6 +25,7 @@ import CartPage from "../pages/CartPage";
 import Checkout from "../pages/Checkout";
 import OrderConfirmation from "../pages/OrderConfirmation";
 import OrderDetails from "../pages/OrderDetails";
+import DashboardView from "../pages/DashboardView";
 
 const router = createBrowserRouter([
   {
@@ -71,6 +72,10 @@ const router = createBrowserRouter([
         path: "/dashboard",
         element: <Dashboard />,
         children: [
+          {
+            path: "view",
+            element: <DashboardView />,
+          },
           {
             path: "profile",
             element: <Profile />,

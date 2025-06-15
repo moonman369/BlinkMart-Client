@@ -173,7 +173,7 @@ const MyOrders = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Link
-            to="/dashboard"
+            to="/dashboard/view"
             className="flex items-center gap-1 text-gray-400 hover:text-gray-300"
           >
             <FaArrowLeft size={14} />

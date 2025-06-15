@@ -13,6 +13,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
+  const user = useSelector((state) => state.user);
   const loadingCategory = useSelector((state) => state.product.loadingCategory);
   const categories = useSelector((state) => state.product.allCategories);
   const subcategories = useSelector((state) => state.product.allSubcategories);
@@ -52,15 +53,17 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
-        await Promise.all([
-          fetchAllCategories({ all: true }),
-          fetchAllSubcategories({ all: true }),
-          // other fetch calls
-        ]);
+        if (user?._id) {
+          setLoading(true);
+          await Promise.all([
+            fetchAllCategories({ all: true }),
+            fetchAllSubcategories({ all: true }),
+            // other fetch calls
+          ]);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
-        axiosToastError(error);
+        // axiosToastError(error);
       } finally {
         setLoading(false);
       }

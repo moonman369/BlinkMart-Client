@@ -87,13 +87,11 @@ function App() {
     const accessToken = Cookies.get("accessToken");
     const refreshToken = Cookies.get("refreshToken");
 
-    // console.log("Access Token:", accessToken);
-    // console.log("Refresh Token:", refreshToken);
-
-    // If both tokens are null, return false to show welcome page
+    // If both tokens are null, redirect to login page and show welcome page
     if (!accessToken && !refreshToken) {
-      console.log("Both tokens are missing, showing welcome page");
+      console.log("Both tokens are missing, redirecting to login page");
       clearAllStorage();
+      navigate("/"); // <-- Add this line
       return false;
     }
 
@@ -290,7 +288,7 @@ function App() {
   }, [user, location.pathname]);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100">
+    <div className="min-h-screen  bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100">
       <Header />
       <main className="min-h-[calc(100vh-8rem)] pb-2">
         <Outlet />
