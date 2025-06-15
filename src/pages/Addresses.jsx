@@ -11,6 +11,7 @@ import { axiosToastError } from "../util/axiosToastError";
 import { fetchAllAddresses } from "../util/fetchAllAddresses";
 import { setAddresses } from "../store/addressSlice";
 import AddressCard from "../components/AddressCard"; // Import the AddressCard component
+import { showToast } from "../config/toastConfig";
 
 const Addresses = () => {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ const Addresses = () => {
       }
     } catch (error) {
       console.error("Error fetching addresses:", error);
-      toast.error("Failed to load addresses");
+      showToast.error("Failed to load addresses");
     } finally {
       setLoading(false);
     }
@@ -80,7 +81,7 @@ const Addresses = () => {
       !formData.country ||
       !formData.mobile
     ) {
-      toast.error("Please fill all required fields");
+      showToast.error("Please fill all required fields");
       return;
     }
 
@@ -107,7 +108,7 @@ const Addresses = () => {
           ? apiSummary.endpoints.address.updateAddress.successStatus
           : apiSummary.endpoints.address.addAddress.successStatus)
       ) {
-        toast.success(
+        showToast.success(
           editMode
             ? "Address updated successfully"
             : "Address added successfully"
@@ -119,7 +120,7 @@ const Addresses = () => {
       }
     } catch (error) {
       console.error("Error saving address:", error);
-      toast.error(
+      showToast.error(
         editMode ? "Failed to update address" : "Failed to add address"
       );
     } finally {
@@ -157,7 +158,7 @@ const Addresses = () => {
         response.status ===
         apiSummary.endpoints.address.deleteAddress.successStatus
       ) {
-        toast.success("Address deleted successfully");
+        showToast.success("Address deleted successfully");
         fetchAddresses();
       }
     } catch (error) {

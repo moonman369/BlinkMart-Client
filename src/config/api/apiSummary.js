@@ -204,6 +204,16 @@ export const apiSummary = {
         method: "post",
         successStatus: 200,
       },
+      paymentFailed: {
+        path: "api/v1/order/payment-failed",
+        method: "post",
+        successStatus: 200,
+      },
+      paymentCancelled: {
+        path: "api/v1/order/payment-cancelled",
+        method: "post",
+        successStatus: 200,
+      },
     },
   },
 };

@@ -8,6 +8,7 @@ import { addToCart } from "../store/cartSlice";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { FaShoppingCart } from "react-icons/fa";
 import LoadingSpinner2 from "./LoadingSpinner2";
+import { showToast } from "../config/toastConfig";
 
 const AddToCartButton = ({ product, cartItem, productDisplayPage }) => {
   const [loading, setLoading] = useState(false);
@@ -31,12 +32,12 @@ const AddToCartButton = ({ product, cartItem, productDisplayPage }) => {
         response.status === apiSummary.endpoints.cart.addToCart.successStatus
       ) {
         dispatch(addToCart(response?.data?.data));
-        toast.success("Product added to cart successfully!");
+        showToast.success("Product added to cart successfully!");
       }
     } catch (error) {
       console.error("Error adding product to cart:", error);
       axiosToastError(error);
-      toast.error("Failed to add product to cart");
+      showToast.error("Failed to add product to cart");
     } finally {
       setLoading(false);
     }
@@ -64,12 +65,12 @@ const AddToCartButton = ({ product, cartItem, productDisplayPage }) => {
         apiSummary.endpoints.cart.removeFromCart.successStatus
       ) {
         dispatch(addToCart(response?.data?.data));
-        toast.success("Product removed from cart successfully!");
+        showToast.success("Product removed from cart successfully!");
       }
     } catch (error) {
       console.error("Error removing product from cart:", error);
       axiosToastError(error);
-      toast.error("Failed to remove product from cart");
+      showToast.error("Failed to remove product from cart");
     } finally {
       setLoading(false);
     }

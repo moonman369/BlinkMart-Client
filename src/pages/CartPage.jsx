@@ -11,6 +11,7 @@ import { addToCart, clearCart } from "../store/cartSlice";
 import toast from "react-hot-toast";
 import ClearCartModal from "../components/ClearCartModal";
 import { use } from "react";
+import { showToast } from "../config/toastConfig";
 
 const CartPage = () => {
   const cart = useSelector((state) => state.cart);
@@ -30,11 +31,11 @@ const CartPage = () => {
         response.status === apiSummary.endpoints.cart.clearCart.successStatus
       ) {
         dispatch(clearCart());
-        toast.success("Cart cleared successfully!");
+        showToast.success("Cart cleared successfully!");
         setShowClearCartModal(false);
       }
     } catch (error) {
-      toast.error("Failed to clear cart");
+      showToast.error("Failed to clear cart");
     }
   };
 
@@ -69,9 +70,9 @@ const CartPage = () => {
   return (
     <>
       <div className="container mx-auto px-2 lg:px-4 py-4 lg:py-8 min-h-[calc(100vh-8rem)] bg-gray-900/30">
-        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 h-full">
+        <div className="flex flex-col lg:flex-row lg:gap-8 h-full">
           {/* Scrollable Cart Items List */}
-          <div className="flex-grow flex flex-col h-[calc(100vh-16rem)] lg:h-[calc(100vh-12rem)] bg-gray-900/50 p-3 lg:p-6 rounded-lg">
+          <div className="flex-grow flex flex-col h-[calc(100vh-16rem)] lg:h-[calc(100vh-12rem)] bg-gray-900/50 p-3 lg:p-6 rounded-lg mb-3 lg:mb-0">
             <div className="flex justify-between items-center mb-4 lg:mb-6">
               <h1 className="text-xl lg:text-2xl font-bold">
                 Shopping Cart ({cart.totalQuantity} items)
@@ -126,19 +127,19 @@ const CartPage = () => {
           </div>
 
           {/* Checkout Section */}
-          <div className="lg:w-1/3 lg:sticky lg:top-28 lg:h-fit mt-4 lg:mt-0">
+          <div className="lg:w-1/3 lg:sticky lg:top-28 lg:h-fit mt-0 lg:mt-0">
             <div className="bg-black/95 p-4 lg:p-6 rounded-lg border border-gray-800">
-              <div className="flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6 pb-3 lg:pb-4 border-b border-gray-800">
+              <div className="flex items-center gap-2 lg:gap-3 mb-3 lg:mb-6 pb-3 lg:pb-4 border-b border-gray-800">
                 <div className="p-1.5 lg:p-2 rounded-full bg-green-600/10">
                   <TiShoppingCart size={20} className="text-green-500" />
                 </div>
-                <h2 className="text-lg lg:text-xl font-bold text-gray-100">
+                <h2 className="text-base lg:text-xl font-bold text-gray-100">
                   Order Summary
                 </h2>
               </div>
 
-              <div className="space-y-3 lg:space-y-4 mb-4 lg:mb-6">
-                <div className="flex justify-between text-gray-300 bg-gray-800/40 p-3 rounded-lg">
+              <div className="space-y-2 lg:space-y-4 mb-3 lg:mb-6">
+                <div className="flex justify-between text-gray-300 bg-gray-800/40 p-2.5 lg:p-3 rounded-lg">
                   <span className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-gray-500"></span>
                     Subtotal
@@ -148,7 +149,7 @@ const CartPage = () => {
                   </span>
                 </div>
 
-                <div className="flex justify-between text-gray-300 bg-gray-800/40 p-3 rounded-lg">
+                <div className="flex justify-between text-gray-300 bg-gray-800/40 p-2.5 lg:p-3 rounded-lg">
                   <span className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-gray-500"></span>
                     Delivery Fee
@@ -156,8 +157,8 @@ const CartPage = () => {
                   <span className="font-medium">{getINRString(40)}</span>
                 </div>
 
-                <div className="border-t border-gray-800 pt-4 mt-4">
-                  <div className="flex justify-between font-bold text-gray-100 bg-gray-800/60 p-4 rounded-lg">
+                <div className="border-t border-gray-800 pt-2 lg:pt-4 mt-2 lg:mt-4">
+                  <div className="flex justify-between font-bold text-gray-100 bg-gray-800/60 p-3 lg:p-4 rounded-lg">
                     <span>Total Amount</span>
                     <span className="text-green-500 text-lg">
                       {getINRString(cart.totalPrice + 40)}
@@ -167,7 +168,10 @@ const CartPage = () => {
               </div>
 
               <div className="space-y-2 lg:space-y-3">
-                <button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 lg:py-4 px-4 rounded-lg" onClick={redirectToCheckout}>
+                <button
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 lg:py-4 px-4 rounded-lg"
+                  onClick={redirectToCheckout}
+                >
                   <span className="text-sm lg:text-base">
                     Proceed to Checkout
                   </span>

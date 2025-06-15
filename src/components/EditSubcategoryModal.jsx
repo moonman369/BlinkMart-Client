@@ -10,6 +10,7 @@ import { checkCategoriesArrayEquality } from "../util/checkCategoriesArrayEquali
 import SelectionDropDown from "./SelectionDropDown.jsx";
 import { fetchAllCategories } from "../util/fetchAllCategories.js";
 import useScrollLock from "../hooks/useScrollLock";
+import { showToast } from "../config/toastConfig";
 
 const EditSubcategoryModal = ({
   fetchSubcategories,
@@ -122,7 +123,7 @@ const EditSubcategoryModal = ({
     try {
       setProcessing(true);
       if (!editSubcategoryData.name) {
-        toast.error("Category Name is required!");
+        showToast.error("Category Name is required!");
         return;
       }
       const formData = new FormData();
@@ -143,7 +144,7 @@ const EditSubcategoryModal = ({
         apiSummary.endpoints.subcategory.updateSubcategory.successStatus
       ) {
         fetchSubcategories();
-        toast.success(response.data.message);
+        showToast.success(response.data.message);
         closeModal();
       }
     } catch (error) {
@@ -165,7 +166,7 @@ const EditSubcategoryModal = ({
           image: file,
         }));
       } else {
-        toast.error(
+        showToast.error(
           `Invalid file format! Choose a format from this list: ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/heif', 'image/heic']`
         );
       }

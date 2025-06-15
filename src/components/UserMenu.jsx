@@ -11,6 +11,7 @@ import { HiOutlineExternalLink } from "react-icons/hi";
 import { isAdmin } from "../util/isAdmin.js";
 import Cookies from "js-cookie";
 import { COOKIE_CLEAR_SETTINGS } from "../util/constants";
+import { showToast } from "../config/toastConfig";
 
 const UserMenu = ({ isMobile, close }) => {
   const user = useSelector((state) => state.user);
@@ -41,7 +42,7 @@ const UserMenu = ({ isMobile, close }) => {
 
       if (response.status === apiSummary.endpoints.user.logout.successStatus) {
         clearAllStorage();
-        toast.success(response?.data?.message || "Logged out successfully");
+        showToast.success(response?.data?.message || "Logged out successfully");
         handleClose();
 
         setTimeout(() => {

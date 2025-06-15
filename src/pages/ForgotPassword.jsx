@@ -5,6 +5,7 @@ import customAxios from "../util/customAxios";
 import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import { Link, useNavigate } from "react-router-dom";
+import { showToast } from "../config/toastConfig";
 
 const ForgotPassword = () => {
   const [userData, setUserData] = useState({
@@ -28,7 +29,7 @@ const ForgotPassword = () => {
     try {
       e.preventDefault();
       if (!isUserDataPopulated) {
-        toast.error("Fill in all the user details and try again!");
+        showToast.error("Fill in all the user details and try again!");
         return;
       }
 
@@ -45,7 +46,7 @@ const ForgotPassword = () => {
         response?.status ===
         apiSummary.endpoints.user.forgotPassword.successStatus
       ) {
-        toast.success(response.data["message"]);
+        showToast.success(response.data["message"]);
         navigate("/verify-otp", {
           state: {
             email: userData.email,

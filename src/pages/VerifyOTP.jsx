@@ -5,6 +5,7 @@ import customAxios from "../util/customAxios";
 import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { showToast } from "../config/toastConfig";
 
 const VerifyOTP = () => {
   const [userData, setUserData] = useState(["", "", "", "", "", ""]);
@@ -30,7 +31,7 @@ const VerifyOTP = () => {
     try {
       e.preventDefault();
       if (!isUserDataPopulated) {
-        toast.error("Fill in all the user details and try again!");
+        showToast.error("Fill in all the user details and try again!");
         return;
       }
 
@@ -47,7 +48,7 @@ const VerifyOTP = () => {
       if (
         response?.status === apiSummary.endpoints.user.verifyOtp.successStatus
       ) {
-        toast.success(response.data["message"]);
+        showToast.success(response.data["message"]);
         navigate("/reset-password", {
           state: {
             verifyOtpResponse: response.data,
@@ -102,11 +103,11 @@ const VerifyOTP = () => {
                       console.log(e.clipboardData.getData("text"));
                       e.preventDefault();
                       if (e.clipboardData.getData("text").length > 6) {
-                        toast.error("OTP should be 6 digits long!");
+                        showToast.error("OTP should be 6 digits long!");
                         return;
                       }
                       if (isNaN(e.clipboardData.getData("text"))) {
-                        toast.error("OTP should be a number!");
+                        showToast.error("OTP should be a number!");
                         return;
                       }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux"; // Add useDispatch
 import { TiShoppingCart } from "react-icons/ti";
@@ -15,6 +15,7 @@ import { clearCart } from "../store/cartSlice"; // Import clearCart action
 import customAxios from "../util/customAxios";
 import { loadRazorpayScript } from "../util/razorPay";
 import { paymentMethodsToRzpMap } from "../util/constants";
+import { showToast } from "../config/toastConfig";
 
 const Checkout = () => {
   const location = useLocation();
@@ -29,7 +30,8 @@ const Checkout = () => {
 
   const [loading, setLoading] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState("COD"); // Set default to COD
+  const [paymentMethod, setPaymentMethod] = useState(""); // Set default to COD
+  const paymentAttemptedRef = useRef(false);
 
   useEffect(() => {
     // Redirect if no cart items
@@ -51,7 +53,11 @@ const Checkout = () => {
 
   const handlePlaceCodOrder = async () => {
     if (!selectedAddress) {
-      toast.error("Please select a delivery address");
+      showToast.error("Please select a delivery address");
+      return;
+    }
+    if (!paymentMethod) {
+      showToast.error("Please select a payment method");
       return;
     }
     setLoading(true);
@@ -76,19 +82,20 @@ const Checkout = () => {
         // Clear the cart after successful order
         await performClearCart();
         console.log(response);
-        toast.success("Order placed successfully!");
+        showToast.success("Order placed successfully!");
         navigate("/order-confirmation", {
           state: {
-            orderId: response?.data?.data?.order_id,
+            orderId: response.data.data.order_id,
             address: selectedAddress,
             paymentMethod: "COD",
             cartItems,
             totalAmount: totalAmount + 50 + 18, // Including shipping and tax
+            paymentStatus: "COD", // <-- Pass this for COD
           },
         });
       }
     } catch (error) {
-      toast.error("Failed to place order. Please try again.");
+      showToast.error("Failed to place order. Please try again.");
       console.error(error);
     } finally {
       setLoading(false);
@@ -97,7 +104,11 @@ const Checkout = () => {
 
   const handlePlaceOnlineOrder = async () => {
     if (!selectedAddress) {
-      toast.error("Please select a delivery address");
+      showToast.error("Please select a delivery address");
+      return;
+    }
+    if (!paymentMethod) {
+      showToast.error("Please select a payment method");
       return;
     }
     setLoading(true);
@@ -123,12 +134,20 @@ const Checkout = () => {
         // Get the payment URL from the response
         const { razorpayOrderId, amount } =
           response?.data?.data?.paymentDetails;
-        console.log("Online", response);
-        handlePayment(paymentMethod, razorpayOrderId, amount);
+        const { order_id } = response?.data?.data?.order;
+        console.log("Online order created:", response.data.data);
+
+        // Store the order_id in localStorage to handle potential payment failures
+        localStorage.setItem("pendingOrderId", response.data.data.order_id);
+
+        // Initialize payment
+        handlePayment(paymentMethod, order_id, razorpayOrderId, amount);
+      } else {
+        throw new Error("Failed to create order");
       }
     } catch (error) {
-      toast.error("Failed to process online payment. Please try again.");
-      console.error(error);
+      console.error("Error creating online order:", error);
+      showToast.error("Failed to process online payment. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -148,15 +167,20 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error("Failed to clear cart:", error);
-      toast.error("Failed to clear cart");
+      showToast.error("Failed to clear cart");
     }
   };
 
-  const handlePayment = async (paymentMethod, orderId, totalAmount) => {
+  const handlePayment = async (
+    paymentMethod,
+    order_id,
+    razorpay_order_id,
+    totalAmount
+  ) => {
     const res = await loadRazorpayScript();
 
     if (!res) {
-      toast.error("Razorpay SDK failed to load. Please try again later.");
+      showToast.error("Razorpay SDK failed to load. Please try again later.");
       return;
     }
 
@@ -165,7 +189,7 @@ const Checkout = () => {
 
     if (!RAZORPAY_KEY_ID) {
       console.error("Razorpay key not found in environment variables");
-      toast.error("Payment configuration error. Please contact support.");
+      showToast.error("Payment configuration error. Please contact support.");
       return;
     }
 
@@ -176,9 +200,9 @@ const Checkout = () => {
       currency: "INR",
       name: "BlinkMart",
       description: "Order Payment",
-      order_id: orderId,
+      order_id: razorpay_order_id,
       handler: async function (response) {
-        toast.success("Payment successful!");
+        showToast.success("Payment successful!");
         console.log("Payment ID:", response.razorpay_payment_id);
         console.log("Order ID:", response.razorpay_order_id);
         console.log("Signature:", response.razorpay_signature);
@@ -187,34 +211,45 @@ const Checkout = () => {
       prefill: {
         name: user?.username || "John Doe",
         email: user?.email || "john@example.com",
-        contact: user?.mobile || "9876543210",
+        contact: user?.mobile || "0000000000",
       },
       notes: {
         address: "BlinkMart",
-        order_id: orderId,
+        order_id: razorpay_order_id,
       },
       theme: {
         color: "#00b050",
       },
+      retry: {
+        enabled: false,
+      },
       modal: {
-        ondismiss: function() {
-          console.log("Payment cancelled by user");
-          toast.error("Payment cancelled");
-        }
-      }
+        ondismiss: function () {
+          setTimeout(() => {
+            console.log(paymentAttemptedRef.current);
+            if (paymentAttemptedRef.current === false) {
+              showToast.error("Payment cancelled by user");
+              handlePaymentCancelled(order_id, razorpay_order_id);
+            }
+          }, 1000); // Delay to allow any pending actions to complete
+        },
+        escape: false, // Prevent closing with ESC key
+        animation: true, // Enable animations
+        handleBackButton: true, // Handle back button press on mobile
+      },
     };
 
     // Map payment method to Razorpay's method names
     const paymentMethodMap = {
-      "Card": "card",
-      "UPI": "upi",
-      "Net Banking": "netbanking"
+      Card: "card",
+      UPI: "upi",
+      "Net Banking": "netbanking",
     };
 
     // Apply the mapped method if it's not COD
     if (paymentMethod !== "COD" && paymentMethodMap[paymentMethod]) {
       options.method = paymentMethodMap[paymentMethod];
-      
+
       // This is the key part: Configure specific payment method settings and hide others
       // These settings control which payment blocks are shown/hidden in the Razorpay modal
       options.config = {
@@ -222,37 +257,39 @@ const Checkout = () => {
           blocks: {},
           sequence: [],
           preferences: {
-            show_default_blocks: false
-          }
-        }
+            show_default_blocks: false,
+          },
+        },
       };
-      
+
       // Only add the selected payment method block
-      switch(paymentMethod) {
+      switch (paymentMethod) {
         case "Card":
           options.config.display.blocks.card = {
             name: "Pay with Card",
-            instruments: [{ method: "card" }]
+            instruments: [{ method: "card" }],
           };
           options.config.display.sequence = ["block.card"];
           break;
-        
+
         case "UPI":
           options.config.display.blocks.upi = {
             name: "Pay using UPI",
-            instruments: [{
-              method: "upi",
-              flow: "all",
-              apps: ["google_pay", "phonepe", "paytm", "amazon_pay", "bhim"]
-            }]
+            instruments: [
+              {
+                method: "upi",
+                flow: "all",
+                apps: ["google_pay", "phonepe", "paytm", "amazon_pay", "bhim"],
+              },
+            ],
           };
           options.config.display.sequence = ["block.upi"];
           break;
-        
+
         case "Net Banking":
           options.config.display.blocks.netbanking = {
             name: "Pay via Net Banking",
-            instruments: [{ method: "netbanking" }]
+            instruments: [{ method: "netbanking" }],
           };
           options.config.display.sequence = ["block.netbanking"];
           break;
@@ -260,14 +297,108 @@ const Checkout = () => {
     }
 
     const rzp = new window.Razorpay(options);
+    rzp.open();
 
     // Event handler for payment failure
     rzp.on("payment.failed", function (response) {
+      console.log(paymentAttemptedRef.current);
       console.error("Payment failed:", response.error);
-      toast.error(`Payment failed: ${response.error.description}`);
+      showToast.error(`Payment failed: ${response.error.description}`);
+      handlePaymentFailed(order_id, razorpay_order_id, response.error);
     });
+    rzp.close();
+  };
 
-    rzp.open();
+  // Add these new handlers for payment cancellation and failure
+  const handlePaymentCancelled = async (order_id, razorpay_order_id) => {
+    try {
+      setLoading(true);
+
+      // Call API to update the order status as cancelled
+      const response = await customAxios.post(
+        apiSummary.endpoints.order.paymentCancelled.path,
+        {
+          razorpay_order_id: razorpay_order_id,
+          reason: "Payment cancelled by user",
+        }
+      );
+
+      if (
+        response.status ===
+        apiSummary.endpoints.order.paymentCancelled.successStatus
+      ) {
+        console.log(response);
+        // Redirect to orders page
+        navigate("/order-confirmation", {
+          state: {
+            orderId: order_id, // Get order ID from the response
+            address: selectedAddress,
+            paymentMethod: paymentMethod,
+            cartItems,
+            totalAmount: totalAmount + 50 + 18, // Including shipping and tax
+            orderReference: razorpay_order_id, // Pass the order reference
+            paymentId: null, // No payment ID since it was cancelled
+            paymentStatus: "Cancelled", // <-- Added
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error handling payment cancellation:", error);
+      // Still navigate to orders so user can see their order
+      navigate("/dashboard/my-orders");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePaymentFailed = async (order_id, razorpay_order_id, error) => {
+    try {
+      setLoading(true);
+      paymentAttemptedRef.current = true; // Set payment attempted to true
+      // Call API to update the order status as payment failed
+      const response = await customAxios.post(
+        apiSummary.endpoints.order.paymentFailed.path,
+        {
+          razorpay_order_id: razorpay_order_id,
+          cancel_reason: "Payment failed",
+          error_code: error.code,
+          error_description: error.description,
+          error_source: error.source,
+          error_step: error.step,
+          error_reason: error.reason,
+        }
+      );
+
+      if (
+        response.status ===
+        apiSummary.endpoints.order.paymentFailed.successStatus
+      ) {
+        // Provide user with options
+        showToast.error(
+          "Payment failed. You can try again from your orders page."
+        );
+
+        // After a slight delay, navigate to orders
+        navigate("/order-confirmation", {
+          state: {
+            orderId: order_id,
+            address: selectedAddress,
+            paymentMethod: paymentMethod,
+            cartItems,
+            totalAmount: totalAmount + 50 + 18,
+            orderReference: razorpay_order_id,
+            paymentId: null,
+            paymentStatus: "Failed", // <-- Added
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error handling payment failure:", error);
+      // Still navigate to orders so user can see their order
+      navigate("/dashboard/my-orders");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Example frontend code
@@ -277,6 +408,7 @@ const Checkout = () => {
 
     try {
       setLoading(true);
+      paymentAttemptedRef.current = true; // Set payment attempted to true
       const result = await customAxios.post("/api/v1/order/verify-payment", {
         razorpay_order_id,
         razorpay_payment_id,
@@ -287,19 +419,23 @@ const Checkout = () => {
         // Clear the cart
         await performClearCart();
 
+        // Clear the pending order ID from localStorage
+        localStorage.removeItem("pendingOrderId");
+
         // Show success message
-        toast.success("Payment verified successfully!");
+        showToast.success("Payment verified successfully!");
 
         // Redirect to order confirmation page
         navigate("/order-confirmation", {
           state: {
-            orderId: result.data.data.order_id, // Get order ID from the response
+            orderId: result.data.data.order_id,
             address: selectedAddress,
             paymentMethod: paymentMethod,
             cartItems,
-            totalAmount: totalAmount + 50 + 18, // Including shipping and tax
+            totalAmount: totalAmount + 50 + 18,
             paymentId: razorpay_payment_id,
             orderReference: razorpay_order_id,
+            paymentStatus: "Completed", // <-- Added
           },
         });
       } else {
@@ -307,7 +443,7 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error("Payment verification error:", error);
-      toast.error("Payment verification failed. Please contact support.");
+      showToast.error("Payment verification failed. Please contact support.");
 
       // Navigate to orders page so they can see their order status
       navigate("/dashboard/my-orders");

@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import useScrollLock from "../hooks/useScrollLock";
+import { showToast } from "../config/toastConfig";
 
 const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
   const [newCategoryData, setNewCategoryData] = useState({
@@ -35,7 +36,7 @@ const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
     try {
       setProcessing(true);
       if (!newCategoryData.name) {
-        toast.error("Category Name is required!");
+        showToast.error("Category Name is required!");
         return;
       }
       const formData = new FormData();
@@ -53,7 +54,7 @@ const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
         apiSummary.endpoints.category.updateCategory.successStatus
       ) {
         fetchCategories();
-        toast.success(response.data.message);
+        showToast.success(response.data.message);
         closeModal();
       }
     } catch (error) {
@@ -75,7 +76,7 @@ const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
           image: file,
         }));
       } else {
-        toast.error(
+        showToast.error(
           `Invalid file format! Choose a format from this list: ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/heif', 'image/heic']`
         );
       }

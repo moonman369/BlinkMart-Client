@@ -10,6 +10,7 @@ import SelectionDropDown from "./SelectionDropDown.jsx";
 import { fetchAllCategories } from "../util/fetchAllCategories.js";
 import { all } from "axios";
 import useScrollLock from "../hooks/useScrollLock";
+import { showToast } from "../config/toastConfig";
 
 const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
   const [newSubcategoryData, setNewSubcategoryData] = useState({
@@ -68,7 +69,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
     try {
       setProcessing(true);
       if (!newSubcategoryData.name) {
-        toast.error("Category Name is required!");
+        showToast.error("Category Name is required!");
         return;
       }
       const formData = new FormData();
@@ -91,7 +92,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
         apiSummary.endpoints.subcategory.addSubcategory.successStatus
       ) {
         fetchSubcategories();
-        toast.success(response.data.message);
+        showToast.success(response.data.message);
         closeModal();
       }
     } catch (error) {
@@ -113,7 +114,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
           image: file,
         }));
       } else {
-        toast.error(
+        showToast.error(
           `Invalid file format! Choose a format from this list: ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/heif', 'image/heic']`
         );
       }

@@ -9,6 +9,7 @@ import SelectionDropDown from "./SelectionDropDown";
 import { fetchAllCategories } from "../util/fetchAllCategories";
 import { fetchAllSubcategories } from "../util/fetchAllSubcategories";
 import useScrollLock from "../hooks/useScrollLock";
+import { showToast } from "../config/toastConfig";
 
 const EditProductModal = ({ closeModal, product, fetchProducts }) => {
   const [editProductData, setEditProductData] = useState({
@@ -107,7 +108,7 @@ const EditProductModal = ({ closeModal, product, fetchProducts }) => {
     );
 
     if (validFiles.length !== files.length) {
-      toast.error(
+      showToast.error(
         `Invalid file format! Choose a format from this list: ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/heif', 'image/heic']`
       );
       return;
@@ -131,7 +132,7 @@ const EditProductModal = ({ closeModal, product, fetchProducts }) => {
     try {
       setProcessing(true);
       if (!editProductData.name || !editProductData.price) {
-        toast.error("Name and Price are required!");
+        showToast.error("Name and Price are required!");
         return;
       }
 
@@ -176,7 +177,7 @@ const EditProductModal = ({ closeModal, product, fetchProducts }) => {
         apiSummary.endpoints.product.updateProduct.successStatus
       ) {
         fetchProducts();
-        toast.success(response.data.message);
+        showToast.success(response.data.message);
         closeModal();
       }
     } catch (error) {

@@ -8,6 +8,7 @@ import { apiSummary } from "../config/api/apiSummary";
 import { fetchUserDetails } from "../util/fetchUserDetails";
 import { setUserDetails, updateAvatar } from "../store/userSlice";
 import { useDispatch } from "react-redux";
+import { showToast } from "../config/toastConfig";
 
 const ChangeProfileAvatar = ({ user, closeModal }) => {
   const [file, setFile] = useState(null);
@@ -42,11 +43,13 @@ const ChangeProfileAvatar = ({ user, closeModal }) => {
         apiSummary.endpoints.user.setProfileAvatar.successStatus
       ) {
         console.log("upload avatar response: ", response);
-        toast.success("Avatar uploaded successfully!");
+        showToast.success("Avatar uploaded successfully!");
         dispatch(updateAvatar({ avatar: response?.data?.avatarUrl }));
         closeModal();
       } else {
-        toast.error(`Failed to upload avatar! ${response?.data?.errorMessage}`);
+        showToast.error(
+          `Failed to upload avatar! ${response?.data?.errorMessage}`
+        );
       }
     } catch (error) {
       setUploadingInProgress(false);

@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { fetchUserDetails } from "../util/fetchUserDetails";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "../store/userSlice";
+import { showToast } from "../config/toastConfig";
 
 const Login = () => {
   const [userData, setUserData] = useState({
@@ -42,7 +43,7 @@ const Login = () => {
     try {
       e.preventDefault();
       if (!isUserDataPopulated) {
-        toast.error("Fill in all the user details and try again!");
+        showToast.error("Fill in all the user details and try again!");
         return;
       }
 
@@ -61,7 +62,7 @@ const Login = () => {
         const userData = await fetchUserDetails();
         console.log(userData);
         dispatch(setUserDetails(userData?.data?.data));
-        toast.success("Login Successful!🎉");
+        showToast.success("Login Successful!🎉");
 
         setUserData({
           email: "",
