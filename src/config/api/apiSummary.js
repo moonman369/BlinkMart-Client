@@ -57,6 +57,11 @@ export const apiSummary = {
         method: "put",
         successStatus: 200,
       },
+      sendVerificationEmail: {
+        path: "api/v1/user/send-verification-email",
+        method: "post",
+        successStatus: 200,
+      },
     },
     category: {
       addCategory: {

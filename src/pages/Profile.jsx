@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { FaRegUserCircle } from "react-icons/fa";
+import {
+  FaRegUserCircle,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaSpinner,
+} from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import ChangeProfileAvatar from "../components/ChangeProfileAvatar";
 import customAxios from "../util/customAxios";
@@ -20,6 +26,7 @@ const Profile = () => {
   });
   const [userDataUpdated, setUserDataUpdated] = useState(false);
   const [savingInProgress, setSavingInProgress] = useState(false);
+  const [sendingVerification, setSendingVerification] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -31,10 +38,6 @@ const Profile = () => {
   }, [user]);
 
   useEffect(() => {
-    // console.log(userData?.username !== user?.username);
-    // console.log(userData?.email !== user?.email);
-    // console.log(userData?.mobile !== (user?.mobile ?? ""));
-    // setUserDataUpdated(JSON.stringify(userData) !== JSON.stringify(user));
     setUserDataUpdated(
       userData?.username !== (user?.username ?? "") ||
         userData?.email !== (user?.email ?? "") ||
@@ -76,10 +79,33 @@ const Profile = () => {
     }
   };
 
-  console.log("profile", user);
+  // Function to send verification email
+  const handleSendVerificationEmail = async () => {
+    try {
+      setSendingVerification(true);
+      const response = await customAxios({
+        url: apiSummary.endpoints.user.sendVerificationEmail.path,
+        method: apiSummary.endpoints.user.sendVerificationEmail.method,
+      });
+
+      if (
+        response.status ===
+        apiSummary.endpoints.user.sendVerificationEmail.successStatus
+      ) {
+        showToast.success("Verification email sent successfully!");
+      } else {
+        showToast.error("Failed to send verification email.");
+      }
+    } catch (error) {
+      console.error("Error sending verification email:", error);
+      showToast.error("Failed to send verification email. Please try again.");
+    } finally {
+      setSendingVerification(false);
+    }
+  };
 
   return (
-    <div>
+    <div className="container mx-auto px-4 py-8">
       <div className="flex-col">
         <div className="w-[120px] h-[120px] flex items-center justify-center rounded-full overflow-hidden drop-shadow-lg">
           {user?.avatar ? (
@@ -159,6 +185,62 @@ const Profile = () => {
           {savingInProgress ? "Saving..." : "Save"}
         </button>
       </form>
+
+      {/* Email Verification Status - Added mb-6 for bottom margin */}
+      <div className="mt-6 mb-6 bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <h3 className="text-lg font-semibold mb-3">Email Verification</h3>
+
+        <div className="flex items-center">
+          <div className="mr-4">
+            {user.email_is_verified ? (
+              <div className="h-12 w-12 rounded-full bg-green-900/30 flex items-center justify-center">
+                <FaCheckCircle className="text-green-500 text-2xl" />
+              </div>
+            ) : (
+              <div className="h-12 w-12 rounded-full bg-yellow-900/30 flex items-center justify-center">
+                <FaExclamationTriangle className="text-yellow-500 text-2xl" />
+              </div>
+            )}
+          </div>
+
+          <div>
+            {user.email_is_verified ? (
+              <div>
+                <p className="font-medium">Email Verified</p>
+                <p className="text-sm text-gray-400">
+                  Your email address has been verified.
+                </p>
+              </div>
+            ) : (
+              <div>
+                <p className="font-medium">Email Not Verified</p>
+                <p className="text-sm text-gray-400">
+                  Please verify your email address to enjoy all features.
+                </p>
+                <button
+                  onClick={handleSendVerificationEmail}
+                  disabled={sendingVerification}
+                  className="mt-2 mb-1 flex items-center gap-2 bg-secondary-200 hover:bg-secondary-300 text-white px-4 py-2 rounded-md text-sm transition-colors"
+                >
+                  {sendingVerification ? (
+                    <>
+                      <FaSpinner className="animate-spin" />
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    <>
+                      <MdEmail />
+                      <span>Send Verification Email</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ...rest of profile content... */}
     </div>
   );
 };
