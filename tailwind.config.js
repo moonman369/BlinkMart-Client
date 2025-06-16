@@ -11,7 +11,39 @@ export default {
         "secondry-100": "#0b1a78",
         "bg-primary-100": "#1f2937",
       },
+      fontSize: {
+        "2xs": "0.65rem",
+      },
     },
   },
-  plugins: [require("tailwind-scrollbar-hide")],
+  plugins: [
+    require("tailwind-scrollbar-hide"),
+    function ({ addBase, addUtilities }) {
+      addBase({
+        html: {
+          scrollbarWidth: "none",
+          "-ms-overflow-style": "none",
+        },
+        "html::-webkit-scrollbar": {
+          display: "none",
+        },
+        "*": {
+          scrollbarWidth: "none",
+        },
+        "*::-webkit-scrollbar": {
+          display: "none",
+        },
+      });
+
+      addUtilities({
+        ".scrollbar-show": {
+          scrollbarWidth: "auto",
+          "-ms-overflow-style": "auto",
+          "&::-webkit-scrollbar": {
+            display: "block",
+          },
+        },
+      });
+    },
+  ],
 };

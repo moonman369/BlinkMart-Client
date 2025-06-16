@@ -26,6 +26,8 @@ import Checkout from "../pages/Checkout";
 import OrderConfirmation from "../pages/OrderConfirmation";
 import OrderDetails from "../pages/OrderDetails";
 import DashboardView from "../pages/DashboardView";
+import VerifyEmail from "../pages/VerifyEmail";
+import NotFound from "../pages/NotFound";
 
 const router = createBrowserRouter([
   {
@@ -41,35 +43,39 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/search",
+        path: "search",
         element: <SearchPage />,
       },
       {
-        path: "/login",
+        path: "login",
         element: <Login />,
       },
       {
-        path: "/register",
+        path: "register",
         element: <Register />,
       },
       {
-        path: "/forgot-password",
+        path: "forgot-password",
         element: <ForgotPassword />,
       },
       {
-        path: "/verify-otp",
+        path: "verify-otp",
         element: <VerifyOTP />,
       },
       {
-        path: "/reset-password",
+        path: "reset-password",
         element: <ResetPassword />,
       },
       {
-        path: "/user",
+        path: "user",
         element: <UserMenuMobilePage />,
       },
       {
-        path: "/dashboard",
+        path: "verify-email",
+        element: <VerifyEmail />,
+      },
+      {
+        path: "dashboard",
         element: <Dashboard />,
         children: [
           {
@@ -127,7 +133,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: ":category",
+        path: "product-categorized/:category",
         children: [
           {
             path: ":subcategory",
@@ -150,6 +156,10 @@ const router = createBrowserRouter([
       {
         path: "order-confirmation",
         element: <OrderConfirmation />,
+      },
+      {
+        path: "*",
+        element: <NotFound />,
       },
     ],
   },

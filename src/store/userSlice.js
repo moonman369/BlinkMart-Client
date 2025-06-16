@@ -32,6 +32,7 @@ const userSlice = createSlice({
       state.shopping_cart = action.payload?.shopping_cart;
       state.order_history = action.payload?.order_history;
       state.role = action.payload?.role;
+      state.createdAt = action.payload?.createdAt;
     },
     updateAvatar: (state, action) => {
       state.avatar = action.payload?.avatar;
@@ -49,6 +50,7 @@ const userSlice = createSlice({
       state.shopping_cart = [];
       state.order_history = [];
       state.role = "";
+      state.createdAt = "";
     },
   },
 });

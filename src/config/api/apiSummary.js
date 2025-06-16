@@ -32,6 +32,12 @@ export const apiSummary = {
         method: "post",
         successStatus: 200,
       },
+      verifyEmail: {
+        path: "api/v1/user/verify-email",
+        method: "post",
+        successStatus: 200,
+        alredyVerifiedStatus: 409,
+      },
       resetPassword: {
         path: "api/v1/user/reset-password",
         method: "put",
@@ -55,6 +61,11 @@ export const apiSummary = {
       updateUserDetails: {
         path: "api/v1/user/update-details",
         method: "put",
+        successStatus: 200,
+      },
+      sendVerificationEmail: {
+        path: "api/v1/user/send-verification-email",
+        method: "post",
         successStatus: 200,
       },
     },
