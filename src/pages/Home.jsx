@@ -36,7 +36,7 @@ const Home = () => {
       return;
     }
 
-    const url = `/${convertToUrlString(
+    const url = `/product-categorized/${convertToUrlString(
       categoryName
     )}-${categoryId}/${convertToUrlString(subcategory?.name)}-${
       subcategory?._id
@@ -118,7 +118,7 @@ const Home = () => {
               return (
                 <div
                   key={category._id + "displayCategory"}
-                  className="w-full h-full object-scale-down rounded cursor-pointer"
+                  className="w-full h-full object-scale-down rounded cursor-pointer mx-4"
                   onClick={() => {
                     handleRedirectProductCategorizedPage(category);
                   }}
