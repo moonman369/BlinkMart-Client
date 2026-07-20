@@ -42,7 +42,7 @@ const ChangeProfileAvatar = ({ user, closeModal }) => {
         response.status ===
         apiSummary.endpoints.user.setProfileAvatar.successStatus
       ) {
-        console.log("upload avatar response: ", response);
+        // console.log("upload avatar response: ", response);
         showToast.success("Avatar uploaded successfully!");
         dispatch(updateAvatar({ avatar: response?.data?.avatarUrl }));
         closeModal();

@@ -43,7 +43,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
         method: apiSummary.endpoints.category.addCategory.method,
         data: formData,
       });
-      console.log("response", response);
+      // console.log("response", response);
       if (
         response.status ===
         apiSummary.endpoints.category.addCategory.successStatus
@@ -63,7 +63,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
   const handleUploadCategoryImage = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      console.log(file?.type);
+      // console.log(file?.type);
       if (IMAGE_MIMETYPE_LIST.includes(file.type)) {
         // const fileBase64String = await getFileAsBase64(file);
         setNewCategoryData((prevData) => ({
@@ -78,7 +78,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
     }
   };
 
-  console.log(newCategoryData);
+  // console.log(newCategoryData);
 
   return (
     <section className="fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-60 flex items-center justify-center z-50">

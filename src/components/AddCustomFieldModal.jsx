@@ -22,7 +22,7 @@ const AddCustomFieldModal = ({ closeModal, customFields, setCustomFields }) => {
         showToast.error("Field already added!");
         return;
       }
-      console.log("newField", newField);
+      // console.log("newField", newField);
       setCustomFields((prevProductData) => {
         return {
           ...prevProductData,

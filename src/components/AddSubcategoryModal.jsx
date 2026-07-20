@@ -31,7 +31,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
         const fetchAllCategoriesResponse = await fetchAllCategories({
           all: true,
         });
-        console.log("fetchAllCategoriesResponse", fetchAllCategoriesResponse);
+        // console.log("fetchAllCategoriesResponse", fetchAllCategoriesResponse);
         if (
           fetchAllCategoriesResponse.status ===
           apiSummary.endpoints.category.getAllCategories.successStatus
@@ -86,7 +86,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
         method: apiSummary.endpoints.subcategory.addSubcategory.method,
         data: formData,
       });
-      console.log("response", response);
+      // console.log("response", response);
       if (
         response.status ===
         apiSummary.endpoints.subcategory.addSubcategory.successStatus
@@ -106,7 +106,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
   const handleUploadSubcategoryImage = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      console.log(file?.type);
+      // console.log(file?.type);
       if (IMAGE_MIMETYPE_LIST.includes(file.type)) {
         // const fileBase64String = await getFileAsBase64(file);
         setNewSubcategoryData((prevData) => ({
@@ -121,7 +121,7 @@ const AddSubcategoryModal = ({ fetchSubcategories, closeModal }) => {
     }
   };
 
-  console.log("newSubcategoryData", newSubcategoryData);
+  // console.log("newSubcategoryData", newSubcategoryData);
 
   return (
     <section className="fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-60 flex items-center justify-center z-50">

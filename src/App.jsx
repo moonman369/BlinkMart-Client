@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
-import toast, { Toaster } from "react-hot-toast";
+import { AnimatePresence, motion } from "framer-motion";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -28,6 +28,7 @@ import { apiSummary } from "./config/api/apiSummary";
 import Cookies from "js-cookie";
 import { COOKIE_CLEAR_SETTINGS } from "./util/constants";
 import CookieConsent from "./components/CookieConsent";
+import StickyCartBar from "./components/StickyCartBar";
 import { fetchAllCartItems } from "./util/fetchAllCartItems";
 import { addToCart } from "./store/cartSlice";
 import { setAddresses } from "./store/addressSlice";
@@ -89,7 +90,7 @@ function App() {
 
     // If both tokens are null, redirect to login page and show welcome page
     if (!accessToken && !refreshToken) {
-      console.log("Both tokens are missing, redirecting to login page");
+      // console.log("Both tokens are missing, redirecting to login page");
       clearAllStorage();
       navigate("/"); // <-- Add this line
       return false;
@@ -97,9 +98,9 @@ function App() {
 
     // If access token is null but refresh token exists, try to refresh
     if (!accessToken && refreshToken) {
-      console.log(
-        "Access token missing but refresh token exists, attempting refresh"
-      );
+      // console.log(
+      //   "Access token missing but refresh token exists, attempting refresh"
+      // );
       try {
         const response = await customAxios({
           url: apiSummary.endpoints.user.refreshToken.path,
@@ -113,23 +114,23 @@ function App() {
           response?.status ===
           apiSummary.endpoints.user.refreshToken.successStatus
         ) {
-          console.log("Token refresh successful");
+          // console.log("Token refresh successful");
           // Backend will handle setting the new access token cookie
           return true;
         }
       } catch (error) {
         console.error("Token refresh error:", error);
         // If refresh fails, clear all storage and return false to show welcome page
-        console.log(
-          "Token refresh failed, clearing all storage and showing welcome page"
-        );
+        // console.log(
+        //   "Token refresh failed, clearing all storage and showing welcome page"
+        // );
         clearAllStorage();
         return false;
       }
     }
 
     // If access token exists, we're good
-    console.log("Access token exists, proceeding normally");
+    // console.log("Access token exists, proceeding normally");
     return true;
   };
 
@@ -288,12 +289,26 @@ function App() {
   }, [user, location.pathname]);
 
   return (
-    <div className="min-h-screen  bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100">
+    <div className="min-h-screen bg-surface-base text-ink-secondary">
       <Header />
       <main className="min-h-[calc(100vh-8rem)] pb-2">
-        <Outlet />
+        {/* Keyed on pathname so each route cross-fades instead of snapping in */}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
+      {/* Clears the sticky cart bar so it never covers footer content */}
+      <div className="h-20 lg:hidden" aria-hidden="true" />
       <Footer />
+      <StickyCartBar />
       <CookieConsent />
       <CustomToaster />
     </div>

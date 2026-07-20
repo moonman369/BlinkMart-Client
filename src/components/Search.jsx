@@ -1,139 +1,129 @@
 import React, { useEffect, useState } from "react";
-import { IoSearch } from "react-icons/io5";
+import { IoSearch, IoClose } from "react-icons/io5";
+import { FaArrowLeft } from "react-icons/fa6";
 import { useLocation, useNavigate } from "react-router-dom";
 import { TypeAnimation } from "react-type-animation";
-import { useMobile } from "../hooks/useMobile";
-import { FaArrowLeft } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
+import { useMobile } from "../hooks/useMobile";
 import { setSearchQuery, addRecentSearch } from "../store/searchSlice";
+import { cn } from "../util/cn";
+
+const SUGGESTIONS = [
+  "Milk",
+  "Sugar",
+  "Bread",
+  "Butter",
+  "Chips",
+  "Cold Drinks",
+  "Chocolate",
+  "Sanitizer",
+  "Shampoo",
+  "Soap",
+  "Cheese",
+  "Salt",
+  "Deodorant",
+];
+
+// TypeAnimation expects a flat [text, pauseMs, text, pauseMs, ...] sequence
+const TYPE_SEQUENCE = SUGGESTIONS.flatMap((item) => [`Search "${item}"`, 1200]);
 
 const Search = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const [isMobile] = useMobile();
-  const [isSearchPage, setIsSearchPage] = useState(
-    location.pathname === "/search"
-  );
   const searchQuery = useSelector((state) => state.search.searchQuery);
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
   const searchInputRef = React.useRef(null);
 
-  useEffect(() => {
-    setIsSearchPage(location.pathname === "/search");
-  }, [location]);
+  const isSearchPage = location.pathname === "/search";
 
   useEffect(() => {
     setLocalSearchQuery(searchQuery);
   }, [searchQuery]);
 
-  const redirectToSearchPage = () => {
-    navigate("/search");
-  };
-
-  const redirectToHomePage = () => {
-    navigate("/");
-  };
-
-  const handleSearchChange = (e) => {
-    setLocalSearchQuery(e.target.value);
-  };
+  useEffect(() => {
+    if (localSearchQuery.trim() === "") dispatch(setSearchQuery(""));
+  }, [localSearchQuery, dispatch]);
 
   const handleSearch = () => {
     if (localSearchQuery.trim()) {
       dispatch(setSearchQuery(localSearchQuery));
       dispatch(addRecentSearch(localSearchQuery));
     }
-    // Blur the input to close mobile keyboard
-    if (searchInputRef.current) {
-      searchInputRef.current.blur();
-    }
+    searchInputRef.current?.blur();
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
+  const clearSearch = () => {
+    setLocalSearchQuery("");
+    dispatch(setSearchQuery(""));
+    searchInputRef.current?.focus();
   };
-
-  useEffect(() => {
-    if (localSearchQuery.trim() === "") {
-      dispatch(setSearchQuery(""));
-    }
-  }, [localSearchQuery]);
 
   return (
-    <div className="w-full min-w-[300px] lg:min-w-[420px] lg:h-12 h-11 rounded-lg border overflow-hidden flex items-center text-neutral-400 bg-gray-700 group focus-within:border-primary-200">
-      <div>
-        {isMobile && isSearchPage ? (
-          <button
-            className="flex justify-center items-center h-full p-3 text-neutral-400 group-focus-within:text-primary-200"
-            onClick={redirectToHomePage}
-          >
-            <FaArrowLeft size={20} />
-          </button>
-        ) : (
-          <button
-            className="flex justify-center items-center h-full p-3 text-neutral-400 group-focus-within:text-primary-200"
-            onClick={handleSearch}
-          >
-            <IoSearch size={20} />
-          </button>
-        )}
-      </div>
-      <div className="w-full h-full flex items-center">
+    <div
+      className={cn(
+        "group flex h-11 w-full items-center overflow-hidden rounded-xl lg:h-12 lg:min-w-[420px]",
+        "border border-surface-border bg-surface-raised text-ink-muted",
+        "transition-all duration-base ease-out",
+        "focus-within:border-mint-500/70 focus-within:bg-surface-overlay focus-within:shadow-glow-mint"
+      )}
+    >
+      {isMobile && isSearchPage ? (
+        <button
+          onClick={() => navigate("/")}
+          aria-label="Back to home"
+          className="flex h-full items-center justify-center px-3 text-ink-muted transition-colors hover:text-ink-primary"
+        >
+          <FaArrowLeft size={18} />
+        </button>
+      ) : (
+        <button
+          onClick={handleSearch}
+          aria-label="Search"
+          className="flex h-full items-center justify-center px-3 text-ink-muted transition-colors group-focus-within:text-mint-400"
+        >
+          <IoSearch size={20} />
+        </button>
+      )}
+
+      <div className="flex h-full min-w-0 flex-1 items-center">
         {!isSearchPage ? (
-          <div onClick={redirectToSearchPage} className="w-full">
+          <button
+            onClick={() => navigate("/search")}
+            className="h-full w-full truncate text-left text-sm text-ink-muted"
+          >
             <TypeAnimation
-              sequence={[
-                // Same substring at the start will only be typed once, initially
-                `Search "Milk"`,
-                1000,
-                `Search "Sugar"`,
-                1000,
-                `Search "Bread"`,
-                1000,
-                `Search "Butter"`,
-                1000,
-                `Search "Chips"`,
-                1000,
-                `Search "Cold Drinks"`,
-                1000,
-                `Search "Chocolate"`,
-                1000,
-                `Search "Sanitizer"`,
-                1000,
-                `Search "Shampoo"`,
-                1000,
-                `Search "Soap"`,
-                1000,
-                `Search "Cheese"`,
-                1000,
-                `Search "Salt"`,
-                1000,
-                `Search "Deodorant"`,
-                1000,
-              ]}
+              sequence={TYPE_SEQUENCE}
               wrapper="span"
-              speed={30}
+              speed={40}
               repeat={Infinity}
+              cursor
             />
-          </div>
+          </button>
         ) : (
-          <div className="w-full h-full">
-            <input
-              ref={searchInputRef}
-              type="text"
-              value={localSearchQuery}
-              onChange={handleSearchChange}
-              onKeyDown={handleKeyPress}
-              placeholder="Search for groceries, snacks and more..."
-              autoFocus
-              className="bg-transparent w-full h-full outline-none"
-            />
-          </div>
+          <input
+            ref={searchInputRef}
+            type="text"
+            value={localSearchQuery}
+            onChange={(e) => setLocalSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            placeholder="Search for groceries, snacks and more..."
+            autoFocus
+            className="h-full w-full bg-transparent text-sm text-ink-primary outline-none placeholder:text-ink-faint"
+          />
         )}
       </div>
+
+      {isSearchPage && localSearchQuery && (
+        <button
+          onClick={clearSearch}
+          aria-label="Clear search"
+          className="flex h-full items-center justify-center px-3 text-ink-muted transition-colors hover:text-ink-primary"
+        >
+          <IoClose size={18} />
+        </button>
+      )}
     </div>
   );
 };
