@@ -1,5 +1,6 @@
 import { apiSummary } from "../config/api/apiSummary";
 import customAxios from "./customAxios";
+import logger from "./logger";
 
 export const fetchUserDetails = async () => {
   try {
@@ -9,6 +10,6 @@ export const fetchUserDetails = async () => {
     });
     return response;
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 };

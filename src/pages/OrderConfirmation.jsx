@@ -15,6 +15,7 @@ import { getINRString } from "../util/getINRString";
 import customAxios from "../util/customAxios";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const OrderConfirmation = () => {
   const location = useLocation();
@@ -64,7 +65,7 @@ const OrderConfirmation = () => {
             navigate("/dashboard/my-orders");
           }
         } catch (error) {
-          console.error("Error fetching order:", error);
+          logger.error("Error fetching order:", error);
           showToast.error("Failed to fetch order details");
           navigate("/dashboard/my-orders");
         } finally {

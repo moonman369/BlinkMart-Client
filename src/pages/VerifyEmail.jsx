@@ -16,6 +16,7 @@ import { setUserDetails } from "../store/userSlice"; // Assuming this action exi
 import { apiSummary } from "../config/api/apiSummary";
 import { fetchUserDetails } from "../util/fetchUserDetails";
 import LoadingSpinner from "../components/LoadingSpinner";
+import logger from "../util/logger";
 
 const VerifyEmail = () => {
   const dispatch = useDispatch();
@@ -54,7 +55,7 @@ const VerifyEmail = () => {
         return;
       }
       setIsVerified(false);
-      console.error("Email verification error:", error);
+      logger.error("Email verification error:", error);
       showToast.error("Email verification failed. Please try again.");
     } finally {
       setIsLoading(false);

@@ -33,6 +33,7 @@ import { fetchAllCartItems } from "./util/fetchAllCartItems";
 import { addToCart } from "./store/cartSlice";
 import { setAddresses } from "./store/addressSlice";
 import { CustomToaster } from "./config/toastConfig";
+import logger from "./util/logger";
 
 function App() {
   const dispatch = useDispatch();
@@ -90,7 +91,7 @@ function App() {
 
     // If both tokens are null, redirect to login page and show welcome page
     if (!accessToken && !refreshToken) {
-      // console.log("Both tokens are missing, redirecting to login page");
+      // logger.log("Both tokens are missing, redirecting to login page");
       clearAllStorage();
       navigate("/"); // <-- Add this line
       return false;
@@ -98,7 +99,7 @@ function App() {
 
     // If access token is null but refresh token exists, try to refresh
     if (!accessToken && refreshToken) {
-      // console.log(
+      // logger.log(
       //   "Access token missing but refresh token exists, attempting refresh"
       // );
       try {
@@ -114,14 +115,14 @@ function App() {
           response?.status ===
           apiSummary.endpoints.user.refreshToken.successStatus
         ) {
-          // console.log("Token refresh successful");
+          // logger.log("Token refresh successful");
           // Backend will handle setting the new access token cookie
           return true;
         }
       } catch (error) {
-        console.error("Token refresh error:", error);
+        logger.error("Token refresh error:", error);
         // If refresh fails, clear all storage and return false to show welcome page
-        // console.log(
+        // logger.log(
         //   "Token refresh failed, clearing all storage and showing welcome page"
         // );
         clearAllStorage();
@@ -130,17 +131,17 @@ function App() {
     }
 
     // If access token exists, we're good
-    // console.log("Access token exists, proceeding normally");
+    // logger.log("Access token exists, proceeding normally");
     return true;
   };
 
   const getUser = async () => {
     try {
       const userData = await fetchUserDetails();
-      // console.log("user", userData);
+      // logger.log("user", userData);
       dispatch(setUserDetails(userData?.data?.data));
     } catch (error) {
-      console.error("Fetch User Error: ", error);
+      logger.error("Fetch User Error: ", error);
       showToast.error("Error fetching user details!");
     }
   };
@@ -151,7 +152,7 @@ function App() {
       const allCategories = await fetchAllCategories({
         all: true,
       });
-      // console.log("allCategories", allCategories);
+      // logger.log("allCategories", allCategories);
       dispatch(setAllCategories(allCategories?.data?.data));
       dispatch(
         setCategoryPageDetails({
@@ -162,7 +163,7 @@ function App() {
         })
       );
     } catch (error) {
-      console.error("Fetch Categories Error: ", error);
+      logger.error("Fetch Categories Error: ", error);
       showToast.error("Error fetching categories!");
     } finally {
       dispatch(setLoadingCategory(false));
@@ -175,7 +176,7 @@ function App() {
       const allSubcategoriesResponse = await fetchAllSubcategories({
         all: true,
       });
-      // console.log("allSubcategories", allSubcategoriesResponse);
+      // logger.log("allSubcategories", allSubcategoriesResponse);
       dispatch(setAllSubcategories(allSubcategoriesResponse?.data?.data));
 
       // Load paginated subcategories for admin view
@@ -184,7 +185,7 @@ function App() {
         currentPage: 1,
         pageSize: 10,
       });
-      // console.log("paginatedSubcategories", paginatedSubcategoriesResponse);
+      // logger.log("paginatedSubcategories", paginatedSubcategoriesResponse);
       dispatch(
         setPaginatedSubcategories(paginatedSubcategoriesResponse?.data?.data)
       );
@@ -197,7 +198,7 @@ function App() {
         })
       );
     } catch (error) {
-      console.error("Fetch Subcategories Error: ", error);
+      logger.error("Fetch Subcategories Error: ", error);
       showToast.error("Error fetching subcategories!");
     }
   };
@@ -209,7 +210,7 @@ function App() {
         currentPage: 1,
         pageSize: 12,
       });
-      // console.log("allProducts", allProducts);
+      // logger.log("allProducts", allProducts);
       dispatch(setAllProducts(allProducts?.data?.data));
       dispatch(
         setProductPageDetails({
@@ -220,7 +221,7 @@ function App() {
         })
       );
     } catch (error) {
-      console.error("Fetch Products Error: ", error);
+      logger.error("Fetch Products Error: ", error);
       showToast.error("Error fetching products!");
     }
   };
@@ -228,13 +229,13 @@ function App() {
   const getAllCartItems = async () => {
     try {
       const response = await fetchAllCartItems();
-      // console.log("Cart Items:", response.data);
+      // logger.log("Cart Items:", response.data);
 
       if (response.status === apiSummary.endpoints.cart.getCart.successStatus) {
         dispatch(addToCart(response.data.data));
       }
     } catch (error) {
-      console.error("Fetch Cart Items Error: ", error);
+      logger.error("Fetch Cart Items Error: ", error);
       showToast.error("Error fetching cart items!");
     }
   };
@@ -251,11 +252,11 @@ function App() {
         apiSummary.endpoints.address.getAllAddresses.successStatus
       ) {
         // Handle the response data as needed
-        // console.log("Addresses fetched successfully:", response.data.data);
+        // logger.log("Addresses fetched successfully:", response.data.data);
         dispatch(setAddresses(response.data.data));
       }
     } catch (error) {
-      console.error("Fetch Addresses Error: ", error);
+      logger.error("Fetch Addresses Error: ", error);
       showToast.error("Error fetching addresses!");
     }
   };

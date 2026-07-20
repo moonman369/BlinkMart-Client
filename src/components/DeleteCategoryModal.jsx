@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError";
 import useScrollLock from "../hooks/useScrollLock";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const DeleteCategoryModal = ({ closeModal, category, fetchCategories }) => {
   const [processing, setProcessing] = useState(false);
@@ -30,7 +31,7 @@ const DeleteCategoryModal = ({ closeModal, category, fetchCategories }) => {
         closeModal();
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       axiosToastError(error);
     } finally {
       setProcessing(false);

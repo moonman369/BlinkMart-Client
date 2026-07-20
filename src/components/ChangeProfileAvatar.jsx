@@ -9,6 +9,7 @@ import { fetchUserDetails } from "../util/fetchUserDetails";
 import { setUserDetails, updateAvatar } from "../store/userSlice";
 import { useDispatch } from "react-redux";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const ChangeProfileAvatar = ({ user, closeModal }) => {
   const [file, setFile] = useState(null);
@@ -42,7 +43,7 @@ const ChangeProfileAvatar = ({ user, closeModal }) => {
         response.status ===
         apiSummary.endpoints.user.setProfileAvatar.successStatus
       ) {
-        // console.log("upload avatar response: ", response);
+        // logger.log("upload avatar response: ", response);
         showToast.success("Avatar uploaded successfully!");
         dispatch(updateAvatar({ avatar: response?.data?.avatarUrl }));
         closeModal();
@@ -53,14 +54,14 @@ const ChangeProfileAvatar = ({ user, closeModal }) => {
       }
     } catch (error) {
       setUploadingInProgress(false);
-      console.error(error);
+      logger.error(error);
       axiosToastError(error);
     } finally {
       setUploadingInProgress(false);
     }
   };
 
-  console.log("file", file);
+  logger.log("file", file);
 
   return (
     <section className="fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-60 flex items-center justify-center">

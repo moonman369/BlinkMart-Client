@@ -16,6 +16,7 @@ import customAxios from "../util/customAxios";
 import { loadRazorpayScript } from "../util/razorPay";
 import { paymentMethodsToRzpMap } from "../util/constants";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const Checkout = () => {
   const location = useLocation();
@@ -81,7 +82,7 @@ const Checkout = () => {
       ) {
         // Clear the cart after successful order
         await performClearCart();
-        console.log(response);
+        logger.log(response);
         showToast.success("Order placed successfully!");
         navigate("/order-confirmation", {
           state: {
@@ -96,7 +97,7 @@ const Checkout = () => {
       }
     } catch (error) {
       showToast.error("Failed to place order. Please try again.");
-      console.error(error);
+      logger.error(error);
     } finally {
       setLoading(false);
     }
@@ -135,7 +136,7 @@ const Checkout = () => {
         const { razorpayOrderId, amount } =
           response?.data?.data?.paymentDetails;
         const { order_id } = response?.data?.data?.order;
-        console.log("Online order created:", response.data.data);
+        logger.log("Online order created:", response.data.data);
 
         // Store the order_id in localStorage to handle potential payment failures
         localStorage.setItem("pendingOrderId", response.data.data.order_id);
@@ -146,7 +147,7 @@ const Checkout = () => {
         throw new Error("Failed to create order");
       }
     } catch (error) {
-      console.error("Error creating online order:", error);
+      logger.error("Error creating online order:", error);
       showToast.error("Failed to process online payment. Please try again.");
     } finally {
       setLoading(false);
@@ -166,7 +167,7 @@ const Checkout = () => {
         dispatch(clearCart());
       }
     } catch (error) {
-      console.error("Failed to clear cart:", error);
+      logger.error("Failed to clear cart:", error);
       showToast.error("Failed to clear cart");
     }
   };
@@ -188,7 +189,7 @@ const Checkout = () => {
     const RAZORPAY_KEY_ID = import.meta.env.VITE_APP_RAZORPAY_KEY_ID;
 
     if (!RAZORPAY_KEY_ID) {
-      console.error("Razorpay key not found in environment variables");
+      logger.error("Razorpay key not found in environment variables");
       showToast.error("Payment configuration error. Please contact support.");
       return;
     }
@@ -203,9 +204,9 @@ const Checkout = () => {
       order_id: razorpay_order_id,
       handler: async function (response) {
         showToast.success("Payment successful!");
-        console.log("Payment ID:", response.razorpay_payment_id);
-        console.log("Order ID:", response.razorpay_order_id);
-        console.log("Signature:", response.razorpay_signature);
+        logger.log("Payment ID:", response.razorpay_payment_id);
+        logger.log("Order ID:", response.razorpay_order_id);
+        logger.log("Signature:", response.razorpay_signature);
         await handlePaymentSuccess(response);
       },
       prefill: {
@@ -226,7 +227,7 @@ const Checkout = () => {
       modal: {
         ondismiss: function () {
           setTimeout(() => {
-            console.log(paymentAttemptedRef.current);
+            logger.log(paymentAttemptedRef.current);
             if (paymentAttemptedRef.current === false) {
               showToast.error("Payment cancelled by user");
               handlePaymentCancelled(order_id, razorpay_order_id);
@@ -301,8 +302,8 @@ const Checkout = () => {
 
     // Event handler for payment failure
     rzp.on("payment.failed", function (response) {
-      console.log(paymentAttemptedRef.current);
-      console.error("Payment failed:", response.error);
+      logger.log(paymentAttemptedRef.current);
+      logger.error("Payment failed:", response.error);
       showToast.error(`Payment failed: ${response.error.description}`);
       handlePaymentFailed(order_id, razorpay_order_id, response.error);
     });
@@ -327,7 +328,7 @@ const Checkout = () => {
         response.status ===
         apiSummary.endpoints.order.paymentCancelled.successStatus
       ) {
-        console.log(response);
+        logger.log(response);
         // Redirect to orders page
         navigate("/order-confirmation", {
           state: {
@@ -343,7 +344,7 @@ const Checkout = () => {
         });
       }
     } catch (error) {
-      console.error("Error handling payment cancellation:", error);
+      logger.error("Error handling payment cancellation:", error);
       // Still navigate to orders so user can see their order
       navigate("/dashboard/my-orders");
     } finally {
@@ -393,7 +394,7 @@ const Checkout = () => {
         });
       }
     } catch (error) {
-      console.error("Error handling payment failure:", error);
+      logger.error("Error handling payment failure:", error);
       // Still navigate to orders so user can see their order
       navigate("/dashboard/my-orders");
     } finally {
@@ -442,7 +443,7 @@ const Checkout = () => {
         throw new Error("Payment verification failed");
       }
     } catch (error) {
-      console.error("Payment verification error:", error);
+      logger.error("Payment verification error:", error);
       showToast.error("Payment verification failed. Please contact support.");
 
       // Navigate to orders page so they can see their order status
@@ -460,22 +461,22 @@ const Checkout = () => {
     switch (method) {
       case "COD":
         // Maybe show a message about COD
-        console.log("Selected Cash on Delivery");
+        logger.log("Selected Cash on Delivery");
         break;
       case "Card":
         // Maybe prepare card form or validation
-        console.log("Selected Card payment");
+        logger.log("Selected Card payment");
         break;
       case "UPI":
         // Maybe prepare UPI form or validation
-        console.log("Selected UPI payment");
+        logger.log("Selected UPI payment");
         break;
       case "Net Banking":
         // Maybe prepare bank selection options
-        console.log("Selected Net Banking");
+        logger.log("Selected Net Banking");
         break;
       default:
-        console.log("Unknown payment method");
+        logger.log("Unknown payment method");
     }
   };
 

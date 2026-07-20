@@ -1,5 +1,6 @@
 import { apiSummary } from "../config/api/apiSummary";
 import customAxios from "./customAxios";
+import logger from "./logger";
 
 export const fetchAllCategories = async ({ all, currentPage, pageSize }) => {
   if (all) {
@@ -21,6 +22,6 @@ export const fetchAllCategories = async ({ all, currentPage, pageSize }) => {
       pageSize: pageSize ?? 20,
     },
   });
-  // console.log(fetchCategoriesResponse);
+  // logger.log(fetchCategoriesResponse);
   return fetchCategoriesResponse;
 };

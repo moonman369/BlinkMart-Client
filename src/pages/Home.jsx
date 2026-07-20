@@ -12,6 +12,7 @@ import DisplayProductsByCategory from "../components/DisplayProductsByCategory";
 import { axiosToastError } from "../util/axiosToastError.js";
 import { buildProductCategorizedUrl } from "../util/buildProductCategorizedUrl.js";
 import { setLoadingCategory } from "../store/productSlice.js";
+import logger from "../util/logger";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -26,16 +27,16 @@ const Home = () => {
     const categoryId = category?._id;
     const categoryName = category?.name;
     if (!categoryId || !categoryName) {
-      console.error("Invalid category data:", category);
+      logger.error("Invalid category data:", category);
       return;
     }
 
     const subcategory = subcategories.find((subcategory) =>
       subcategory.category.some((cat) => cat._id === categoryId)
     );
-    console.log("matchedSubcategories", subcategory);
+    logger.log("matchedSubcategories", subcategory);
     if (!subcategory) {
-      console.error("No subcategory found for this categoryId:", categoryId);
+      logger.error("No subcategory found for this categoryId:", categoryId);
       return;
     }
 
@@ -60,7 +61,7 @@ const Home = () => {
           ]);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        logger.error("Error fetching data:", error);
         // axiosToastError(error);
       } finally {
         setLoading(false);

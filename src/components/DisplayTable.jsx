@@ -5,6 +5,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import logger from "../util/logger";
 
 const DisplayTable = ({ data, columns }) => {
   const table = useReactTable({
@@ -20,7 +21,7 @@ const DisplayTable = ({ data, columns }) => {
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               <th className="border border-gray-500 w-[60px]">SL No.</th>
-              {console.log(headerGroup.headers)}
+              {logger.log(headerGroup.headers)}
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}

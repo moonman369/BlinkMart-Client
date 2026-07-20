@@ -10,6 +10,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import ProductCard from "../components/ProductCard";
 import NoData from "../components/NoData";
 import PaginationBar from "../components/PaginationBar";
+import logger from "../util/logger";
 
 const SearchPage = () => {
   const navigate = useNavigate();
@@ -69,7 +70,7 @@ const SearchPage = () => {
         });
       }
     } catch (error) {
-      console.error("Search Products Error: ", error);
+      logger.error("Search Products Error: ", error);
       axiosToastError(error);
     } finally {
       setLoading(false);

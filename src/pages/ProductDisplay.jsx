@@ -17,6 +17,7 @@ import {
 import { FaIndianRupeeSign } from "react-icons/fa6";
 import AddToCartButton from "../components/AddToCartButton";
 import { useSelector } from "react-redux";
+import logger from "../util/logger";
 
 const ProductDisplay = () => {
   const location = useLocation();
@@ -94,8 +95,8 @@ const ProductDisplay = () => {
     try {
       setLoading(true);
       const productResponse = await fetchProductsById({ productId });
-      console.log("productId", productId);
-      console.log("productResponse", productResponse);
+      logger.log("productId", productId);
+      logger.log("productResponse", productResponse);
       if (productResponse?.data?.data) {
         setProduct(productResponse.data.data);
         // Parse more_details if it exists
@@ -107,13 +108,13 @@ const ProductDisplay = () => {
                 : productResponse.data.data.more_details;
             setMoreDetails(parsedDetails);
           } catch (error) {
-            console.error("Error parsing more_details:", error);
+            logger.error("Error parsing more_details:", error);
             setMoreDetails(null);
           }
         }
       }
     } catch (error) {
-      console.log(error);
+      logger.log(error);
     } finally {
       setLoading(false);
     }
