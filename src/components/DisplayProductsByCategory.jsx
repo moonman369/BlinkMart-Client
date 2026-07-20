@@ -6,6 +6,7 @@ import { apiSummary } from "../config/api/apiSummary.js";
 import ProductCard from "./ProductCard.jsx";
 import { ProductCardSkeleton } from "./ui/Skeleton.jsx";
 import { cn } from "../util/cn.js";
+import logger from "../util/logger";
 
 const SCROLL_STEP = 320;
 
@@ -38,7 +39,7 @@ const DisplayProductsByCategory = ({
           setProducts(productResponse.data.data);
         }
       } catch (error) {
-        console.error(error);
+        logger.error(error);
         axiosToastError(error);
       } finally {
         setLoading(false);

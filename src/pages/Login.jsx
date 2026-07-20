@@ -9,6 +9,7 @@ import { fetchUserDetails } from "../util/fetchUserDetails";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "../store/userSlice";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const Login = () => {
   const [userData, setUserData] = useState({
@@ -57,10 +58,10 @@ const Login = () => {
         },
       });
 
-      console.log(`Login Response: `, response);
+      logger.log(`Login Response: `, response);
       if (response?.status === apiSummary.endpoints.user.login.successStatus) {
         const userData = await fetchUserDetails();
-        console.log(userData);
+        logger.log(userData);
         dispatch(setUserDetails(userData?.data?.data));
         showToast.success("Login Successful!🎉");
 
@@ -71,14 +72,14 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       axiosToastError(error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  console.log(userData);
+  logger.log(userData);
   return (
     <section className="w-full container mx-auto px-2">
       <div className="bg-gray-900 my-4 w-full max-w-lg mx-auto rounded p-6">

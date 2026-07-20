@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { IoClose } from "react-icons/io5";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const AddCustomFieldModal = ({ closeModal, customFields, setCustomFields }) => {
   const [newField, setNewField] = useState("");
@@ -22,7 +23,7 @@ const AddCustomFieldModal = ({ closeModal, customFields, setCustomFields }) => {
         showToast.error("Field already added!");
         return;
       }
-      // console.log("newField", newField);
+      // logger.log("newField", newField);
       setCustomFields((prevProductData) => {
         return {
           ...prevProductData,
@@ -35,7 +36,7 @@ const AddCustomFieldModal = ({ closeModal, customFields, setCustomFields }) => {
       showToast.success("Custom Field added successfully!");
       closeModal();
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       showToast.error("Failed to add custom field!");
     } finally {
       setProcessing(false);

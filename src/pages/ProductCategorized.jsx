@@ -12,6 +12,7 @@ import { IoClose } from "react-icons/io5";
 import { buildProductCategorizedUrl } from "../util/buildProductCategorizedUrl";
 import { FaBoxOpen } from "react-icons/fa";
 import NoData from "../components/NoData";
+import logger from "../util/logger";
 
 const ProductCategorized = () => {
   const location = useLocation();
@@ -28,7 +29,7 @@ const ProductCategorized = () => {
   );
   const mobileMenuRef = useRef(null);
 
-  console.log("allSubcategories", allSubcategories);
+  logger.log("allSubcategories", allSubcategories);
 
   // Scroll to top on component mount
   useEffect(() => {
@@ -68,7 +69,7 @@ const ProductCategorized = () => {
         setCategorySubcategories(response.data.data);
       }
     } catch (error) {
-      console.error("Error fetching subcategories:", error);
+      logger.error("Error fetching subcategories:", error);
       axiosToastError(error);
     } finally {
       setLoadingSubcategories(false);
@@ -96,7 +97,7 @@ const ProductCategorized = () => {
         setProducts(productResponse.data.data || []);
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setProducts([]); // Clear products on error
       // axiosToastError(error);
     } finally {
@@ -108,8 +109,8 @@ const ProductCategorized = () => {
     loadProductsSubcategorywise();
   }, [currentPage, subcategory?._id]);
 
-  console.log("products", products);
-  console.log("location.state", location.state);
+  logger.log("products", products);
+  logger.log("location.state", location.state);
 
   const handleSubcategoryClick = (selectedSubcategory) => {
     // Clear current products before navigation

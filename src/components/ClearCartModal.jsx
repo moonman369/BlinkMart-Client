@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import useScrollLock from "../hooks/useScrollLock";
+import logger from "../util/logger";
 
 const ClearCartModal = ({ isOpen, onClose, onConfirm }) => {
   const [processing, setProcessing] = useState(false);
@@ -13,7 +14,7 @@ const ClearCartModal = ({ isOpen, onClose, onConfirm }) => {
       setProcessing(true);
       await onConfirm();
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setProcessing(false);
     }

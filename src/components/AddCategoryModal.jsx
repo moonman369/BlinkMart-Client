@@ -9,6 +9,7 @@ import { axiosToastError } from "../util/axiosToastError";
 import { useDispatch } from "react-redux";
 import useScrollLock from "../hooks/useScrollLock";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const AddCategoryModal = ({ fetchCategories, closeModal }) => {
   const [newCategoryData, setNewCategoryData] = useState({
@@ -43,7 +44,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
         method: apiSummary.endpoints.category.addCategory.method,
         data: formData,
       });
-      // console.log("response", response);
+      // logger.log("response", response);
       if (
         response.status ===
         apiSummary.endpoints.category.addCategory.successStatus
@@ -63,7 +64,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
   const handleUploadCategoryImage = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // console.log(file?.type);
+      // logger.log(file?.type);
       if (IMAGE_MIMETYPE_LIST.includes(file.type)) {
         // const fileBase64String = await getFileAsBase64(file);
         setNewCategoryData((prevData) => ({
@@ -78,7 +79,7 @@ const AddCategoryModal = ({ fetchCategories, closeModal }) => {
     }
   };
 
-  // console.log(newCategoryData);
+  // logger.log(newCategoryData);
 
   return (
     <section className="fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-60 flex items-center justify-center z-50">

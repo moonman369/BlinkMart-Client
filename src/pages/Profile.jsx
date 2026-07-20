@@ -15,6 +15,7 @@ import { axiosToastError } from "../util/axiosToastError";
 import { fetchUserDetails } from "../util/fetchUserDetails";
 import { setUserDetails } from "../store/userSlice";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const Profile = () => {
   const user = useSelector((state) => state.user);
@@ -97,7 +98,7 @@ const Profile = () => {
         showToast.error("Failed to send verification email.");
       }
     } catch (error) {
-      console.error("Error sending verification email:", error);
+      logger.error("Error sending verification email:", error);
       showToast.error("Failed to send verification email. Please try again.");
     } finally {
       setSendingVerification(false);

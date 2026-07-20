@@ -15,6 +15,7 @@ import {
   setCategoryPageDetails,
 } from "../store/productSlice";
 import PaginationBar from "../components/PaginationBar";
+import logger from "../util/logger";
 
 const Categories = () => {
   const [openAddCategoryModal, setOpenAddCategoryModal] = useState(false);
@@ -39,12 +40,12 @@ const Categories = () => {
         currentPage,
         pageSize,
       });
-      console.log(fetchCategoriesResponse);
+      logger.log(fetchCategoriesResponse);
       if (
         fetchCategoriesResponse.status ===
         apiSummary.endpoints.category.getAllCategories.successStatus
       ) {
-        console.log("Refresh Categories", fetchCategoriesResponse);
+        logger.log("Refresh Categories", fetchCategoriesResponse);
         dispatch(setAllCategories(fetchCategoriesResponse.data.data));
         dispatch(
           setCategoryPageDetails({
@@ -56,7 +57,7 @@ const Categories = () => {
         );
       }
     } catch (error) {
-      console.error("Fetch Categories Error: ", error);
+      logger.error("Fetch Categories Error: ", error);
       axiosToastError(error);
     } finally {
       setLoading(false);
@@ -74,7 +75,7 @@ const Categories = () => {
 
   useEffect(() => {
     // fetchAllCategories();
-    // console.log("categoriesPageDetails", categoryPageDetails);
+    // logger.log("categoriesPageDetails", categoryPageDetails);
   }, []);
 
   return (

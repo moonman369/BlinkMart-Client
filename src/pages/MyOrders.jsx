@@ -8,6 +8,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
 import { apiSummary } from "../config/api/apiSummary";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const OrderStatusBadge = ({ status, paymentStatus }) => {
   const getStatusDetails = () => {
@@ -90,7 +91,7 @@ const MyOrders = () => {
         throw new Error("Failed to fetch orders");
       }
     } catch (error) {
-      console.error("Error fetching orders:", error);
+      logger.error("Error fetching orders:", error);
       setError("Failed to load your orders. Please try again later.");
       showToast.error("Failed to load orders");
     } finally {

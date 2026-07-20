@@ -20,6 +20,7 @@ import {
   setPaginatedSubcategories,
 } from "../store/productSlice";
 import PaginationBar from "../components/PaginationBar";
+import logger from "../util/logger";
 
 const SubCategories = () => {
   const dispatch = useDispatch();
@@ -64,7 +65,7 @@ const SubCategories = () => {
     columnHelper.accessor("category", {
       header: "Category",
       cell: ({ row }) => {
-        console.log("row", row?.original?.category);
+        logger.log("row", row?.original?.category);
         const categoriesArray = row?.original?.category;
         if (categoriesArray && categoriesArray.length > 0) {
           return categoriesArray.map((category) => (
@@ -110,12 +111,12 @@ const SubCategories = () => {
         currentPage,
         pageSize,
       });
-      console.log(fetchSubcategoriesResponse);
+      logger.log(fetchSubcategoriesResponse);
       if (
         fetchSubcategoriesResponse.status ===
         apiSummary.endpoints.subcategory.getAllSubcategories.successStatus
       ) {
-        console.log("Refresh Subcategories", fetchSubcategoriesResponse);
+        logger.log("Refresh Subcategories", fetchSubcategoriesResponse);
         dispatch(
           setPaginatedSubcategories(fetchSubcategoriesResponse.data.data)
         );
@@ -129,7 +130,7 @@ const SubCategories = () => {
         );
       }
     } catch (error) {
-      console.error("Fetch Subcategories Error: ", error);
+      logger.error("Fetch Subcategories Error: ", error);
       axiosToastError(error);
     } finally {
       setLoading(false);
@@ -142,7 +143,7 @@ const SubCategories = () => {
   const handleEditClick = (subcategory) => {
     setOpenEditSubcategoryModal(true);
     setSelectedSubcategory(subcategory);
-    console.log("subcategory", subcategory);
+    logger.log("subcategory", subcategory);
   };
   const closeEditSubcategoryModal = () => {
     setOpenEditSubcategoryModal(false);
@@ -152,7 +153,7 @@ const SubCategories = () => {
   const handleDeleteClick = (subcategory) => {
     setOpenDeleteSubcategoryModal(true);
     setSelectedSubcategory(subcategory);
-    console.log("subcategory", subcategory);
+    logger.log("subcategory", subcategory);
   };
   const closeDeleteSubcategoryModal = () => {
     setOpenDeleteSubcategoryModal(false);
@@ -168,8 +169,8 @@ const SubCategories = () => {
     setSelectedSubcategory(null);
   };
 
-  console.log("subcategories", subcategories);
-  console.log(
+  logger.log("subcategories", subcategories);
+  logger.log(
     `subcategoryPageDetails ${subcategoryPageDetails?.totalCount} ${Math.floor(
       subcategoryPageDetails?.totalCount / 10
     )} ${subcategoryPageDetails?.totalCount % 10 > 0 ? 1 : 0}`

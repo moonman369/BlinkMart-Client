@@ -10,6 +10,7 @@ import { fetchAllCategories } from "../util/fetchAllCategories";
 import { fetchAllSubcategories } from "../util/fetchAllSubcategories";
 import useScrollLock from "../hooks/useScrollLock";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const EditProductModal = ({ closeModal, product, fetchProducts }) => {
   const [editProductData, setEditProductData] = useState({
@@ -58,7 +59,7 @@ const EditProductModal = ({ closeModal, product, fetchProducts }) => {
           setSubcategories(subcategoriesResponse.data.data);
         }
       } catch (error) {
-        console.error(error);
+        logger.error(error);
         axiosToastError(error);
       }
     };
@@ -181,7 +182,7 @@ const EditProductModal = ({ closeModal, product, fetchProducts }) => {
         closeModal();
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       axiosToastError(error);
     } finally {
       setProcessing(false);

@@ -7,6 +7,7 @@ import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import useScrollLock from "../hooks/useScrollLock";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
   const [newCategoryData, setNewCategoryData] = useState({
@@ -48,7 +49,7 @@ const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
         method: apiSummary.endpoints.category.updateCategory.method,
         data: formData,
       });
-      console.log("response", response);
+      logger.log("response", response);
       if (
         response.status ===
         apiSummary.endpoints.category.updateCategory.successStatus
@@ -58,7 +59,7 @@ const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
         closeModal();
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       axiosToastError(error);
     } finally {
       setProcessing(false);
@@ -68,7 +69,7 @@ const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
   const handleUploadCategoryImage = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      console.log(file?.type);
+      logger.log(file?.type);
       if (IMAGE_MIMETYPE_LIST.includes(file.type)) {
         // const fileBase64String = await getFileAsBase64(file);
         setNewCategoryData((prevData) => ({
@@ -83,7 +84,7 @@ const EditCategoryModal = ({ closeModal, category, fetchCategories }) => {
     }
   };
 
-  console.log(newCategoryData);
+  logger.log(newCategoryData);
 
   return (
     <section className="fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-60 flex items-center justify-center z-50">

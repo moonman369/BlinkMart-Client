@@ -1,5 +1,6 @@
 import { apiSummary } from "../config/api/apiSummary";
 import customAxios from "./customAxios";
+import logger from "./logger";
 
 export const fetchAllSubcategories = async ({ all, currentPage, pageSize }) => {
   if (all) {
@@ -21,7 +22,7 @@ export const fetchAllSubcategories = async ({ all, currentPage, pageSize }) => {
       pageSize: pageSize ?? 20,
     },
   });
-  // console.log(subcategoryResponse);
+  // logger.log(subcategoryResponse);
   return subcategoryResponse;
 };
 

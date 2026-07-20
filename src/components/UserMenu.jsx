@@ -12,6 +12,7 @@ import { isAdmin } from "../util/isAdmin.js";
 import Cookies from "js-cookie";
 import { COOKIE_CLEAR_SETTINGS } from "../util/constants";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const UserMenu = ({ isMobile, close }) => {
   const user = useSelector((state) => state.user);
@@ -50,7 +51,7 @@ const UserMenu = ({ isMobile, close }) => {
         }, 100);
       }
     } catch (error) {
-      console.error("Logout error:", error);
+      logger.error("Logout error:", error);
       axiosToastError(error);
     }
   };

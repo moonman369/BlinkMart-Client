@@ -1,5 +1,6 @@
 import { apiSummary } from "../config/api/apiSummary";
 import customAxios from "./customAxios";
+import logger from "./logger";
 
 export const fetchAllProducts = async ({
   all,
@@ -27,7 +28,7 @@ export const fetchAllProducts = async ({
       ...(searchText && { search: searchText }),
     },
   });
-  // console.log(productResponse);
+  // logger.log(productResponse);
   return productResponse;
 };
 
@@ -58,7 +59,7 @@ export const fetchProductsByCategory = async ({
       pageSize: pageSize ?? 20,
     },
   });
-  // console.log(productResponse);
+  // logger.log(productResponse);
   return productResponse;
 };
 
@@ -89,7 +90,7 @@ export const fetchProductsBySubcategory = async ({
       pageSize: pageSize ?? 20,
     },
   });
-  // console.log(productResponse);
+  // logger.log(productResponse);
   return productResponse;
 };
 
@@ -107,7 +108,7 @@ export const fetchProductsById = async ({ productId }) => {
     });
     return productResponse;
   } catch (error) {
-    console.error("Error fetching product:", error);
+    logger.error("Error fetching product:", error);
     return null;
   }
 };

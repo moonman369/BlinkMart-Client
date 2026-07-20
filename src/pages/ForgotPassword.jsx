@@ -6,6 +6,7 @@ import { apiSummary } from "../config/api/apiSummary";
 import { axiosToastError } from "../util/axiosToastError";
 import { Link, useNavigate } from "react-router-dom";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const ForgotPassword = () => {
   const [userData, setUserData] = useState({
@@ -41,7 +42,7 @@ const ForgotPassword = () => {
         },
       });
 
-      console.log(`Forgot Password Response: `, response);
+      logger.log(`Forgot Password Response: `, response);
       if (
         response?.status ===
         apiSummary.endpoints.user.forgotPassword.successStatus
@@ -54,12 +55,12 @@ const ForgotPassword = () => {
         });
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       axiosToastError(error);
     }
   };
 
-  console.log(userData);
+  logger.log(userData);
   return (
     <section className="w-full container mx-auto px-2">
       <div className="bg-gray-900 my-4 w-full max-w-lg mx-auto rounded p-6">

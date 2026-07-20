@@ -12,6 +12,7 @@ import { fetchAllAddresses } from "../util/fetchAllAddresses";
 import { setAddresses } from "../store/addressSlice";
 import AddressCard from "../components/AddressCard"; // Import the AddressCard component
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const Addresses = () => {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ const Addresses = () => {
         dispatch(setAddresses(response.data.data || []));
       }
     } catch (error) {
-      console.error("Error fetching addresses:", error);
+      logger.error("Error fetching addresses:", error);
       showToast.error("Failed to load addresses");
     } finally {
       setLoading(false);
@@ -119,7 +120,7 @@ const Addresses = () => {
         fetchAddresses();
       }
     } catch (error) {
-      console.error("Error saving address:", error);
+      logger.error("Error saving address:", error);
       showToast.error(
         editMode ? "Failed to update address" : "Failed to add address"
       );
@@ -162,7 +163,7 @@ const Addresses = () => {
         fetchAddresses();
       }
     } catch (error) {
-      console.error("Error deleting address:", error);
+      logger.error("Error deleting address:", error);
       axiosToastError(error);
     } finally {
       setLoading(false);

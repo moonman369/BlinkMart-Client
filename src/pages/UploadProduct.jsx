@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import customAxios from "../util/customAxios";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const UploadProduct = () => {
   const [productData, setProductData] = useState({
@@ -41,7 +42,7 @@ const UploadProduct = () => {
       const fetchAllCategoriesResponse = await fetchAllCategories({
         all: true,
       });
-      console.log("fetchAllCategoriesResponse", fetchAllCategoriesResponse);
+      logger.log("fetchAllCategoriesResponse", fetchAllCategoriesResponse);
       if (
         fetchAllCategoriesResponse?.status ===
         apiSummary.endpoints.category.getAllCategories.successStatus
@@ -49,7 +50,7 @@ const UploadProduct = () => {
         setAllCategories(fetchAllCategoriesResponse?.data?.data);
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       axiosToastError(error);
     }
   };
@@ -58,7 +59,7 @@ const UploadProduct = () => {
       const fetchAllSubcategoriesResponse = await fetchAllSubcategories({
         all: true,
       });
-      console.log(
+      logger.log(
         "fetchAllSubcategoriesResponse",
         fetchAllSubcategoriesResponse
       );
@@ -69,7 +70,7 @@ const UploadProduct = () => {
         setAllSubCategories(fetchAllSubcategoriesResponse?.data?.data);
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       axiosToastError(error);
     }
   };
@@ -80,7 +81,7 @@ const UploadProduct = () => {
 
   const handleUploadProductImage = (e) => {
     const files = e.target.files;
-    console.log("files", files);
+    logger.log("files", files);
     if (files && files.length > 0) {
       setProductData({
         ...productData,
@@ -177,7 +178,7 @@ const UploadProduct = () => {
         formData.append("images", productData?.image[i]);
       }
       formData.append("publish", true);
-      console.log("formdata", formData.getAll("images"));
+      logger.log("formdata", formData.getAll("images"));
 
       const response = await customAxios({
         url: apiSummary.endpoints.product.addProduct.path,
@@ -185,7 +186,7 @@ const UploadProduct = () => {
         data: formData,
       });
 
-      console.log("add product response", response);
+      logger.log("add product response", response);
       if (
         response.status ===
         apiSummary.endpoints.product.addProduct.successStatus
@@ -207,14 +208,14 @@ const UploadProduct = () => {
         loadAllSubcategories();
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       axiosToastError(error);
     } finally {
       setProcessing(false);
     }
   };
 
-  console.log("productData", productData);
+  logger.log("productData", productData);
 
   return (
     <section>

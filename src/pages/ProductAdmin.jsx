@@ -8,6 +8,7 @@ import ProductCardAdmin from "../components/ProductCardAdmin";
 import PaginationBar from "../components/PaginationBar";
 import { IoSearch } from "react-icons/io5";
 import { BiHandicap } from "react-icons/bi";
+import logger from "../util/logger";
 
 const ProductAdmin = () => {
   const products = useSelector((state) => state.product.allProducts);
@@ -34,12 +35,12 @@ const ProductAdmin = () => {
         pageSize,
         searchText,
       });
-      console.log(fetchProductsResponse);
+      logger.log(fetchProductsResponse);
       if (
         fetchProductsResponse.status ===
         apiSummary.endpoints.product.getProducts.successStatus
       ) {
-        console.log("Refresh Products", fetchProductsResponse);
+        logger.log("Refresh Products", fetchProductsResponse);
         dispatch(setAllProducts(fetchProductsResponse.data.data));
         dispatch(
           setProductPageDetails({
@@ -51,7 +52,7 @@ const ProductAdmin = () => {
         );
       }
     } catch (error) {
-      console.error("Fetch Products Error: ", error);
+      logger.error("Fetch Products Error: ", error);
       axiosToastError(error);
     } finally {
       setLoading(false);

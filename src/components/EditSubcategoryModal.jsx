@@ -11,6 +11,7 @@ import SelectionDropDown from "./SelectionDropDown.jsx";
 import { fetchAllCategories } from "../util/fetchAllCategories.js";
 import useScrollLock from "../hooks/useScrollLock";
 import { showToast } from "../config/toastConfig";
+import logger from "../util/logger";
 
 const EditSubcategoryModal = ({
   fetchSubcategories,
@@ -31,13 +32,13 @@ const EditSubcategoryModal = ({
       const fetchAllCategoriesResponse = await fetchAllCategories({
         all: true,
       });
-      console.log("fetchAllCategoriesResponse", fetchAllCategoriesResponse);
+      logger.log("fetchAllCategoriesResponse", fetchAllCategoriesResponse);
       setCategories(fetchAllCategoriesResponse?.data?.data);
     };
 
     performFetchCategories();
   }, []);
-  console.log("categories", categories);
+  logger.log("categories", categories);
 
   useEffect(() => {
     setEditSubcategoryData(subcategory);
@@ -68,7 +69,7 @@ const EditSubcategoryModal = ({
   //   const newCategory = categories.find(
   //     (category) => category?._id === newCategoryId
   //   );
-  //   console.log(newCategory);
+  //   logger.log(newCategory);
   //   setEditSubcategoryData((prevData) => ({
   //     ...prevData,
   //     category: [...prevData?.category, newCategory],
@@ -82,7 +83,7 @@ const EditSubcategoryModal = ({
   // };
 
   // useEffect(() => {
-  //   console.log(
+  //   logger.log(
   //     "condition",
   //     editSubcategoryData?.name != null,
   //     editSubcategoryData?.category?.length > 0,
@@ -138,7 +139,7 @@ const EditSubcategoryModal = ({
         method: apiSummary.endpoints.subcategory.updateSubcategory.method,
         data: formData,
       });
-      console.log("response", response);
+      logger.log("response", response);
       if (
         response.status ===
         apiSummary.endpoints.subcategory.updateSubcategory.successStatus
@@ -148,7 +149,7 @@ const EditSubcategoryModal = ({
         closeModal();
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       axiosToastError(error);
     } finally {
       setProcessing(false);
@@ -158,7 +159,7 @@ const EditSubcategoryModal = ({
   const handleUploadSubcategoryImage = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      console.log(file?.type);
+      logger.log(file?.type);
       if (IMAGE_MIMETYPE_LIST.includes(file.type)) {
         // const fileBase64String = await getFileAsBase64(file);
         setEditSubcategoryData((prevData) => ({
@@ -173,7 +174,7 @@ const EditSubcategoryModal = ({
     }
   };
 
-  console.log("editSubcategoryData", editSubcategoryData);
+  logger.log("editSubcategoryData", editSubcategoryData);
 
   return (
     <section className="fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
