@@ -1,85 +1,116 @@
-import React, { useEffect } from "react";
-// import { DisplayPriceInRupees } from "../utils/DisplayPriceInRupees";
-import { data, Link } from "react-router-dom";
-// import { valideURLConvert } from "../utils/valideURLConvert";
-// import { pricewithDiscount } from "../utils/PriceWithDiscount";
-import { axiosToastError } from "../util/axiosToastError";
-import toast from "react-hot-toast";
-import { useState } from "react";
-import { apiSummary } from "../config/api/apiSummary";
+import React, { useMemo } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
+import { MdOutlineTimer } from "react-icons/md";
 import { getINRString } from "../util/getINRString.js";
+import { getDiscountedPrice } from "../util/price.js";
 import { convertToUrlString } from "../util/convertToUrlString.js";
-import customAxios from "../util/customAxios.js";
-import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "../store/cartSlice.js";
 import AddToCartButton from "./AddToCartButton.jsx";
-import { FaMinus, FaPlus } from "react-icons/fa6";
+import { cn } from "../util/cn.js";
 
-const ProductCard = ({ product }) => {
-  const [loading, setLoading] = useState(false);
-  const [cartItem, setCartItem] = useState({});
+const ProductCard = ({ product, index = 0 }) => {
   const cartItems = useSelector((state) => state.cart?.items);
 
-  const url = `/product/${convertToUrlString(product?.name)}-${product._id}`;
-  const dispatch = useDispatch();
-  // console.log("product", product);
+  const cartItem = useMemo(
+    () => cartItems?.find((item) => item?.product?._id === product?._id),
+    [cartItems, product?._id]
+  );
 
-  useEffect(() => {
-    if (cartItems && cartItems.length > 0) {
-      const item = cartItems.find((item) => item.product._id === product._id);
-      if (item) {
-        setCartItem(item);
-      } else {
-        setCartItem({});
-      }
-    } else {
-      setCartItem({});
-    }
-  }, [cartItems]);
+  const url = `/product/${convertToUrlString(product?.name)}-${product?._id}`;
+
+  const hasDiscount = product?.discount > 0;
+  const effectivePrice = getDiscountedPrice(product?.price, product?.discount);
+  const outOfStock = !(product?.stock > 0);
 
   return (
-    <Link
-      to={url}
-      state={{
-        productId: product._id,
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.32,
+        ease: [0.16, 1, 0.3, 1],
+        // Cascade cards in rather than snapping the whole grid at once
+        delay: Math.min(index * 0.035, 0.25),
       }}
-      className="border hover:border-secondary-200 p-2 lg:p-4 grid gap-0.5 lg:gap-3 max-w-44 lg:max-w-72 rounded cursor-pointer bg-gray-700"
     >
-      <div className="min-h-20 max-h-28 rounded">
-        <img
-          src={product.image[0]}
-          className="object-scale-down scale-75 lg:scale-105 overflow-hidden h-full w-full rounded"
-          loading="lazy"
-        />
-      </div>
-      <div className="bg-[#2e482e] text-green-500 rounded px-1 text-[10px] lg:text-sm w-fit">
-        10 min
-      </div>
-      <div className="font-medium text-ellipsis line-clamp-2 text-xs lg:text-base">
-        {product.name}
-      </div>
-      <div className="w-fit text-gray-400 text-[10px] lg:text-sm">
-        {product.unit}
-      </div>
+      <Link
+        to={url}
+        state={{ productId: product?._id }}
+        className={cn(
+          "group flex h-full flex-col gap-2 rounded-card border border-surface-border bg-surface-raised p-2.5 lg:p-3",
+          "transition-all duration-base ease-out",
+          "hover:-translate-y-1 hover:border-mint-600/50 hover:shadow-e3"
+        )}
+      >
+        {/* Image */}
+        <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-surface-hover/50">
+          <img
+            src={product?.image?.[0]}
+            alt={product?.name}
+            loading="lazy"
+            className={cn(
+              "h-full w-full object-contain p-2 transition-transform duration-slow ease-out",
+              "group-hover:scale-[1.08]",
+              outOfStock && "opacity-40 grayscale"
+            )}
+          />
 
-      <div className="flex items-center justify-between gap-1 lg:gap-3">
-        <div className="bg-gray-600 rounded w-16 text-secondary-200 font-bold p-1 lg:p-2 text-xs">
-          {getINRString(product.price)}
-        </div>
-        <div>
-          {product.stock > 0 ? (
-            <AddToCartButton product={product} cartItem={cartItem} />
-          ) : (
-            <button
-              className="bg-gray-600 px-2 py-0.5 lg:px-4 lg:py-1 text-white rounded cursor-not-allowed text-xs"
-              disabled
-            >
-              Out of Stock
-            </button>
+          {hasDiscount && !outOfStock && (
+            <div className="absolute left-1.5 top-1.5 rounded-md bg-brand-500 px-1.5 py-0.5 text-2xs font-extrabold text-surface-base shadow-e1">
+              {product.discount}% OFF
+            </div>
+          )}
+
+          {outOfStock && (
+            <div className="absolute inset-0 flex items-center justify-center bg-surface-base/60 backdrop-blur-[1px]">
+              <span className="rounded-md bg-surface-overlay px-2 py-1 text-2xs font-bold uppercase tracking-wide text-ink-secondary">
+                Out of stock
+              </span>
+            </div>
           )}
         </div>
-      </div>
-    </Link>
+
+        {/* Delivery ETA */}
+        <div className="flex w-fit items-center gap-1 rounded-md bg-mint-600/10 px-1.5 py-0.5 text-2xs font-semibold text-mint-400">
+          <MdOutlineTimer size={11} />
+          10 MINS
+        </div>
+
+        {/* Name + unit */}
+        <h3 className="line-clamp-2 text-xs font-semibold leading-snug text-ink-primary lg:text-sm">
+          {product?.name}
+        </h3>
+        <p className="text-2xs text-ink-muted lg:text-xs">{product?.unit}</p>
+
+        {/* Price + action */}
+        <div className="mt-auto flex items-end justify-between gap-2 pt-1">
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-ink-primary lg:text-base">
+              {getINRString(effectivePrice)}
+            </p>
+            {hasDiscount && (
+              <p className="text-2xs text-ink-faint line-through lg:text-xs">
+                {getINRString(product.price)}
+              </p>
+            )}
+          </div>
+
+          <div className="shrink-0">
+            {outOfStock ? (
+              <button
+                disabled
+                className="h-8 w-[86px] cursor-not-allowed rounded-lg border border-surface-border bg-surface-hover text-2xs font-semibold text-ink-faint lg:h-9 lg:w-24 lg:text-xs"
+              >
+                Sold out
+              </button>
+            ) : (
+              <AddToCartButton product={product} cartItem={cartItem} />
+            )}
+          </div>
+        </div>
+      </Link>
+    </motion.div>
   );
 };
 

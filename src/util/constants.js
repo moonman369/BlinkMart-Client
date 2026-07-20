@@ -19,6 +19,8 @@ export const COOKIE_CLEAR_SETTINGS = {
   domain: import.meta.env.COOKIE_DOMAIN ?? ".*",
 };
 
+export const DELIVERY_FEE = 40;
+
 export const paymentMethodsToRzpMap = {
   UPI: "upi",
   Card: "card",

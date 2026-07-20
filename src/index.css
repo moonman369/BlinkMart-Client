@@ -1,68 +1,85 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"); */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-html {
-  scroll-behavior: smooth;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
+  body {
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+      "Segoe UI", sans-serif;
+    @apply bg-surface-base text-ink-secondary;
+    /* Prevent iOS rubber-band revealing a light background behind the app */
+    overscroll-behavior-y: none;
+  }
 
-html::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
-}
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-ink-primary font-semibold tracking-tightest;
+  }
 
-/* Apply to all elements with overflow */
-* {
-  scrollbar-width: none; /* Firefox */
-}
+  /* Visible, on-brand focus ring for keyboard users only */
+  :focus-visible {
+    @apply outline-none ring-2 ring-mint-400/70 ring-offset-2 ring-offset-surface-base;
+  }
 
-*::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
-}
-
-body {
-  /* font-family: "Poppins", serif;
-  font-weight: 100;
-  font-style: normal; */
-  @apply bg-gray-800;
-  @apply text-gray-300 scroll-smooth;
-  @layer utilities {
-    .scrollbar-hide {
-      -ms-overflow-style: none; /* IE and Edge */
-      scrollbar-width: none; /* Firefox */
-    }
-
-    .scrollbar-hide::-webkit-scrollbar {
-      display: none; /* Chrome, Safari and Opera */
-    }
+  /* Slim, themed scrollbar instead of hiding it entirely */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full border-2 border-solid border-transparent bg-surface-border bg-clip-content;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-faint bg-clip-content;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme("colors.surface.border") transparent;
   }
 }
 
-/* Toast swipe animations */
-.swipe-to-dismiss {
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.swipe-to-dismiss:hover {
-  transform: scale(0.98);
-}
-
-/* Swipe animation for toast */
-@keyframes swipe-out {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
+@layer components {
+  /* Skeleton shimmer — used by <Skeleton /> */
+  .skeleton {
+    @apply relative overflow-hidden bg-surface-hover;
   }
-  100% {
-    transform: translateX(calc(100% + 50px));
-    opacity: 0;
+  .skeleton::after {
+    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/[0.06] to-transparent;
+    content: "";
+  }
+
+  /* Frosted panel used for sticky bars and overlays */
+  .glass {
+    @apply border border-surface-border/80 bg-surface-overlay/80 backdrop-blur-xl;
+  }
+
+  /* Press feedback for any tappable element */
+  .pressable {
+    @apply transition-transform duration-fast ease-spring active:scale-[0.97];
   }
 }
 
-.go-away {
-  animation: swipe-out 0.5s cubic-bezier(0.55, 0, 0.1, 1) forwards;
+/* Respect the OS "reduce motion" setting: strip animation, keep state changes */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

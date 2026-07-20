@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import Skeleton from "../components/ui/Skeleton";
 import banner from "../assets/banner_cropped.JPG";
 import bannerMobile from "../assets/banner-mobile_cropped.JPG";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCategories } from "../util/fetchAllCategories";
 import { fetchAllSubcategories } from "../util/fetchAllSubcategories";
 import { Link, useNavigate } from "react-router-dom";
 import { apiSummary } from "../config/api/apiSummary";
 import DisplayProductsByCategory from "../components/DisplayProductsByCategory";
 import { axiosToastError } from "../util/axiosToastError.js";
-import { convertToUrlString } from "../util/convertToUrlString.js";
-import LoadingSpinner from "../components/LoadingSpinner";
+import { buildProductCategorizedUrl } from "../util/buildProductCategorizedUrl.js";
+import { setLoadingCategory } from "../store/productSlice.js";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -18,6 +20,7 @@ const Home = () => {
   const categories = useSelector((state) => state.product.allCategories);
   const subcategories = useSelector((state) => state.product.allSubcategories);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleRedirectProductCategorizedPage = (category) => {
     const categoryId = category?._id;
@@ -36,12 +39,7 @@ const Home = () => {
       return;
     }
 
-    const url = `/product-categorized/${convertToUrlString(
-      categoryName
-    )}-${categoryId}/${convertToUrlString(subcategory?.name)}-${
-      subcategory?._id
-    }`;
-    console.log(url);
+    const url = buildProductCategorizedUrl(category, subcategory);
     navigate(url, {
       state: {
         category: category,
@@ -72,66 +70,86 @@ const Home = () => {
     fetchData();
   }, []);
 
+  // Skeletons mirroring the real layout keep the page from collapsing to a
+  // spinner and back, which is the main source of perceived jank on load.
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
+      <section className="pb-4">
+        <div className="container mx-auto px-3 pt-3">
+          <Skeleton className="h-40 w-full lg:h-64" rounded="rounded-sheet" />
+        </div>
+        <div className="container mx-auto grid grid-cols-3 gap-3 px-3 py-6 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+          {new Array(8).fill(null).map((_, i) => (
+            <div
+              key={i}
+              className="flex flex-col items-center gap-2 rounded-card border border-surface-border bg-surface-raised p-3"
+            >
+              <Skeleton className="aspect-square w-full" rounded="rounded-xl" />
+              <Skeleton className="h-3 w-3/4" />
+            </div>
+          ))}
+        </div>
+      </section>
     );
   }
 
   return (
-    <section>
-      <div className="container mx-auto">
-        <div
-          className={`w-full h-full min-h-48 bg-blue-100 rounded ${
-            !banner && "animate-pulse my-2"
-          } `}
-        >
+    <section className="pb-4">
+      {/* Banner */}
+      <div className="container mx-auto px-3 pt-3">
+        <div className="w-full overflow-hidden rounded-sheet border border-surface-border bg-surface-raised shadow-e2">
           <img
             src={banner}
-            className="w-full h-full hidden lg:block"
-            alt="banner"
+            className="hidden h-full w-full object-cover lg:block"
+            alt="Seasonal offers"
           />
           <img
             src={bannerMobile}
-            className="w-full h-full lg:hidden"
-            alt="banner"
+            className="h-full w-full object-cover lg:hidden"
+            alt="Seasonal offers"
           />
         </div>
       </div>
 
-      <div className="container mx-auto p-4 my-2 grid grid-cols-4 md:grid-cols-8 lg:grid-cols-10 gap-4">
+      {/* Category rail */}
+      <div className="container mx-auto grid grid-cols-3 gap-3 px-3 py-6 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
         {loadingCategory
-          ? new Array(12).fill(null).map((_, index) => {
-              return (
-                <div
-                  key={index + "loadingcategory"}
-                  className=" rounded p-4 min-h-36 grid gap-2 shadow animate-pulse"
-                >
-                  <div className="bg-gray-700 min-h-24 rounded"></div>
-                  <div className="bg-gray-700 h-8 rounded"></div>
+          ? new Array(12).fill(null).map((_, index) => (
+              <div
+                key={index + "loadingcategory"}
+                className="flex flex-col items-center gap-2 rounded-card border border-surface-border bg-surface-raised p-3"
+              >
+                <Skeleton className="aspect-square w-full" rounded="rounded-xl" />
+                <Skeleton className="h-3 w-3/4" />
+              </div>
+            ))
+          : categories.map((category, index) => (
+              <motion.button
+                key={category._id + "displayCategory"}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.3,
+                  ease: [0.16, 1, 0.3, 1],
+                  delay: Math.min(index * 0.03, 0.3),
+                }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleRedirectProductCategorizedPage(category)}
+                className="group flex flex-col items-center gap-2 rounded-card border border-surface-border bg-surface-raised p-3 transition-all duration-base ease-out hover:-translate-y-1 hover:border-brand-500/50 hover:shadow-e2"
+              >
+                <div className="aspect-square w-full overflow-hidden rounded-xl">
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    loading="lazy"
+                    className="h-full w-full object-contain transition-transform duration-slow ease-out group-hover:scale-110"
+                  />
                 </div>
-              );
-            })
-          : categories.map((category, index) => {
-              return (
-                <div
-                  key={category._id + "displayCategory"}
-                  className="w-full h-full object-scale-down rounded cursor-pointer mx-4"
-                  onClick={() => {
-                    handleRedirectProductCategorizedPage(category);
-                  }}
-                >
-                  <div>
-                    <img
-                      src={category.image}
-                      className="w-full object-scale-down rounded"
-                    />
-                  </div>
-                </div>
-              );
-            })}
+                <p className="line-clamp-1 text-center text-2xs font-semibold text-ink-secondary transition-colors group-hover:text-ink-primary lg:text-xs">
+                  {category.name}
+                </p>
+              </motion.button>
+            ))}
       </div>
 
       {categories.map((category, index) => {

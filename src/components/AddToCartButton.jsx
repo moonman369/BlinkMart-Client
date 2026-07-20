@@ -1,137 +1,157 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
+import { FaMinus, FaPlus } from "react-icons/fa6";
+import { FiShoppingBag } from "react-icons/fi";
 import { apiSummary } from "../config/api/apiSummary";
-import toast from "react-hot-toast";
 import { axiosToastError } from "../util/axiosToastError";
 import customAxios from "../util/customAxios";
-import { useDispatch } from "react-redux";
-import { addToCart } from "../store/cartSlice";
-import { FaMinus, FaPlus } from "react-icons/fa6";
-import { FaShoppingCart } from "react-icons/fa";
-import LoadingSpinner2 from "./LoadingSpinner2";
+import { addToCart, optimisticAdjustQty, revertCart } from "../store/cartSlice";
 import { showToast } from "../config/toastConfig";
+import { cn } from "../util/cn";
 
+/**
+ * Cart stepper.
+ *
+ * Quantity changes are applied to the store immediately and reconciled with the
+ * server afterwards, so taps register instantly instead of waiting on a
+ * round-trip. If a request fails the pre-change snapshot is restored.
+ */
 const AddToCartButton = ({ product, cartItem, productDisplayPage }) => {
-  const [loading, setLoading] = useState(false);
-
+  const [pending, setPending] = useState(false);
   const dispatch = useDispatch();
+  const items = useSelector((state) => state.cart?.items);
 
-  const handleAddToCart = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  // Rapid taps fire overlapping requests; only the newest response may write
+  // to the store, otherwise a stale one can clobber a newer quantity.
+  const requestSeq = useRef(0);
 
+  const quantity = cartItem?.quantity || 0;
+
+  const adjust = async (delta, e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+
+    const snapshot = items;
+    const seq = ++requestSeq.current;
+
+    // 1. Optimistic: update the UI now.
+    dispatch(optimisticAdjustQty({ product, delta }));
+
+    if (delta > 0) {
+      showToast.cart(product, { quantity: quantity + delta });
+    }
+
+    // 2. Reconcile with the server.
     try {
-      setLoading(true);
-      const response = await customAxios.post(
-        apiSummary.endpoints.cart.addToCart.path,
-        {
-          productId: product._id,
-          quantity: 1,
+      setPending(true);
+
+      const isAdd = delta > 0;
+      const endpoint = isAdd
+        ? apiSummary.endpoints.cart.addToCart
+        : apiSummary.endpoints.cart.removeFromCart;
+
+      const payload = isAdd
+        ? { productId: product._id, quantity: 1 }
+        : { cartProductId: cartItem?._id, quantity: 1 };
+
+      const response = await customAxios.post(endpoint.path, payload);
+
+      if (response.status === endpoint.successStatus) {
+        if (seq === requestSeq.current) {
+          dispatch(addToCart(response?.data?.data));
         }
-      );
-      if (
-        response.status === apiSummary.endpoints.cart.addToCart.successStatus
-      ) {
-        dispatch(addToCart(response?.data?.data));
-        showToast.success("Product added to cart successfully!");
+      } else if (seq === requestSeq.current) {
+        dispatch(revertCart(snapshot));
       }
     } catch (error) {
-      console.error("Error adding product to cart:", error);
+      if (seq === requestSeq.current) {
+        dispatch(revertCart(snapshot));
+      }
       axiosToastError(error);
-      showToast.error("Failed to add product to cart");
     } finally {
-      setLoading(false);
+      if (seq === requestSeq.current) setPending(false);
     }
   };
 
-  const increaseQty = async (e) => {
-    await handleAddToCart(e);
-  };
+  // ---- Stepper (item already in cart) ----
+  if (quantity > 0) {
+    return (
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        onClick={(e) => e.preventDefault()}
+        className={cn(
+          "flex items-center justify-between overflow-hidden rounded-lg bg-mint-600 shadow-e1",
+          productDisplayPage ? "h-12 w-full" : "h-8 w-[86px] lg:h-9 lg:w-24"
+        )}
+      >
+        <button
+          onClick={(e) => adjust(-1, e)}
+          aria-label={`Remove one ${product?.name || "item"}`}
+          className="flex h-full flex-1 items-center justify-center text-white transition-colors duration-fast active:bg-mint-700"
+        >
+          <FaMinus size={productDisplayPage ? 14 : 10} />
+        </button>
 
-  const decreaseQty = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    try {
-      setLoading(true);
-      const response = await customAxios.post(
-        apiSummary.endpoints.cart.removeFromCart.path,
-        {
-          cartProductId: cartItem._id,
-          quantity: 1,
-        }
-      );
-      if (
-        response.status ===
-        apiSummary.endpoints.cart.removeFromCart.successStatus
-      ) {
-        dispatch(addToCart(response?.data?.data));
-        showToast.success("Product removed from cart successfully!");
-      }
-    } catch (error) {
-      console.error("Error removing product from cart:", error);
-      axiosToastError(error);
-      showToast.error("Failed to remove product from cart");
-    } finally {
-      setLoading(false);
-    }
-  };
-  return (
-    <div>
-      {cartItem?.quantity > 0 ? (
-        <div className="flex w-full h-full">
-          <button
-            onClick={decreaseQty}
-            className={`bg-green-600 hover:bg-green-700 text-white flex-1 w-full ${
-              productDisplayPage ? "p-3" : "p-1"
-            } rounded flex items-center justify-center`}
-          >
-            <FaMinus />
-          </button>
-
-          <div>
-            {loading ? (
-              <LoadingSpinner2 size={"5"} />
-            ) : (
-              <p
-                className={`flex-1 w-full ${
-                  productDisplayPage ? "px-2 py-3" : "px-1"
-                } flex items-center justify-center ${
-                  productDisplayPage ? "font-bold" : "font-semibold"
-                }`}
-              >
-                {cartItem?.quantity}
-              </p>
-            )}
-          </div>
-
-          <button
-            onClick={increaseQty}
-            className={`bg-green-600 hover:bg-green-700 text-white flex-1 w-full ${
-              productDisplayPage ? "p-3" : "p-1"
-            } rounded flex items-center justify-center`}
-          >
-            <FaPlus />
-          </button>
+        <div className="relative flex min-w-[26px] items-center justify-center overflow-hidden">
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.span
+              key={quantity}
+              initial={{ y: 14, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -14, opacity: 0 }}
+              transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+              className={cn(
+                "block font-bold tabular-nums text-white",
+                productDisplayPage ? "text-base" : "text-xs lg:text-sm"
+              )}
+            >
+              {quantity}
+            </motion.span>
+          </AnimatePresence>
         </div>
-      ) : productDisplayPage ? (
+
         <button
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
-          onClick={handleAddToCart}
-          disabled={loading}
+          onClick={(e) => adjust(1, e)}
+          disabled={product?.stock != null && quantity >= product.stock}
+          aria-label={`Add one ${product?.name || "item"}`}
+          className="flex h-full flex-1 items-center justify-center text-white transition-colors duration-fast active:bg-mint-700 disabled:opacity-40"
         >
-          <FaShoppingCart />
-          Add to Cart
+          <FaPlus size={productDisplayPage ? 14 : 10} />
         </button>
-      ) : (
-        <button
-          className="bg-green-600 px-2 py-1 lg:px-4 lg:py-1 text-white rounded hover:bg-green-700 text-sm"
-          onClick={handleAddToCart}
-          disabled={loading}
-        >
-          {loading ? <LoadingSpinner2 size={"5"} /> : "Add"}
-        </button>
-      )}
-    </div>
+      </motion.div>
+    );
+  }
+
+  // ---- Full-width CTA on the product page ----
+  if (productDisplayPage) {
+    return (
+      <motion.button
+        whileTap={{ scale: 0.97 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        onClick={(e) => adjust(1, e)}
+        disabled={pending}
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-mint-600 text-sm font-bold text-white shadow-e1 transition-colors duration-base hover:bg-mint-500 hover:shadow-glow-mint disabled:opacity-60"
+      >
+        <FiShoppingBag size={18} />
+        Add to Cart
+      </motion.button>
+    );
+  }
+
+  // ---- Compact "Add" on cards ----
+  return (
+    <motion.button
+      whileTap={{ scale: 0.94 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      onClick={(e) => adjust(1, e)}
+      disabled={pending}
+      className="h-8 w-[86px] rounded-lg border border-mint-600/40 bg-mint-600/10 text-xs font-bold uppercase tracking-wide text-mint-400 transition-colors duration-base hover:bg-mint-600 hover:text-white lg:h-9 lg:w-24 lg:text-sm"
+    >
+      Add
+    </motion.button>
   );
 };
 

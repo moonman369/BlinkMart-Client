@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import { fetchSubcategoriesByCategory } from "../util/fetchAllSubcategories";
 import { IoMenu } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
-import { convertToUrlString } from "../util/convertToUrlString";
+import { buildProductCategorizedUrl } from "../util/buildProductCategorizedUrl";
 import { FaBoxOpen } from "react-icons/fa";
 import NoData from "../components/NoData";
 
@@ -116,11 +116,7 @@ const ProductCategorized = () => {
     setProducts([]);
     setCurrentPage(1);
 
-    const url = `/${convertToUrlString(category.name)}-${
-      category._id
-    }/${convertToUrlString(selectedSubcategory.name)}-${
-      selectedSubcategory._id
-    }`;
+    const url = buildProductCategorizedUrl(category, selectedSubcategory);
     navigate(url, {
       state: {
         category: category,
